@@ -1,0 +1,17 @@
+@import "tailwindcss";
+
+/* Fuente personalizada */
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap");
+
+:root {
+  --primary: #9fb36d;   /* Verde brillante */
+  --secondary: #085123; /* Verde oscuro */
+  --background: #fefce8; /* Fondo claro */
+  --text: #1e293b;      /* Texto gris oscuro */
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+  background-color: var(--background);
+  color: var(--text);
+}
