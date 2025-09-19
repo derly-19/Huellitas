@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom"; // ✅ Para Vite/React
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Home, HeartHandshake, Dog, Cat } from "lucide-react";
@@ -6,15 +7,16 @@ import { Menu, X, Home, HeartHandshake, Dog, Cat } from "lucide-react";
 export default function Navbar() {
   const [open, setOpen] = useState(false);
 
+  // ✅ Links principales
   const links = [
-    { name: "Inicio", icon: <Home size={18} /> },
-    { name: "Fundaciones", icon: <HeartHandshake size={18} /> },
-    { name: "Perritos", icon: <Dog size={18} /> },
-    { name: "Gaticos", icon: <Cat size={18} /> },
+    { name: "Inicio", path: "/", icon: <Home size={18} /> },
+    { name: "Perritos", path: "/Dogs", icon: <Dog size={18} /> },
+    { name: "Gatitos", path: "/cats", icon: <Cat size={18} /> },
+    { name: "Fundaciones", path: "/fundaciones", icon: <HeartHandshake size={18} /> },
   ];
 
   return (
-    <nav className="flex justify-between items-center px-6 py-4 bg-[var(--primary)] text-[var(--secondary)] relative">
+    <nav className="flex justify-between items-center px-6 py-4 bg-[var(--primary)] text-[var(--secondary)] relative shadow">
       {/* Logo */}
       <motion.div
         className="flex items-center gap-2"
@@ -36,7 +38,7 @@ export default function Navbar() {
             className="flex items-center gap-2"
           >
             {link.icon}
-            <a href="#">{link.name}</a>
+            <Link to={link.path}>{link.name}</Link>
           </motion.li>
         ))}
       </ul>
@@ -47,13 +49,13 @@ export default function Navbar() {
           whileHover={{ scale: 1.05 }}
           className="bg-white text-[var(--secondary)] px-4 py-1 rounded hover:bg-gray-100"
         >
-          Sign in
+          <Link to="/login">Sign in</Link>
         </motion.button>
         <motion.button
           whileHover={{ scale: 1.05 }}
           className="bg-[var(--secondary)] text-white px-4 py-1 rounded hover:bg-opacity-90"
         >
-          Register
+          <Link to="/register">Register</Link>
         </motion.button>
       </div>
 
@@ -76,25 +78,34 @@ export default function Navbar() {
             transition={{ duration: 0.3 }}
           >
             {links.map((link, i) => (
-              <motion.a
+              <motion.div
                 key={i}
-                href="#"
                 whileHover={{ scale: 1.1, color: "#fff" }}
                 whileTap={{ scale: 0.95 }}
                 className="flex items-center gap-2 text-lg font-medium"
               >
                 {link.icon}
-                {link.name}
-              </motion.a>
+                <Link to={link.path} onClick={() => setOpen(false)}>
+                  {link.name}
+                </Link>
+              </motion.div>
             ))}
 
             <div className="flex flex-col gap-3 mt-4">
-              <button className="bg-white text-[var(--secondary)] px-4 py-1 rounded hover:bg-gray-100">
+              <Link
+                to="/login"
+                className="bg-white text-[var(--secondary)] px-4 py-1 rounded hover:bg-gray-100 text-center"
+                onClick={() => setOpen(false)}
+              >
                 Sign in
-              </button>
-              <button className="bg-[var(--secondary)] text-white px-4 py-1 rounded hover:bg-opacity-90">
+              </Link>
+              <Link
+                to="/register"
+                className="bg-[var(--secondary)] text-white px-4 py-1 rounded hover:bg-opacity-90 text-center"
+                onClick={() => setOpen(false)}
+              >
                 Register
-              </button>
+              </Link>
             </div>
           </motion.div>
         )}
