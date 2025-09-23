@@ -4,25 +4,25 @@ import Card from "./Card";
 
 export default function AdoptionSection({ title, pets }) {
   return (
-    <section className="my-12 text-center">
+    <section className="my-12 px-4 md:px-8 lg:px-16">
       {/* Título animado */}
       <motion.h2
-        className="text-2xl font-bold mb-6"
+        className="text-2xl md:text-3xl font-bold mb-8 text-center"
         initial={{ opacity: 0, y: -30 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        viewport={{ once: false }} // 👈 se repite cada vez que pasa
+        viewport={{ once: false }}
       >
         {title}
       </motion.h2>
 
-      {/* Contenedor de cards */}
+      {/* Grid responsive */}
       <motion.div
-        className="flex flex-wrap justify-center gap-6"
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto"
         initial="hidden"
         whileInView="visible"
         transition={{ staggerChildren: 0.2 }}
-        viewport={{ once: false }} // 👈 también aquí
+        viewport={{ once: false }}
       >
         {pets.map((pet, i) => (
           <motion.div

@@ -24,7 +24,6 @@ export default function Home() {
       <AdoptionSection title="Perros en adopción" pets={dogs} />
       <InfoSection />
       <CallToAction />
-      <Footer />
     </>
   );
 }

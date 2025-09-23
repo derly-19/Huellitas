@@ -4,17 +4,17 @@ import { motion } from "framer-motion";
 export default function InfoSection() {
   return (
     <motion.section
-      className="bg-[#FDF8E7] rounded-lg shadow-md mx-6 my-10 p-8 flex flex-col md:flex-row items-center gap-8"
+      className="w-full bg-[#FDF8E7] py-10 sm:py-14 px-4 sm:px-8 flex flex-col md:flex-row items-center md:items-start justify-center gap-8 md:gap-12"
       initial={{ opacity: 0, y: 50 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, ease: "easeOut" }}
-      viewport={{ once: false, amount: 0.3 }} // Se repite cada vez que entra en vista
+      viewport={{ once: false, amount: 0.3 }}
     >
       {/* Imagen ilustrativa */}
       <motion.img
         src="https://cdn-icons-png.flaticon.com/512/616/616408.png"
         alt="Adopción"
-        className="w-40 md:w-60"
+        className="w-28 sm:w-40 md:w-56 lg:w-64 flex-shrink-0"
         initial={{ opacity: 0, scale: 0.9 }}
         whileInView={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.8 }}
@@ -24,15 +24,16 @@ export default function InfoSection() {
 
       {/* Texto */}
       <motion.div
+        className="text-center md:text-left max-w-2xl"
         initial={{ opacity: 0, x: 40 }}
         whileInView={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.9, delay: 0.2 }}
         viewport={{ once: false }}
       >
-        <h2 className="text-2xl font-bold mb-3 text-[var(--secondary)]">
-          Adoptar cambia su vida... <br /> y también la tuya
+        <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-4 text-[var(--secondary)] leading-snug">
+          Adoptar cambia su vida... <br className="hidden sm:block" /> y también la tuya
         </h2>
-        <p className="text-[var(--text)] leading-relaxed">
+        <p className="text-sm sm:text-base md:text-lg text-[var(--text)] leading-relaxed">
           Un peludito adoptado no solo encuentra un hogar, también te regala
           alegría, compañía y un amor sin condiciones.  
           Es la oportunidad perfecta de crecer juntos y crear momentos inolvidables.
@@ -41,4 +42,3 @@ export default function InfoSection() {
     </motion.section>
   );
 }
-

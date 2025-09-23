@@ -4,11 +4,12 @@ import { motion } from "framer-motion";
 export default function CallToAction() {
   return (
     <motion.section
-      className="bg-white border rounded-lg mx-6 my-10 p-10 text-center shadow"
+      className="max-w-5xl mx-auto bg-gradient-to-r from-[#fff3e6] via-[#fffaf5] to-white 
+      border rounded-xl my-10 p-6 sm:p-10 lg:p-16 text-center shadow-xl"
       initial={{ opacity: 0, y: 50 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, ease: "easeOut" }}
-      viewport={{ once: false }} // 👈 se repite cada vez que entra en pantalla
+      viewport={{ once: false }}
     >
       <motion.div
         className="flex flex-col items-center"
@@ -17,7 +18,7 @@ export default function CallToAction() {
         transition={{ staggerChildren: 0.2 }}
         viewport={{ once: false }}
       >
-        {/* Emoji 🐾 con rebote */}
+        {/* Emoji 🐾 */}
         <motion.span
           className="text-4xl"
           variants={{
@@ -31,7 +32,7 @@ export default function CallToAction() {
 
         {/* Título */}
         <motion.h2
-          className="text-2xl font-bold mt-2 mb-4 text-[var(--secondary)]"
+          className="text-2xl md:text-3xl font-bold mt-2 mb-4 text-[var(--secondary)]"
           variants={{
             hidden: { opacity: 0, y: -30 },
             visible: { opacity: 1, y: 0 },
@@ -43,7 +44,7 @@ export default function CallToAction() {
 
         {/* Texto */}
         <motion.p
-          className="max-w-2xl mx-auto text-[var(--text)] mb-6"
+          className="max-w-2xl mx-auto text-[var(--text)] mb-6 text-sm sm:text-base"
           variants={{
             hidden: { opacity: 0 },
             visible: { opacity: 1 },
@@ -55,9 +56,9 @@ export default function CallToAction() {
           para que nunca olvides su cuidado.
         </motion.p>
 
-        {/* Botón con animación */}
+        {/* Botón */}
         <motion.button
-          className="bg-[var(--primary)] text-white px-6 py-2 rounded hover:bg-[var(--secondary)]"
+          className="bg-[var(--primary)] text-white px-6 py-2 rounded-lg hover:bg-[var(--secondary)] transition"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >

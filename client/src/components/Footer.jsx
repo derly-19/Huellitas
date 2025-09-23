@@ -39,24 +39,22 @@ export default function Footer() {
       </div>
 
       {/* Contenido */}
-      <div className="relative z-10 max-w-5xl mx-auto text-center px-4">
+      <div className="relative z-10 max-w-6xl mx-auto text-center px-4 sm:px-6 lg:px-8">
         {/* Marca */}
         <motion.p
-          className="font-bold text-lg text-[var(--secondary)] mb-3"
+          className="font-bold text-xl sm:text-2xl text-[var(--secondary)] mb-4"
           initial={{ opacity: 0, scale: 0.8 }}
           whileInView={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6 }}
-          viewport={{ once: false }}
         >
           Huellitas 🐾
         </motion.p>
 
         {/* Redes sociales */}
         <motion.div
-          className="flex justify-center gap-6 text-2xl text-[var(--secondary)]/80 mb-4"
+          className="flex justify-center gap-5 sm:gap-8 text-xl sm:text-2xl text-[var(--secondary)]/80 mb-6 flex-wrap"
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: false }}
           transition={{ staggerChildren: 0.2 }}
         >
           {[
@@ -83,11 +81,10 @@ export default function Footer() {
 
         {/* Botón */}
         <motion.button
-          className="bg-[var(--secondary)] text-white px-5 py-2 rounded-lg shadow hover:bg-opacity-90 transition"
+          className="bg-[var(--secondary)] text-white px-6 py-2 sm:px-8 sm:py-3 rounded-lg shadow hover:bg-opacity-90 transition text-sm sm:text-base"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.3 }}
-          viewport={{ once: false }}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
@@ -96,11 +93,10 @@ export default function Footer() {
 
         {/* Créditos */}
         <motion.p
-          className="mt-4 text-xs text-[var(--secondary)]/60"
+          className="mt-6 text-xs sm:text-sm text-[var(--secondary)]/60"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.5 }}
-          viewport={{ once: false }}
         >
           © {new Date().getFullYear()} Huellitas
         </motion.p>

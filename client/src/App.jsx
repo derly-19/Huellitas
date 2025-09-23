@@ -12,6 +12,7 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/Dogs" element={<Perritos />} />
       </Routes>
+      <Footer />
     </>
   );
 }
