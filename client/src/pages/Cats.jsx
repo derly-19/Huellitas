@@ -114,7 +114,7 @@ export default function Gatitos() {
 
       {/* Modal */}
       {selectedCat && (
-        <div className="fixed inset-0  flex items-center justify-center z-50">
+        <div className="fixed inset-0 backdrop-blur-sm bg-black/20 flex items-center justify-center z-50">
           <div className="bg-[#FDF8E7] rounded-lg shadow-lg w-11/12 md:w-2/3 lg:w-1/2 p-6 relative">
             {/* Cerrar */}
             <button
