@@ -4,8 +4,9 @@ import Home from "./pages/Home";
 import Perritos from "./pages/Dogs"; 
 import Footer from "./components/Footer";
 import HeroCats from "./pages/Cats";
-import Login from "./pages/Login"; // tu página de login
-import Register from "./pages/Register"; // tu página de registro (archivo `Registro.jsx`)
+import Login from "./pages/Login";
+import Register from "./pages/Register"; 
+import Fundaciones from "./pages/Fundaciones";
 
 export default function App() {
   const location = useLocation();
@@ -24,7 +25,8 @@ export default function App() {
         <Route path="/Dogs" element={<Perritos />} />
         <Route path="/Cats" element={<HeroCats />} />
         <Route path="/login" element={<Login />} />
-         <Route path="/Register" element={<Register />} />
+        <Route path="/Register" element={<Register />} />
+        <Route path="/Fundaciones" element={<Fundaciones />} />
       </Routes>
       {!hideLayout && <Footer />}
     </>
