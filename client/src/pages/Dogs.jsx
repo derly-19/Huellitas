@@ -1,16 +1,57 @@
 // src/pages/dogs.jsx
+import { useState } from "react";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
 
 export default function Perritos() {
+  const [selectedDog, setSelectedDog] = useState(null);
+
   const dogs = [
-    { name: "Bella", img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSnNTDiPRdfGMebY_P_6IPEyW2264DmSupI6Q&s" },
-    { name: "Rocky", img: "https://preview.redd.it/as6631550tj61.jpg?auto=webp&s=9f8b41d109ff5bed814b3422efd1f5872a5b63d3" },
-    { name: "Nina", img: "https://i.pinimg.com/1200x/5d/a7/42/5da7428cf51bb650635a0cb309c2366d.jpg" },
-    { name: "Max", img: "https://i.pinimg.com/736x/39/de/b5/39deb59ff143470cd25f296b9639f7e4.jpg" },
-    { name: "Toby", img: "https://e7.pngegg.com/pngimages/582/702/png-clipart-grumpy-cat-meme-humour-mouse-cat-animals-cat-like-mammal-thumbnail.png" },
+    {
+      name: "Bella",
+      img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSnNTDiPRdfGMebY_P_6IPEyW2264DmSupI6Q&s",
+      desc: "Bella es una perrita tranquila, le encanta jugar y busca un hogar lleno de cariño.",
+      edad: "Cachorra",
+      tamaño: "Pequeña",
+      sexo: "Hembra",
+      fundacion: "Huellitas de Amor",
+    },
+    {
+      name: "Rocky",
+      img: "https://preview.redd.it/as6631550tj61.jpg?auto=webp&s=9f8b41d109ff5bed814b3422efd1f5872a5b63d3",
+      desc: "Rocky es un perro lleno de energía, ideal para familias activas.",
+      edad: "Adulto",
+      tamaño: "Grande",
+      sexo: "Macho",
+      fundacion: "Corazón Canino",
+    },
+    {
+      name: "Nina",
+      img: "https://i.pinimg.com/1200x/5d/a7/42/5da7428cf51bb650635a0cb309c2366d.jpg",
+      desc: "Nina es amorosa y muy sociable, perfecta para cualquier familia.",
+      edad: "Joven",
+      tamaño: "Mediana",
+      sexo: "Hembra",
+      fundacion: "Refugio Esperanza",
+    },
+    {
+      name: "Max",
+      img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRtDRxxrx0d1FjEyrwHtQrQ9Aincg2w4UM01Q&s",
+      desc: "Max es juguetón y muy noble, siempre está listo para recibir cariño.",
+      edad: "Cachorro",
+      tamaño: "Grande",
+      sexo: "Macho",
+      fundacion: "Amigos de 4 Patas",
+    },
+    {
+      name: "Toby",
+      img: "https://los40.com/resizer/v2/CGYG52C77NNURMA2LZLO63FGLE.jpg?auth=88dbd0108b3751ae693cfc9bec1a5773f78cfb024931d017817c370b49c738f0&quality=70&width=1200&height=900&smart=true",
+      desc: "Toby es tranquilo, le gusta descansar y disfrutar de la compañía.",
+      edad: "Adulto",
+      tamaño: "Mediano",
+      sexo: "Macho",
+      fundacion: "Patitas Felices",
+    },
   ];
 
   return (
@@ -48,7 +89,8 @@ export default function Perritos() {
         {dogs.map((dog, i) => (
           <motion.div
             key={i}
-            className="bg-[#EDE4D6] rounded-lg shadow-md overflow-hidden hover:shadow-xl transition"
+            onClick={() => setSelectedDog(dog)}
+            className="bg-[#EDE4D6] rounded-lg shadow-md overflow-hidden hover:shadow-xl transition cursor-pointer"
             whileHover={{ scale: 1.05 }}
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -64,12 +106,53 @@ export default function Perritos() {
                 <span className="font-semibold"> Juguetón</span>
               </p>
               <p className="text-sm text-gray-500 mt-2">
-                Este perrito espera un hogar lleno de amor ❤️
+                {dog.desc.substring(0, 50)}...
               </p>
             </div>
           </motion.div>
         ))}
       </section>
+
+      {/* Modal */}
+      {selectedDog && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-[#FDF8E7] rounded-lg shadow-lg w-11/12 md:w-2/3 lg:w-1/2 p-6 relative">
+            {/* Cerrar */}
+            <button
+              onClick={() => setSelectedDog(null)}
+              className="absolute top-3 right-3 text-xl font-bold text-gray-700 hover:text-black"
+            >
+              ✖
+            </button>
+
+            <h2 className="text-2xl font-bold mb-4 text-center">{selectedDog.name}</h2>
+
+            <div className="flex flex-col md:flex-row gap-6 items-center">
+              <img
+                src={selectedDog.img}
+                alt={selectedDog.name}
+                className="w-48 h-40 object-cover rounded-lg"
+              />
+              <p className="text-gray-700">{selectedDog.desc}</p>
+            </div>
+
+            {/* Info */}
+            <div className="grid grid-cols-2 gap-4 mt-6 text-sm">
+              <span><strong>Edad:</strong> {selectedDog.edad}</span>
+              <span><strong>Tamaño:</strong> {selectedDog.tamaño}</span>
+              <span><strong>Sexo:</strong> {selectedDog.sexo}</span>
+              <span><strong>Fundación:</strong> {selectedDog.fundacion}</span>
+            </div>
+
+            {/* Botón adoptar */}
+            <div className="text-center mt-6">
+              <button className="bg-green-600 text-white px-6 py-2 rounded-lg shadow hover:bg-green-700 transition">
+                🐾 Adoptar a {selectedDog.name}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Paginación */}
       <div className="flex justify-center items-center gap-2 my-10">
@@ -85,6 +168,7 @@ export default function Perritos() {
         ))}
       </div>
 
+      
     </>
   );
 }
