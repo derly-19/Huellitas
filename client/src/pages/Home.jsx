@@ -25,7 +25,7 @@ export default function Home() {
 
       {/* Banner antes de gatos con animación */}
       <motion.div
-        className="w-full my-8"
+        className="w-full mt-16 mb-28"
         initial={{ opacity: 0, y: 40 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
@@ -34,14 +34,25 @@ export default function Home() {
         <motion.img
           src={Imagen1}
           alt="Encuentra a tu compañero ideal"
-          className="w-full h-50 md:h-100 object-contain"
+          className="w-full h-64 md:h-96 object-cover"
         />
       </motion.div>
 
-      <AdoptionSection title="Gatos en adopción" pets={cats} />
-      <AdoptionSection title="Perros en adopción" pets={dogs} />
-      <InfoSection />
-      <CallToAction />
+      <div className="mb-20">
+        <AdoptionSection title="Gatos en adopción" pets={cats} />
+      </div>
+
+      <div className="mb-20">
+        <AdoptionSection title="Perros en adopción" pets={dogs} />
+      </div>
+
+      <div className="mb-20">
+        <InfoSection />
+      </div>
+
+      <div className="mb-16">
+        <CallToAction />
+      </div>
     </>
   );
 }

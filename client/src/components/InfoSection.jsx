@@ -5,7 +5,7 @@ import image2 from "../assets/Image2.jpeg"; // ajusta la ruta según tu carpeta
 export default function InfoSection() {
   return (
     <motion.section
-      className="max-w-5xl mx-auto bg-[#FFF98F] py-10 sm:py-14 px-4 sm:px-8 flex flex-col 
+      className="max-w-6xl mx-auto bg-[#F5ECCA] py-10 sm:py-14 px-4 sm:px-8 flex flex-col 
       rounded-xl md:flex-row items-center md:items-start justify-center gap-8 md:gap-12"
       initial={{ opacity: 0, y: 50 }}
       whileInView={{ opacity: 1, y: 0 }}
