@@ -113,46 +113,46 @@ export default function Perritos() {
         ))}
       </section>
 
-      {/* Modal */}
-      {selectedDog && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-[#FDF8E7] rounded-lg shadow-lg w-11/12 md:w-2/3 lg:w-1/2 p-6 relative">
+        {/* Modal */}
+        {selectedDog && (
+        <div className="fixed inset-0 backdrop-blur-sm bg-black/20 flex items-center justify-center z-50">
+            <div className="bg-[#FDF8E7] rounded-lg shadow-lg w-11/12 md:w-2/3 lg:w-1/2 p-6 relative">
             {/* Cerrar */}
             <button
-              onClick={() => setSelectedDog(null)}
-              className="absolute top-3 right-3 text-xl font-bold text-gray-700 hover:text-black"
+                onClick={() => setSelectedDog(null)}
+                className="absolute top-3 right-3 text-xl font-bold text-gray-700 hover:text-black"
             >
-              ✖
+                ✖
             </button>
 
             <h2 className="text-2xl font-bold mb-4 text-center">{selectedDog.name}</h2>
 
             <div className="flex flex-col md:flex-row gap-6 items-center">
-              <img
+                <img
                 src={selectedDog.img}
                 alt={selectedDog.name}
                 className="w-48 h-40 object-cover rounded-lg"
-              />
-              <p className="text-gray-700">{selectedDog.desc}</p>
+                />
+                <p className="text-gray-700">{selectedDog.desc}</p>
             </div>
 
             {/* Info */}
             <div className="grid grid-cols-2 gap-4 mt-6 text-sm">
-              <span><strong>Edad:</strong> {selectedDog.edad}</span>
-              <span><strong>Tamaño:</strong> {selectedDog.tamaño}</span>
-              <span><strong>Sexo:</strong> {selectedDog.sexo}</span>
-              <span><strong>Fundación:</strong> {selectedDog.fundacion}</span>
+                <span><strong>Edad:</strong> {selectedDog.edad}</span>
+                <span><strong>Tamaño:</strong> {selectedDog.tamaño}</span>
+                <span><strong>Sexo:</strong> {selectedDog.sexo}</span>
+                <span><strong>Fundación:</strong> {selectedDog.fundacion}</span>
             </div>
 
             {/* Botón adoptar */}
             <div className="text-center mt-6">
-              <button className="bg-green-600 text-white px-6 py-2 rounded-lg shadow hover:bg-green-700 transition">
+                <button className="bg-green-600 text-white px-6 py-2 rounded-lg shadow hover:bg-green-700 transition">
                 🐾 Adoptar a {selectedDog.name}
-              </button>
+                </button>
             </div>
-          </div>
+            </div>
         </div>
-      )}
+        )}
 
       {/* Paginación */}
       <div className="flex justify-center items-center gap-2 my-10">
