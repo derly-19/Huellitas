@@ -4,8 +4,7 @@ import { motion } from "framer-motion";
 export default function CallToAction() {
   return (
     <motion.section
-      className="max-w-5xl mx-auto bg-gradient-to-r from-[#fff3e6] via-[#fffaf5] to-white 
-      rounded-xl my-10 p-6 sm:p-10 lg:p-16 text-center shadow-xl"
+      className="max-w-6xl mx-auto bg-white rounded-xl my-10 p-8 sm:p-12 lg:p-16 text-center shadow-lg border border-gray-100"
       initial={{ opacity: 0, y: 50 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, ease: "easeOut" }}
@@ -18,52 +17,62 @@ export default function CallToAction() {
         transition={{ staggerChildren: 0.2 }}
         viewport={{ once: false }}
       >
-        {/* Emoji 🐾 */}
-        <motion.span
-          className="text-4xl"
+        {/* Huella usando la imagen del public */}
+        <motion.div
+          className="w-16 h-16 mb-6"
           variants={{
             hidden: { scale: 0.5, opacity: 0 },
             visible: { scale: 1, opacity: 1 },
           }}
           transition={{ type: "spring", stiffness: 200, damping: 10 }}
         >
-          🐾
-        </motion.span>
+          <img 
+            src="/Huella.png" 
+            alt="Huella" 
+            className="w-full h-full object-contain"
+          />
+        </motion.div>
 
         {/* Título */}
         <motion.h2
-          className="text-2xl md:text-3xl font-bold mt-2 mb-4 text-[var(--secondary)]"
+          className="text-3xl md:text-4xl font-bold mb-6 text-gray-800 leading-tight"
           variants={{
             hidden: { opacity: 0, y: -30 },
             visible: { opacity: 1, y: 0 },
           }}
           transition={{ duration: 0.6 }}
         >
-          Adopta con responsabilidad, ama sin condiciones
+          Adopta con responsabilidad,<br />
+          ama sin condiciones
         </motion.h2>
 
         {/* Texto */}
-        <motion.p
-          className="max-w-2xl mx-auto text-[var(--text)] mb-6 text-sm sm:text-base"
+        <motion.div
+          className="max-w-4xl mx-auto mb-8"
           variants={{
             hidden: { opacity: 0 },
             visible: { opacity: 1 },
           }}
           transition={{ duration: 0.8, delay: 0.3 }}
         >
-          En nuestra plataforma encontrarás perritos y gatitos que esperan un hogar lleno de amor.  
-          Cada adopción incluye un carnet digital con su historial médico y recordatorios de vacunación 
-          para que nunca olvides su cuidado.
-        </motion.p>
+          <p className="text-gray-600 text-lg leading-relaxed mb-4">
+            En nuestra plataforma encontrarás perritos y gatitos que esperan un hogar lleno de amor.
+          </p>
+          <p className="text-gray-600 text-lg leading-relaxed">
+            Cada adopción incluye un carnet digital con su historial médico y recordatorios de vacunación 
+            para que nunca olvides su cuidado.
+          </p>
+        </motion.div>
 
-        {/* Botón */}
-        <motion.button
-          className="bg-[var(--primary)] text-white px-6 py-2 rounded-lg hover:bg-[var(--secondary)] transition"
+        {/* Botón con borde */}
+        <motion.a
+          href="/dogs"
+          className="inline-block px-8 py-3 border-2 border-gray-400 text-gray-700 font-medium rounded-lg hover:bg-gray-50 hover:border-gray-500 transition-all duration-200"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
           Ver mascotas en adopción
-        </motion.button>
+        </motion.a>
       </motion.div>
     </motion.section>
   );
