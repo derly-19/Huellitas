@@ -1,8 +1,10 @@
+// eslint-disable-next-line no-unused-vars
+import { motion } from "framer-motion";
 import Hero from "../components/Hero";
 import AdoptionSection from "../components/AdoptionSection";
 import InfoSection from "../components/InfoSection";
 import CallToAction from "../components/CallToAction";
-import Footer from "../components/Footer";
+import Imagen1 from "../assets/Imagen1.png";
 
 export default function Home() {
   const cats = [
@@ -20,6 +22,22 @@ export default function Home() {
   return (
     <>
       <Hero />
+
+      {/* Banner antes de gatos con animación */}
+      <motion.div
+        className="w-full my-8"
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        viewport={{ once: true }}
+      >
+        <motion.img
+          src={Imagen1}
+          alt="Encuentra a tu compañero ideal"
+          className="w-full h-50 md:h-100 object-contain"
+        />
+      </motion.div>
+
       <AdoptionSection title="Gatos en adopción" pets={cats} />
       <AdoptionSection title="Perros en adopción" pets={dogs} />
       <InfoSection />

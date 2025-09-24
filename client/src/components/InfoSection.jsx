@@ -1,10 +1,12 @@
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
+import image2 from "../assets/Image2.jpeg"; // ajusta la ruta según tu carpeta
 
 export default function InfoSection() {
   return (
     <motion.section
-      className="w-full bg-[#FDF8E7] py-10 sm:py-14 px-4 sm:px-8 flex flex-col md:flex-row items-center md:items-start justify-center gap-8 md:gap-12"
+      className="max-w-5xl mx-auto bg-[#FFF98F] py-10 sm:py-14 px-4 sm:px-8 flex flex-col 
+      rounded-xl md:flex-row items-center md:items-start justify-center gap-8 md:gap-12"
       initial={{ opacity: 0, y: 50 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, ease: "easeOut" }}
@@ -12,15 +14,16 @@ export default function InfoSection() {
     >
       {/* Imagen ilustrativa */}
       <motion.img
-        src="https://cdn-icons-png.flaticon.com/512/616/616408.png"
-        alt="Adopción"
-        className="w-28 sm:w-40 md:w-56 lg:w-64 flex-shrink-0"
-        initial={{ opacity: 0, scale: 0.9 }}
-        whileInView={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.8 }}
-        viewport={{ once: false }}
-        whileHover={{ scale: 1.1 }}
-      />
+          src={image2}
+          alt="Adopción"
+          className="w-28 sm:w-40 md:w-56 lg:w-64 flex-shrink-0 rounded-xl"
+          initial={{ opacity: 0, scale: 0.9 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: false }}
+          whileHover={{ scale: 1.1 }}
+        />
+
 
       {/* Texto */}
       <motion.div

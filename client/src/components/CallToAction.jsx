@@ -5,7 +5,7 @@ export default function CallToAction() {
   return (
     <motion.section
       className="max-w-5xl mx-auto bg-gradient-to-r from-[#fff3e6] via-[#fffaf5] to-white 
-      border rounded-xl my-10 p-6 sm:p-10 lg:p-16 text-center shadow-xl"
+      rounded-xl my-10 p-6 sm:p-10 lg:p-16 text-center shadow-xl"
       initial={{ opacity: 0, y: 50 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, ease: "easeOut" }}
