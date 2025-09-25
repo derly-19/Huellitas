@@ -50,7 +50,7 @@ export default function Hero() {
 
           {/* Imagen destacada más grande y ancha */}
           <div className="flex justify-center">
-            <div className="w-full max-w-5xl rounded-2xl shadow-lg border border-black/5">
+            <div className="w-full max-w-5xl">
               <img
                 src={Imagen1}
                 alt="Encuentra a tu compañero ideal"

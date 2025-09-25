@@ -9,7 +9,7 @@ export default function Perritos() {
   const dogs = [
     {
       name: "Bella",
-      img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSnNTDiPRdfGMebY_P_6IPEyW2264DmSupI6Q&s",
+      img: "/p1.jpg",
       desc: "Bella es una perrita tranquila, le encanta jugar y busca un hogar lleno de cariño.",
       edad: "Cachorra",
       tamaño: "Pequeña",
@@ -18,7 +18,7 @@ export default function Perritos() {
     },
     {
       name: "Rocky",
-      img: "https://preview.redd.it/as6631550tj61.jpg?auto=webp&s=9f8b41d109ff5bed814b3422efd1f5872a5b63d3",
+      img: "/p2.jpg",
       desc: "Rocky es un perro lleno de energía, ideal para familias activas.",
       edad: "Adulto",
       tamaño: "Grande",
@@ -27,7 +27,7 @@ export default function Perritos() {
     },
     {
       name: "Nina",
-      img: "https://i.pinimg.com/1200x/5d/a7/42/5da7428cf51bb650635a0cb309c2366d.jpg",
+      img: "/p3.jpg",
       desc: "Nina es amorosa y muy sociable, perfecta para cualquier familia.",
       edad: "Joven",
       tamaño: "Mediana",
@@ -36,7 +36,7 @@ export default function Perritos() {
     },
     {
       name: "Max",
-      img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRtDRxxrx0d1FjEyrwHtQrQ9Aincg2w4UM01Q&s",
+      img: "/p4.jpg",
       desc: "Max es juguetón y muy noble, siempre está listo para recibir cariño.",
       edad: "Cachorro",
       tamaño: "Grande",
@@ -45,7 +45,7 @@ export default function Perritos() {
     },
     {
       name: "Toby",
-      img: "https://los40.com/resizer/v2/CGYG52C77NNURMA2LZLO63FGLE.jpg?auth=88dbd0108b3751ae693cfc9bec1a5773f78cfb024931d017817c370b49c738f0&quality=70&width=1200&height=900&smart=true",
+      img: "/p5.jpg",
       desc: "Toby es tranquilo, le gusta descansar y disfrutar de la compañía.",
       edad: "Adulto",
       tamaño: "Mediano",
