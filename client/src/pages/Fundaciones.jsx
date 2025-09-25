@@ -21,7 +21,7 @@ export default function Fundaciones() {
   };
 
   return (
-    <div className="bg-[#F8F5EF] text-gray-800">
+    <div className="bg-[#FFFCF4] text-gray-800">
       <div className="max-w-6xl mx-auto px-6 py-16">
         <h1 className="text-4xl font-extrabold text-center mb-3">Fundaciones</h1>
         <p className="text-center text-gray-600 max-w-2xl mx-auto mb-8">Encuentra las mejores fundaciones para adoptar a tu nuevo amigo</p>

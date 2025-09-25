@@ -58,7 +58,7 @@ export default function Perritos() {
     <>
 
       {/* Hero */}
-      <section className="bg-[#FAF9F5] text-center py-12">
+      <section className="bg-[#FFFCF4] text-center py-12">
         <h1 className="text-3xl font-bold text-gray-900">Perritos en adopción</h1>
         <p className="text-gray-600 mt-3 max-w-2xl mx-auto">
           Estos pequeños buscan un hogar lleno de amor.  

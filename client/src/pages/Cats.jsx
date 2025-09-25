@@ -9,7 +9,7 @@ export default function Gatitos() {
   const cats = [
     {
       name: "Luna",
-      img: "https://i.pinimg.com/originals/1d/40/0e/1d400e79e924b844848049f3e52172b2.jpg",
+      img: "/g1.jpg",
       desc: "Luna es dulce y tranquila, disfruta acurrucarse en lugares soleados.",
       edad: "Joven",
       tamaño: "Pequeña",
@@ -18,7 +18,7 @@ export default function Gatitos() {
     },
     {
       name: "Simba",
-      img: "https://i.ytimg.com/vi/BdEKok52qPY/maxresdefault.jpg",
+      img: "/g2.jpg",
       desc: "Simba es curioso y muy juguetón, le encanta explorar.",
       edad: "Cachorro",
       tamaño: "Mediano",
@@ -27,7 +27,7 @@ export default function Gatitos() {
     },
     {
       name: "Misu",
-      img: "https://hips.hearstapps.com/hmg-prod/images/grumpy-cat-gatos-internet-meme-1582125875.jpg?crop=0.663xw:1.00xh;0.169xw,0&resize=1200:*",
+      img: "/g3.jpg",
       desc: "Misu es independiente, pero adora las caricias cuando tiene confianza.",
       edad: "Adulto",
       tamaño: "Mediano",
@@ -36,7 +36,7 @@ export default function Gatitos() {
     },
     {
       name: "Tom",
-      img: "https://i.pinimg.com/736x/39/de/b5/39deb59ff143470cd25f296b9639f7e4.jpg",
+      img: "/g4.jpg",
       desc: "Tom es un gato cariñoso que siempre busca compañía.",
       edad: "Adulto",
       tamaño: "Grande",
@@ -45,7 +45,7 @@ export default function Gatitos() {
     },
     {
       name: "Nieve",
-      img: "https://stickerly.pstatic.net/sticker_pack/M6DUfwweCC1PPhJ9HOcpw/DAS3U4/19/-837628409.png",
+      img: "/g5.jpg",
       desc: "Nieve es tranquila, ideal para familias que busquen calma.",
       edad: "Joven",
       tamaño: "Pequeña",
@@ -57,7 +57,7 @@ export default function Gatitos() {
   return (
     <>
       {/* Hero */}
-      <section className="bg-[#FAF9F5] text-center py-12">
+      <section className="bg-[#FFFCF4] text-center py-12">
         <h1 className="text-3xl font-bold text-gray-900">Gatitos en adopción</h1>
         <p className="text-gray-600 mt-3 max-w-2xl mx-auto">
           Estos pequeños buscan un hogar lleno de amor.  
