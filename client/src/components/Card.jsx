@@ -15,7 +15,7 @@ export default function Card({ name, img }) {
         <p className="text-base text-gray-700 mb-4">
           Este peludito está buscando un hogar lleno de amor.
         </p>
-        <button className="w-full py-2 rounded-xl bg-[#13B94A] text-white font-semibold text-base shadow hover:bg-[#0e8c37] transition">
+        <button className="w-full py-2 rounded-xl bg-[#005017] text-white font-semibold text-base shadow hover:bg-[#0e8c37] transition">
           Conoce más
         </button>
       </div>

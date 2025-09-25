@@ -4,9 +4,9 @@
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap");
 
 :root {
-  --primary: #9fb36d;   /* Verde brillante */
+  --primary: #BCC990;   /* Verde brillante */
   --secondary: #085123; /* Verde oscuro */
-  --background: #fefce8; /* Fondo claro */
+  --background: #FFFCF4; /* Fondo claro */
   --text: #1e293b;      /* Texto gris oscuro */
 }
 

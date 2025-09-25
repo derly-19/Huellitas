@@ -78,7 +78,7 @@ export default function Fundaciones() {
                   </div>
                 </div>
 
-                <button className="w-full px-3 py-2 bg-[#BCC990] hover:bg-[#9FB36F] text-white rounded-md text-sm font-medium">
+                <button className="w-full px-3 py-2 bg-[#005017] hover:bg-[#BCC990] text-white rounded-md text-sm font-medium">
                   Ver más
                 </button>
               </div>
@@ -92,9 +92,9 @@ export default function Fundaciones() {
             <div className="flex flex-col md:flex-row items-center justify-center gap-8">
               {/* Corazón con huella usando la imagen */}
               <div className="flex-shrink-0">
-                <div className="w-32 h-32 bg-[#BCC990] rounded-3xl flex items-center justify-center shadow-lg relative overflow-hidden">
+                <div className="w-32 h-32 bg-[#005017] rounded-3xl flex items-center justify-center shadow-lg relative overflow-hidden">
                   {/* SVG del corazón como fondo */}
-                  <svg className="absolute inset-0 w-full h-full text-[#BCC990]" viewBox="0 0 24 24" fill="currentColor">
+                  <svg className="absolute inset-0 w-full h-full text-[#005017]" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                   </svg>
                   {/* Imagen de la huella centrada */}
@@ -120,7 +120,7 @@ export default function Fundaciones() {
             <div className="mt-8">
               <a 
                 href="/dogs" 
-                className="inline-block px-10 py-4 bg-[#BCC990] hover:bg-[#9FB36F] text-white rounded-full font-semibold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+                className="inline-block px-10 py-4 bg-[#005017] hover:bg-[#9FB36F] text-white rounded-full font-semibold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
               >
                 Ver mascotas en adopción
               </a>
