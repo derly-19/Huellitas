@@ -95,7 +95,7 @@ export default function Perritos() {
           </button>
           {openFilter === 'Tamaño' && (
             <div className="absolute left-0 mt-2 bg-white rounded-lg shadow-md p-3 w-40 z-20">
-              {['Pequeña','Mediano','Mediana','Grande'].map((opt) => (
+              {['Pequeño','Mediano','Grande'].map((opt) => (
                 <button
                   key={opt}
                   onClick={() => { setSelectedSize(opt); setOpenFilter(null); }}
@@ -119,7 +119,7 @@ export default function Perritos() {
           </button>
           {openFilter === 'Edad' && (
             <div className="absolute left-0 mt-2 bg-white rounded-lg shadow-md p-3 w-40 z-20">
-              {['Cachorro','Cachorra','Joven','Adulto'].map((opt) => (
+              {['Cachorro','Joven','Adulto'].map((opt) => (
                 <button
                   key={opt}
                   onClick={() => { setSelectedAge(opt); setOpenFilter(null); }}
