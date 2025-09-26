@@ -7,6 +7,7 @@ import HeroCats from "./pages/Cats";
 import Login from "./pages/Login";
 import Register from "./pages/Register"; 
 import Fundaciones from "./pages/Fundaciones";
+import Formulario from "./pages/Formulario";
 
 export default function App() {
   const location = useLocation();
@@ -27,6 +28,7 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/Register" element={<Register />} />
         <Route path="/Fundaciones" element={<Fundaciones />} />
+        <Route path="/formulario" element={<Formulario />} />
       </Routes>
       {!hideLayout && <Footer />}
     </>
