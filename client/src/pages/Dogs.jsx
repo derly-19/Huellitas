@@ -161,11 +161,12 @@ export default function Perritos() {
       {/* Grid de Perritos */}
       <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 px-6 max-w-6xl mx-auto my-10">
         {dogs
-          .filter((dog) => {
-            if (selectedSize && dog.tamaño.toLowerCase() !== selectedSize.toLowerCase()) return false;
-            if (selectedAge && dog.edad.toLowerCase() !== selectedAge.toLowerCase()) return false;
-            if (selectedSex && dog.sexo.toLowerCase() !== selectedSex.toLowerCase()) return false;
-            return true;
+      .filter((dog) => {
+        const normalize = (s) => (s || "").toLowerCase().replace(/[ao]$/,'');
+        if (selectedSize && normalize(dog.tamaño) !== normalize(selectedSize)) return false;
+        if (selectedAge && normalize(dog.edad) !== normalize(selectedAge)) return false;
+        if (selectedSex && dog.sexo.toLowerCase() !== selectedSex.toLowerCase()) return false;
+        return true;
           })
           .map((dog, i) => (
           <motion.div

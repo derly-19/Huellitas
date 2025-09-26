@@ -12,6 +12,11 @@ import g5 from "../assets/g5.jpg";
 
 export default function Gatitos() {
   const [selectedCat, setSelectedCat] = useState(null);
+  // Estados para filtros y control de menú de filtros
+  const [openFilter, setOpenFilter] = useState(null);
+  const [selectedSize, setSelectedSize] = useState(null);
+  const [selectedAge, setSelectedAge] = useState(null);
+  const [selectedSex, setSelectedSex] = useState(null);
 
   const cats = [
     {
@@ -63,36 +68,100 @@ export default function Gatitos() {
 
   return (
     <>
-      {/* Hero */}
-      <section className="bg-[#FFFCF4] text-center py-12">
-        <h1 className="text-3xl font-bold text-gray-900">Gatitos en adopción</h1>
-        <p className="text-gray-600 mt-3 max-w-2xl mx-auto">
-          Estos pequeños buscan un hogar lleno de amor.  
-          ¿Quieres cambiar sus vidas y la tuya?
-        </p>
-      </section>
-
       {/* Filtros */}
       <motion.div
-        className="flex justify-center gap-4 my-6 flex-wrap"
+        className="flex justify-center gap-4 my-6 flex-wrap relative"
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
+        transition={{ duration: 0.1 }}
         viewport={{ once: true }}
       >
-        {["Tamaño", "Edad", "Sexo"].map((filtro, i) => (
+        {/* Filtro Tamaño */}
+        <div className="relative">
           <button
-            key={i}
-            className="bg-[#EDE4D6] px-6 py-2 rounded-full shadow hover:bg-[#d6c9b5] transition"
+            onClick={() => setOpenFilter(openFilter === 'Tamaño' ? null : 'Tamaño')}
+            className={`px-6 py-3 rounded-full shadow ${selectedSize ? 'bg-white ring-2 ring-[#BCC990]' : 'bg-[#EDE4D6]'} transition`}
           >
-            {filtro} ⌄
+            {selectedSize ? `Tamaño: ${selectedSize}` : 'Tamaño'} ⌄
           </button>
-        ))}
+          {openFilter === 'Tamaño' && (
+            <div className="absolute left-0 mt-2 bg-white rounded-lg shadow-md p-3 w-40 z-20">
+              {['Pequeña','Mediano','Grande'].map((opt) => (
+                <button
+                  key={opt}
+                  onClick={() => { setSelectedSize(opt); setOpenFilter(null); }}
+                  className={`block w-full text-left px-2 py-1 rounded hover:bg-[#F3F1EE] ${selectedSize===opt? 'font-semibold':''}`}
+                >
+                  {opt}
+                </button>
+              ))}
+              <button onClick={()=>{setSelectedSize(null); setOpenFilter(null);}} className="mt-2 text-sm text-gray-500">Limpiar</button>
+            </div>
+          )}
+        </div>
+
+        {/* Filtro Edad */}
+        <div className="relative">
+          <button
+            onClick={() => setOpenFilter(openFilter === 'Edad' ? null : 'Edad')}
+            className={`px-6 py-3 rounded-full shadow ${selectedAge ? 'bg-white ring-2 ring-[#BCC990]' : 'bg-[#EDE4D6]'} transition`}
+          >
+            {selectedAge ? `Edad: ${selectedAge}` : 'Edad'} ⌄
+          </button>
+          {openFilter === 'Edad' && (
+            <div className="absolute left-0 mt-2 bg-white rounded-lg shadow-md p-3 w-40 z-20">
+              {['Cachorro','Joven','Adulto'].map((opt) => (
+                <button
+                  key={opt}
+                  onClick={() => { setSelectedAge(opt); setOpenFilter(null); }}
+                  className={`block w-full text-left px-2 py-1 rounded hover:bg-[#F3F1EE] ${selectedAge===opt? 'font-semibold':''}`}
+                >
+                  {opt}
+                </button>
+              ))}
+              <button onClick={()=>{setSelectedAge(null); setOpenFilter(null);}} className="mt-2 text-sm text-gray-500">Limpiar</button>
+            </div>
+          )}
+        </div>
+
+        {/* Filtro Sexo */}
+        <div className="relative">
+          <button
+            onClick={() => setOpenFilter(openFilter === 'Sexo' ? null : 'Sexo')}
+            className={`px-6 py-3 rounded-full shadow ${selectedSex ? 'bg-white ring-2 ring-[#BCC990]' : 'bg-[#EDE4D6]'} transition`}
+          >
+            {selectedSex ? `Sexo: ${selectedSex}` : 'Sexo'} ⌄
+          </button>
+          {openFilter === 'Sexo' && (
+            <div className="absolute left-0 mt-2 bg-white rounded-lg shadow-md p-3 w-40 z-20">
+              {['Hembra','Macho'].map((opt) => (
+                <button
+                  key={opt}
+                  onClick={() => { setSelectedSex(opt); setOpenFilter(null); }}
+                  className={`block w-full text-left px-2 py-1 rounded hover:bg-[#F3F1EE] ${selectedSex===opt? 'font-semibold':''}`}
+                >
+                  {opt}
+                </button>
+              ))}
+              <button onClick={()=>{setSelectedSex(null); setOpenFilter(null);}} className="mt-2 text-sm text-gray-500">Limpiar</button>
+            </div>
+          )}
+        </div>
+
       </motion.div>
+      
 
       {/* Grid de Gatitos */}
       <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 px-6 max-w-6xl mx-auto my-10">
-        {cats.map((cat, i) => (
+        {cats
+          .filter((cat) => {
+            const normalize = (s) => (s || "").toLowerCase().replace(/[ao]$/,'');
+            if (selectedSize && normalize(cat.tamaño) !== normalize(selectedSize)) return false;
+            if (selectedAge && normalize(cat.edad) !== normalize(selectedAge)) return false;
+            if (selectedSex && cat.sexo.toLowerCase() !== selectedSex.toLowerCase()) return false;
+            return true;
+          })
+          .map((cat, i) => (
           <motion.div
             key={i}
             onClick={() => setSelectedCat(cat)}
