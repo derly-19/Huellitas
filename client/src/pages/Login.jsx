@@ -1,27 +1,42 @@
+// client/src/pages/Login.jsx
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
+import { useState } from "react";
 
 export default function Login() {
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [message, setMessage] = useState("");
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        try {
+            const res = await fetch("http://localhost:4000/api/users/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ email, password }),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                setMessage(data.error || "Error en el login ❌");
+            } else {
+                setMessage("✅ Login exitoso, bienvenido " + data.user.name);
+                // Guardar usuario en localStorage (ejemplo)
+                localStorage.setItem("user", JSON.stringify(data.user));
+            }
+       } catch (error) {
+      console.error(error);
+      setMessage({ type: "error", text: "Error de conexión con el servidor" });
+    }
+    };
+
     return (
         <div className="min-h-screen flex items-center justify-center bg-[#BCC990] relative overflow-hidden px-4 sm:px-6">
-            {/* Huellas decorativas */}
-            <motion.span
-                className="absolute left-6 top-12 text-5xl sm:text-6xl text-[#BCC990] opacity-25"
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 0.25, y: 0 }}
-                transition={{ duration: 1, delay: 0.2 }}
-            >
-                🐾
-            </motion.span>
-            <motion.span
-                className="absolute right-6 bottom-14 text-6xl sm:text-7xl text-[#BCC990] opacity-20"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 0.2, y: 0 }}
-                transition={{ duration: 1, delay: 0.4 }}
-            >
-                🐾
-            </motion.span>
-
             {/* Tarjeta central */}
             <motion.div
                 className="bg-white p-6 sm:p-7 rounded-2xl shadow-xl z-10 w-full max-w-sm"
@@ -39,41 +54,34 @@ export default function Login() {
                     <img src="/Huella.png" alt="Huella" className="w-10 h-10 sm:w-12 sm:h-12 object-contain" loading="lazy" />
                 </motion.div>
 
-                {/* Títulos */}
-                <motion.h2
-                    className="text-2xl sm:text-3xl font-extrabold mb-2 text-center"
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.2 }}
-                >
+                <h2 className="text-2xl sm:text-3xl font-extrabold mb-2 text-center">
                     Bienvenido
-                </motion.h2>
-                <motion.p
-                    className="text-center text-xs sm:text-sm text-gray-500 mb-5"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.6, delay: 0.4 }}
-                >
+                </h2>
+                <p className="text-center text-xs sm:text-sm text-gray-500 mb-5">
                     Inicia sesión para ver mascotas disponibles 🐶🐱
-                </motion.p>
+                </p>
 
-                {/* Formulario */}
+                {/* Formulario conectado */}
                 <motion.form
+                    onSubmit={handleSubmit}
                     className="flex flex-col gap-3"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.5 }}
                 >
                     <input
                         type="email"
                         placeholder="tuemail@ejemplo.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
                         className="w-full border border-gray-200 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-[#BCC990]"
+                        required
                     />
 
                     <input
                         type="password"
                         placeholder="••••••••••"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
                         className="w-full border border-gray-200 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-[#BCC990]"
+                        required
                     />
 
                     <motion.button
@@ -84,39 +92,24 @@ export default function Login() {
                     >
                         Iniciar sesión
                     </motion.button>
-
-                    <a
-                        href="#"
-                        className="text-xs sm:text-sm text-[#BCC990] text-center mt-2 hover:underline"
-                    >
-                        ¿Olvidaste tu contraseña?
-                    </a>
-
-                    <div className="mt-3 text-center">
-                        <span className="text-xs sm:text-sm text-gray-600 mr-1">¿No tienes cuenta?</span>
-                        <a
-                            href="/register"
-                            className="inline-block text-xs sm:text-sm font-semibold text-[#BCC990] hover:underline"
-                        >
-                            Regístrate
-                        </a>
-                    </div>
                 </motion.form>
 
-                {/* Botón para volver al inicio */}
-                <motion.div
-                    className="mt-6 text-center"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.8, delay: 0.7 }}
-                >
+                {/* Mostrar mensaje */}
+                {message && (
+                    <p className="mt-3 text-center text-sm font-medium text-gray-700">
+                        {message}
+                    </p>
+                )}
+
+                <div className="mt-3 text-center">
+                    <span className="text-xs sm:text-sm text-gray-600 mr-1">¿No tienes cuenta?</span>
                     <a
-                        href="/"
-                        className="inline-block bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 px-5 rounded-lg shadow transition"
+                        href="/register"
+                        className="inline-block text-xs sm:text-sm font-semibold text-[#BCC990] hover:underline"
                     >
-                        ← Volver al inicio
+                        Regístrate
                     </a>
-                </motion.div>
+                </div>
             </motion.div>
         </div>
     );
