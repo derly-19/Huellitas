@@ -8,6 +8,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register"; 
 import Fundaciones from "./pages/Fundaciones";
 import Formulario from "./pages/Formulario";
+import Carnet from "./pages/Carnet";
 
 export default function App() {
   const location = useLocation();
@@ -29,6 +30,7 @@ export default function App() {
         <Route path="/Register" element={<Register />} />
         <Route path="/Fundaciones" element={<Fundaciones />} />
         <Route path="/formulario" element={<Formulario />} />
+        <Route path="/carnet" element={<Carnet />} />
       </Routes>
       {!hideLayout && <Footer />}
     </>
