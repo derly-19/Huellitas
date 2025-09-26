@@ -102,6 +102,21 @@ export default function Login() {
                         </a>
                     </div>
                 </motion.form>
+
+                {/* Botón para volver al inicio */}
+                <motion.div
+                    className="mt-6 text-center"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.8, delay: 0.7 }}
+                >
+                    <a
+                        href="/"
+                        className="inline-block bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 px-5 rounded-lg shadow transition"
+                    >
+                        ← Volver al inicio
+                    </a>
+                </motion.div>
             </motion.div>
         </div>
     );

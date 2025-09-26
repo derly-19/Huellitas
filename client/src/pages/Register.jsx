@@ -1,11 +1,10 @@
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 
-// Componente de la página de Registro
 export default function Register() {
     return (
         <div className="min-h-screen flex items-center justify-center bg-[#BCC990] relative overflow-hidden px-4 sm:px-6">
-            {/* Fondos decorativos con huellas */}
+            {/* Fondos decorativos */}
             <motion.span
                 className="absolute left-4 top-10 text-4xl sm:text-5xl md:text-6xl text-[#BCC990] opacity-25"
                 initial={{ opacity: 0, y: -20 }}
@@ -106,6 +105,16 @@ export default function Register() {
                             Inicia sesión
                         </a>
                     </div>
+
+                    {/* Botón volver al Home */}
+                    <motion.a
+                        href="/"
+                        className="mt-4 w-full inline-block text-center bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 rounded-lg shadow-sm"
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                    >
+                        ⬅ Volver al Home
+                    </motion.a>
                 </motion.form>
             </motion.div>
         </div>
