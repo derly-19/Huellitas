@@ -2,6 +2,7 @@
 import { useState } from "react";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
+import { IoChevronDown } from "react-icons/io5";
 
 // Importar imágenes locales desde src/assets (si moviste las imágenes ahí)
 import g1 from "../assets/g1.jpg";
@@ -68,6 +69,15 @@ export default function Gatitos() {
 
   return (
     <>
+      {/* Hero */}
+      <section className="bg-[#FFFCF4] text-center py-12">
+        <h1 className="text-3xl font-bold text-gray-900">Gatitos en adopción</h1>
+        <p className="text-gray-600 mt-3 max-w-2xl mx-auto">
+          Estos pequeños buscan un hogar lleno de amor.  
+          ¿Quieres cambiar sus vidas y la tuya?
+        </p>
+      </section>
+
       {/* Filtros */}
       <motion.div
         className="flex justify-center gap-4 my-6 flex-wrap relative"
@@ -80,9 +90,10 @@ export default function Gatitos() {
         <div className="relative">
           <button
             onClick={() => setOpenFilter(openFilter === 'Tamaño' ? null : 'Tamaño')}
-            className={`px-6 py-3 rounded-full shadow ${selectedSize ? 'bg-white ring-2 ring-[#BCC990]' : 'bg-[#EDE4D6]'} transition`}
+            className={`px-6 py-3 rounded-full shadow ${selectedSize ? 'bg-white ring-2 ring-[#BCC990]' : 'bg-[#EDE4D6]'} transition flex items-center gap-2`}
           >
-            {selectedSize ? `Tamaño: ${selectedSize}` : 'Tamaño'} ⌄
+            {selectedSize ? `Tamaño: ${selectedSize}` : 'Tamaño'}
+            <IoChevronDown className="text-sm" />
           </button>
           {openFilter === 'Tamaño' && (
             <div className="absolute left-0 mt-2 bg-white rounded-lg shadow-md p-3 w-40 z-20">
@@ -104,9 +115,10 @@ export default function Gatitos() {
         <div className="relative">
           <button
             onClick={() => setOpenFilter(openFilter === 'Edad' ? null : 'Edad')}
-            className={`px-6 py-3 rounded-full shadow ${selectedAge ? 'bg-white ring-2 ring-[#BCC990]' : 'bg-[#EDE4D6]'} transition`}
+            className={`px-6 py-3 rounded-full shadow ${selectedAge ? 'bg-white ring-2 ring-[#BCC990]' : 'bg-[#EDE4D6]'} transition flex items-center gap-2`}
           >
-            {selectedAge ? `Edad: ${selectedAge}` : 'Edad'} ⌄
+            {selectedAge ? `Edad: ${selectedAge}` : 'Edad'}
+            <IoChevronDown className="text-sm" />
           </button>
           {openFilter === 'Edad' && (
             <div className="absolute left-0 mt-2 bg-white rounded-lg shadow-md p-3 w-40 z-20">
@@ -128,9 +140,10 @@ export default function Gatitos() {
         <div className="relative">
           <button
             onClick={() => setOpenFilter(openFilter === 'Sexo' ? null : 'Sexo')}
-            className={`px-6 py-3 rounded-full shadow ${selectedSex ? 'bg-white ring-2 ring-[#BCC990]' : 'bg-[#EDE4D6]'} transition`}
+            className={`px-6 py-3 rounded-full shadow ${selectedSex ? 'bg-white ring-2 ring-[#BCC990]' : 'bg-[#EDE4D6]'} transition flex items-center gap-2`}
           >
-            {selectedSex ? `Sexo: ${selectedSex}` : 'Sexo'} ⌄
+            {selectedSex ? `Sexo: ${selectedSex}` : 'Sexo'}
+            <IoChevronDown className="text-sm" />
           </button>
           {openFilter === 'Sexo' && (
             <div className="absolute left-0 mt-2 bg-white rounded-lg shadow-md p-3 w-40 z-20">
