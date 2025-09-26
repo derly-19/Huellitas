@@ -3,13 +3,20 @@ import { useState } from "react";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 
+// Importar imágenes locales desde src/assets (si moviste las imágenes ahí)
+import g1 from "../assets/g1.jpg";
+import g2 from "../assets/g2.jpg";
+import g3 from "../assets/g3.jpg";
+import g4 from "../assets/g4.jpg";
+import g5 from "../assets/g5.jpg";
+
 export default function Gatitos() {
   const [selectedCat, setSelectedCat] = useState(null);
 
   const cats = [
     {
       name: "Luna",
-      img: "/g1.jpg",
+      img: g1,
       desc: "Luna es dulce y tranquila, disfruta acurrucarse en lugares soleados.",
       edad: "Joven",
       tamaño: "Pequeña",
@@ -18,7 +25,7 @@ export default function Gatitos() {
     },
     {
       name: "Simba",
-      img: "/g2.jpg",
+      img: g2,
       desc: "Simba es curioso y muy juguetón, le encanta explorar.",
       edad: "Cachorro",
       tamaño: "Mediano",
@@ -27,7 +34,7 @@ export default function Gatitos() {
     },
     {
       name: "Misu",
-      img: "/g3.jpg",
+      img: g3,
       desc: "Misu es independiente, pero adora las caricias cuando tiene confianza.",
       edad: "Adulto",
       tamaño: "Mediano",
@@ -36,7 +43,7 @@ export default function Gatitos() {
     },
     {
       name: "Tom",
-      img: "/g4.jpg",
+      img: g4,
       desc: "Tom es un gato cariñoso que siempre busca compañía.",
       edad: "Adulto",
       tamaño: "Grande",
@@ -45,7 +52,7 @@ export default function Gatitos() {
     },
     {
       name: "Nieve",
-      img: "/g5.jpg",
+      img: g5,
       desc: "Nieve es tranquila, ideal para familias que busquen calma.",
       edad: "Joven",
       tamaño: "Pequeña",

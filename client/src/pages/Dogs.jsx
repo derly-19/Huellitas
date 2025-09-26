@@ -3,13 +3,24 @@ import { useState } from "react";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 
+// Importar imágenes locales desde src/assets (si moviste las imágenes ahí)
+import p1 from "../assets/p1.jpg";
+import p2 from "../assets/p2.jpg";
+import p3 from "../assets/p3.jpg";
+import p4 from "../assets/p4.jpg";
+import p5 from "../assets/p5.jpg";
+
 export default function Perritos() {
   const [selectedDog, setSelectedDog] = useState(null);
-
+  // Estados para filtros y control de menú de filtros
+  const [openFilter, setOpenFilter] = useState(null);
+  const [selectedSize, setSelectedSize] = useState(null);
+  const [selectedAge, setSelectedAge] = useState(null);
+  const [selectedSex, setSelectedSex] = useState(null);
   const dogs = [
     {
       name: "Bella",
-      img: "/p1.jpg",
+      img: p1,
       desc: "Bella es una perrita tranquila, le encanta jugar y busca un hogar lleno de cariño.",
       edad: "Cachorra",
       tamaño: "Pequeña",
@@ -18,7 +29,7 @@ export default function Perritos() {
     },
     {
       name: "Rocky",
-      img: "/p2.jpg",
+      img: p2,
       desc: "Rocky es un perro lleno de energía, ideal para familias activas.",
       edad: "Adulto",
       tamaño: "Grande",
@@ -27,7 +38,7 @@ export default function Perritos() {
     },
     {
       name: "Nina",
-      img: "/p3.jpg",
+      img: p3,
       desc: "Nina es amorosa y muy sociable, perfecta para cualquier familia.",
       edad: "Joven",
       tamaño: "Mediana",
@@ -36,7 +47,7 @@ export default function Perritos() {
     },
     {
       name: "Max",
-      img: "/p4.jpg",
+      img: p4,
       desc: "Max es juguetón y muy noble, siempre está listo para recibir cariño.",
       edad: "Cachorro",
       tamaño: "Grande",
@@ -45,7 +56,7 @@ export default function Perritos() {
     },
     {
       name: "Toby",
-      img: "/p5.jpg",
+      img: p5,
       desc: "Toby es tranquilo, le gusta descansar y disfrutar de la compañía.",
       edad: "Adulto",
       tamaño: "Mediano",
@@ -68,25 +79,95 @@ export default function Perritos() {
 
       {/* Filtros */}
       <motion.div
-        className="flex justify-center gap-4 my-6 flex-wrap"
+        className="flex justify-center gap-4 my-6 flex-wrap relative"
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.1 }}
         viewport={{ once: true }}
       >
-        {["Tamaño", "Edad", "Sexo"].map((filtro, i) => (
+        {/* Filtro Tamaño */}
+        <div className="relative">
           <button
-            key={i}
-            className="bg-[#EDE4D6] px-6 py-2 rounded-full shadow hover:bg-[#d6c9b5] transition"
+            onClick={() => setOpenFilter(openFilter === 'Tamaño' ? null : 'Tamaño')}
+            className={`px-6 py-3 rounded-full shadow ${selectedSize ? 'bg-white ring-2 ring-[#BCC990]' : 'bg-[#EDE4D6]'} transition`}
           >
-            {filtro} ⌄
+            {selectedSize ? `Tamaño: ${selectedSize}` : 'Tamaño'} ⌄
           </button>
-        ))}
+          {openFilter === 'Tamaño' && (
+            <div className="absolute left-0 mt-2 bg-white rounded-lg shadow-md p-3 w-40 z-20">
+              {['Pequeña','Mediano','Mediana','Grande'].map((opt) => (
+                <button
+                  key={opt}
+                  onClick={() => { setSelectedSize(opt); setOpenFilter(null); }}
+                  className={`block w-full text-left px-2 py-1 rounded hover:bg-[#F3F1EE] ${selectedSize===opt? 'font-semibold':''}`}
+                >
+                  {opt}
+                </button>
+              ))}
+              <button onClick={()=>{setSelectedSize(null); setOpenFilter(null);}} className="mt-2 text-sm text-gray-500">Limpiar</button>
+            </div>
+          )}
+        </div>
+
+        {/* Filtro Edad */}
+        <div className="relative">
+          <button
+            onClick={() => setOpenFilter(openFilter === 'Edad' ? null : 'Edad')}
+            className={`px-6 py-3 rounded-full shadow ${selectedAge ? 'bg-white ring-2 ring-[#BCC990]' : 'bg-[#EDE4D6]'} transition`}
+          >
+            {selectedAge ? `Edad: ${selectedAge}` : 'Edad'} ⌄
+          </button>
+          {openFilter === 'Edad' && (
+            <div className="absolute left-0 mt-2 bg-white rounded-lg shadow-md p-3 w-40 z-20">
+              {['Cachorro','Cachorra','Joven','Adulto'].map((opt) => (
+                <button
+                  key={opt}
+                  onClick={() => { setSelectedAge(opt); setOpenFilter(null); }}
+                  className={`block w-full text-left px-2 py-1 rounded hover:bg-[#F3F1EE] ${selectedAge===opt? 'font-semibold':''}`}
+                >
+                  {opt}
+                </button>
+              ))}
+              <button onClick={()=>{setSelectedAge(null); setOpenFilter(null);}} className="mt-2 text-sm text-gray-500">Limpiar</button>
+            </div>
+          )}
+        </div>
+
+        {/* Filtro Sexo */}
+        <div className="relative">
+          <button
+            onClick={() => setOpenFilter(openFilter === 'Sexo' ? null : 'Sexo')}
+            className={`px-6 py-3 rounded-full shadow ${selectedSex ? 'bg-white ring-2 ring-[#BCC990]' : 'bg-[#EDE4D6]'} transition`}
+          >
+            {selectedSex ? `Sexo: ${selectedSex}` : 'Sexo'} ⌄
+          </button>
+          {openFilter === 'Sexo' && (
+            <div className="absolute left-0 mt-2 bg-white rounded-lg shadow-md p-3 w-40 z-20">
+              {['Hembra','Macho'].map((opt) => (
+                <button
+                  key={opt}
+                  onClick={() => { setSelectedSex(opt); setOpenFilter(null); }}
+                  className={`block w-full text-left px-2 py-1 rounded hover:bg-[#F3F1EE] ${selectedSex===opt? 'font-semibold':''}`}
+                >
+                  {opt}
+                </button>
+              ))}
+              <button onClick={()=>{setSelectedSex(null); setOpenFilter(null);}} className="mt-2 text-sm text-gray-500">Limpiar</button>
+            </div>
+          )}
+        </div>
       </motion.div>
 
       {/* Grid de Perritos */}
       <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 px-6 max-w-6xl mx-auto my-10">
-        {dogs.map((dog, i) => (
+        {dogs
+          .filter((dog) => {
+            if (selectedSize && dog.tamaño.toLowerCase() !== selectedSize.toLowerCase()) return false;
+            if (selectedAge && dog.edad.toLowerCase() !== selectedAge.toLowerCase()) return false;
+            if (selectedSex && dog.sexo.toLowerCase() !== selectedSex.toLowerCase()) return false;
+            return true;
+          })
+          .map((dog, i) => (
           <motion.div
             key={i}
             onClick={() => setSelectedDog(dog)}

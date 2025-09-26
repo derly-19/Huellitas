@@ -1,6 +1,7 @@
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import Imagen1 from "../assets/Imagen1.png";
+import p1 from "../assets/p1.jpg";
 
 export default function Hero() {
   return (
@@ -20,7 +21,7 @@ export default function Hero() {
           transition={{ duration: 1.5, ease: "easeOut" }}
         >
           <img
-            src="/p1.jpg"
+            src={p1}
             alt="Banner principal"
             className="absolute left-1/2 top-0 bottom-0 w-[140%] h-full object-cover transform -translate-x-1/2"
           />
