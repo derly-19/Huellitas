@@ -110,6 +110,15 @@ export default function Login() {
                         Regístrate
                     </a>
                 </div>
+                  {/* Botón volver al Home */}
+                <motion.a
+                href="/"
+                className="mt-4 w-full inline-block text-center bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 rounded-lg shadow-sm"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                >
+                ⬅ Volver al Home
+                </motion.a>
             </motion.div>
         </div>
     );
