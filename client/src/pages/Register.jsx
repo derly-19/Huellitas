@@ -130,7 +130,16 @@ export default function Register() {
             {message.text}
           </p>
         )}
-
+        
+        <div className="mt-3 text-center">
+            <span className="text-xs sm:text-sm text-gray-600 mr-1">¿Ya tienes una cuenta?</span>
+            <a
+                href="/login"
+                className="inline-block text-xs sm:text-sm font-semibold text-[#BCC990] hover:underline"
+            > 
+              Iniciar sesión 
+            </a>
+        </div>
         {/* Botón volver al Home */}
         <motion.a
           href="/"

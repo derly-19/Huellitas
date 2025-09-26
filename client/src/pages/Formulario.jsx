@@ -1,4 +1,8 @@
 import { useState } from "react";
+<<<<<<< HEAD
+=======
+// eslint-disable-next-line no-unused-vars
+>>>>>>> 29a2cd37635d12d1c1234fd33411bf813fe196ab
 import { motion } from "framer-motion";
 
 export default function Formulario() {

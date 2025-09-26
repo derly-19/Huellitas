@@ -1,4 +1,37 @@
+# Node.js
 node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build / dist
 dist
 dist-ssr
+build
+
+# SQLite database
+*.db
+*.sqlite
+*.sqlite3
+
+# Environment variables
+.env
+.env.*.local
+
+# Local config
 *.local
+
+# Logs
+logs
+*.log
+debug.log
+
+# IDE / OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Coverage / testing
+coverage
