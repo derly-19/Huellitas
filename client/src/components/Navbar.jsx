@@ -16,7 +16,7 @@ export default function Navbar() {
   ];
 
   return (
-    <nav className="flex justify-between items-center px-6 py-4 bg-[var(--primary)] text-[var(--secondary)] relative shadow">
+    <nav className="fixed top-0 left-0 w-full flex justify-between items-center px-6 py-4 bg-[var(--primary)] text-[var(--secondary)] shadow z-50">
       {/* Logo */}
       <motion.div
         className="flex items-center gap-2"
