@@ -34,6 +34,7 @@ function AppContent() {
         <Route path="/formulario" element={<Formulario />} />
         <Route path="/formulario/:petId" element={<Formulario />} />
         <Route path="/carnet" element={<Carnet />} />
+        <Route path="/carnet/:petId" element={<Carnet />} />
       </Routes>
       {!hideLayout && <Footer />}
     </>

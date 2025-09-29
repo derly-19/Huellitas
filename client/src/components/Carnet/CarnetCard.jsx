@@ -1,15 +1,28 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import CarnetSection from './CarnetSection';
 
 export default function CarnetCard({ initialData = {} }) {
   const [expandedSection, setExpandedSection] = useState('vacunas');
   const [carnetData, setCarnetData] = useState({
     vacunas: initialData.vacunas || [],
+    desparasitaciones: initialData.desparasitaciones || [],
     baños: initialData.baños || [],
-    desparasitacion: initialData.desparasitacion || [],
-    medicamentos: initialData.medicamentos || [],
-    historialMedico: initialData.historialMedico || []
+    procedimientos: initialData.procedimientos || [],
+    medicamentos: initialData.medicamentos || []
   });
+
+  // Actualizar datos cuando cambien las props
+  useEffect(() => {
+    if (initialData) {
+      setCarnetData({
+        vacunas: initialData.vacunas || [],
+        desparasitaciones: initialData.desparasitaciones || [],
+        baños: initialData.baños || [],
+        procedimientos: initialData.procedimientos || [],
+        medicamentos: initialData.medicamentos || []
+      });
+    }
+  }, [initialData]);
 
   const sections = [
     { 
@@ -18,24 +31,24 @@ export default function CarnetCard({ initialData = {} }) {
       icon: '💉' 
     },
     { 
-      id: 'baños', 
-      title: 'Baños', 
-      icon: '🛁' 
+      id: 'desparasitaciones', 
+      title: 'Desparasitaciones', 
+      icon: '🪱' 
     },
     { 
-      id: 'desparasitacion', 
-      title: 'Desparasitación', 
-      icon: '💊' 
+      id: 'baños', 
+      title: 'Baños y Cuidados', 
+      icon: '�' 
+    },
+    { 
+      id: 'procedimientos', 
+      title: 'Procedimientos Médicos', 
+      icon: '🏥' 
     },
     { 
       id: 'medicamentos', 
       title: 'Medicamentos', 
-      icon: '🏥' 
-    },
-    { 
-      id: 'historialMedico', 
-      title: 'Historial médico', 
-      icon: '📋' 
+      icon: '�' 
     }
   ];
 
