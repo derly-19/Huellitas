@@ -188,7 +188,15 @@ export default function Formulario() {
                 <p><strong>Fundación:</strong> {mascota.foundation}</p>
               </div>
             )}
-            <button className="bg-[#A5A07A] text-white px-4 py-2 rounded hover:bg-[#8C8762] transition">
+            <button 
+              onClick={() => navigate('/carnet', { 
+                state: { 
+                  petInfo: mascota,
+                  fromFormulario: true 
+                }
+              })}
+              className="bg-[#A5A07A] text-white px-4 py-2 rounded hover:bg-[#8C8762] transition"
+            >
               Ver carnet
             </button>
           </div>
