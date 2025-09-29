@@ -1,5 +1,3 @@
-import { useNavigate } from "react-router-dom";
-
 export default function Card({ 
   id, 
   name, 
@@ -8,8 +6,6 @@ export default function Card({
   type = "pet", 
   onAdopt 
 }) {
-  const navigate = useNavigate();
-
   // Función para manejar el clic en "Adoptar"
   const handleAdoptClick = () => {
     if (onAdopt) {
@@ -45,18 +41,12 @@ export default function Card({
           }
         </p>
         
-        <div className="flex gap-2">
+        <div className="w-full">
           <button 
             onClick={handleAdoptClick}
-            className="flex-1 py-2 rounded-xl bg-[#005017] text-white font-semibold text-base shadow hover:bg-[#0e8c37] transition"
+            className="w-full py-3 rounded-xl bg-[#005017] text-white font-semibold text-base shadow hover:bg-[#0e8c37] transition"
           >
             ¡Adóptame!
-          </button>
-          <button 
-            onClick={() => navigate(`/pet/${id}`)}
-            className="flex-1 py-2 rounded-xl bg-gray-200 text-gray-700 font-semibold text-base shadow hover:bg-gray-300 transition"
-          >
-            Ver más
           </button>
         </div>
       </div>

@@ -63,6 +63,7 @@ export default function Perritos() {
           tamaño: dog.size,
           sexo: dog.sex,
           fundacion: dog.foundation,
+          historial: dog.historial, // Historia de rescate
         }));
         setDogs(formattedDogs);
       } else {
@@ -219,6 +220,7 @@ export default function Perritos() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: i * 0.1 }}
             viewport={{ once: true }}
+            onClick={() => setSelectedDog(dog)} // Abrir modal al hacer clic en la card
           >
             <img src={dog.img} alt={dog.name} className="w-full h-48 object-cover" />
             <div className="p-4 text-left">
@@ -232,22 +234,16 @@ export default function Perritos() {
                 {dog.desc.substring(0, 50)}...
               </p>
               
-              {/* Botones de acción */}
-              <div className="flex gap-2 mt-4">
+              {/* Botón de acción */}
+              <div className="w-full mt-4">
                 <button
                   onClick={(e) => {
                     e.stopPropagation(); // Evitar que se abra el modal
                     handleAdopt(dog);
                   }}
-                  className="flex-1 bg-[#005017] text-white py-2 px-4 rounded-lg font-semibold hover:bg-[#0e8c37] transition"
+                  className="w-full bg-[#005017] text-white py-3 px-4 rounded-lg font-semibold hover:bg-[#0e8c37] transition"
                 >
                   ¡Adoptar!
-                </button>
-                <button
-                  onClick={() => setSelectedDog(dog)}
-                  className="flex-1 bg-gray-200 text-gray-700 py-2 px-4 rounded-lg font-semibold hover:bg-gray-300 transition"
-                >
-                  Ver más
                 </button>
               </div>
             </div>
@@ -258,15 +254,14 @@ export default function Perritos() {
 
         {/* Modal */}
         {selectedDog && (
-        <div className="fixed inset-0 backdrop-blur-sm bg-black/20 flex items-center justify-center z-50">
-            <div className="bg-[#FDF8E7] rounded-lg shadow-lg w-11/12 md:w-2/3 lg:w-1/2 p-6 relative">
-            {/* Cerrar */}
-            <button
-                onClick={() => setSelectedDog(null)}
-                className="absolute top-3 right-3 text-xl font-bold text-gray-700 hover:text-black"
+        <div 
+            className="fixed inset-0 backdrop-blur-sm bg-black/20 flex items-center justify-center z-50"
+            onClick={() => setSelectedDog(null)} // Cerrar al hacer clic en el fondo
+        >
+            <div 
+                className="bg-[#FDF8E7] rounded-lg shadow-lg w-11/12 md:w-2/3 lg:w-1/2 p-6 relative"
+                onClick={(e) => e.stopPropagation()} // Evitar que se cierre al hacer clic dentro del modal
             >
-                ✖
-            </button>
 
             <h2 className="text-2xl font-bold mb-4 text-center">{selectedDog.name}</h2>
 
@@ -276,7 +271,17 @@ export default function Perritos() {
                 alt={selectedDog.name}
                 className="w-48 h-40 object-cover rounded-lg"
                 />
-                <p className="text-gray-700">{selectedDog.desc}</p>
+                <div className="flex-1">
+                    <p className="text-gray-700 mb-4">{selectedDog.desc}</p>
+                    
+                    {/* Historial de rescate */}
+                    {selectedDog.historial && (
+                        <div className="bg-amber-50 border-l-4 border-amber-400 p-4 rounded">
+                            <h4 className="font-semibold text-amber-800 mb-2">📖 Historia de rescate</h4>
+                            <p className="text-amber-700 text-sm leading-relaxed">{selectedDog.historial}</p>
+                        </div>
+                    )}
+                </div>
             </div>
 
             {/* Info */}

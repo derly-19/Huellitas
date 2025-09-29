@@ -63,7 +63,9 @@ export default function Gatitos() {
           tamaño: cat.size,
           sexo: cat.sex,
           fundacion: cat.foundation,
+          historial: cat.historial, // Historia de rescate
         }));
+        
         setCats(formattedCats);
       } else {
         setError('Error al cargar los gatos');
@@ -219,6 +221,7 @@ export default function Gatitos() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: i * 0.1 }}
             viewport={{ once: true }}
+            onClick={() => setSelectedCat(cat)} // Abrir modal al hacer clic en la card
           >
             <img src={cat.img} alt={cat.name} className="w-full h-48 object-cover" />
             <div className="p-4 text-left">
@@ -232,22 +235,16 @@ export default function Gatitos() {
                 {cat.desc.substring(0, 50)}...
               </p>
               
-              {/* Botones de acción */}
-              <div className="flex gap-2 mt-4">
+              {/* Botón de acción */}
+              <div className="w-full mt-4">
                 <button
                   onClick={(e) => {
                     e.stopPropagation(); // Evitar que se abra el modal
                     handleAdopt(cat);
                   }}
-                  className="flex-1 bg-[#005017] text-white py-2 px-4 rounded-lg font-semibold hover:bg-[#0e8c37] transition"
+                  className="w-full bg-[#005017] text-white py-3 px-4 rounded-lg font-semibold hover:bg-[#0e8c37] transition"
                 >
                   ¡Adoptar!
-                </button>
-                <button
-                  onClick={() => setSelectedCat(cat)}
-                  className="flex-1 bg-gray-200 text-gray-700 py-2 px-4 rounded-lg font-semibold hover:bg-gray-300 transition"
-                >
-                  Ver más
                 </button>
               </div>
             </div>
@@ -258,15 +255,14 @@ export default function Gatitos() {
 
       {/* Modal */}
       {selectedCat && (
-        <div className="fixed inset-0 backdrop-blur-sm bg-black/20 flex items-center justify-center z-50">
-          <div className="bg-[#FDF8E7] rounded-lg shadow-lg w-11/12 md:w-2/3 lg:w-1/2 p-6 relative">
-            {/* Cerrar */}
-            <button
-              onClick={() => setSelectedCat(null)}
-              className="absolute top-3 right-3 text-xl font-bold text-gray-700 hover:text-black"
-            >
-              ✖
-            </button>
+        <div 
+            className="fixed inset-0 backdrop-blur-sm bg-black/20 flex items-center justify-center z-50"
+            onClick={() => setSelectedCat(null)} // Cerrar al hacer clic en el fondo
+        >
+          <div 
+              className="bg-[#FDF8E7] rounded-lg shadow-lg w-11/12 md:w-2/3 lg:w-1/2 p-6 relative"
+              onClick={(e) => e.stopPropagation()} // Evitar que se cierre al hacer clic dentro del modal
+          >
 
             <h2 className="text-2xl font-bold mb-4 text-center">{selectedCat.name}</h2>
 
@@ -276,20 +272,33 @@ export default function Gatitos() {
                 alt={selectedCat.name}
                 className="w-48 h-40 object-cover rounded-lg"
               />
-              <p className="text-gray-700">{selectedCat.desc}</p>
+              <div className="flex-1">
+                  <p className="text-gray-700 mb-4">{selectedCat.desc || selectedCat.description}</p>
+                  
+                  {/* Historial de rescate */}
+                  {selectedCat.historial && (
+                      <div className="bg-amber-50 border-l-4 border-amber-400 p-4 rounded">
+                          <h4 className="font-semibold text-amber-800 mb-2">📖 Historia de rescate</h4>
+                          <p className="text-amber-700 text-sm leading-relaxed">{selectedCat.historial}</p>
+                      </div>
+                  )}
+              </div>
             </div>
 
             {/* Info */}
             <div className="grid grid-cols-2 gap-4 mt-6 text-sm">
-              <span><strong>Edad:</strong> {selectedCat.edad}</span>
-              <span><strong>Tamaño:</strong> {selectedCat.tamaño}</span>
-              <span><strong>Sexo:</strong> {selectedCat.sexo}</span>
-              <span><strong>Fundación:</strong> {selectedCat.fundacion}</span>
+              <span><strong>Edad:</strong> {selectedCat.age || selectedCat.edad}</span>
+              <span><strong>Tamaño:</strong> {selectedCat.size || selectedCat.tamaño}</span>
+              <span><strong>Sexo:</strong> {selectedCat.sex || selectedCat.sexo}</span>
+              <span><strong>Fundación:</strong> {selectedCat.foundation || selectedCat.fundacion}</span>
             </div>
 
             {/* Botón adoptar */}
             <div className="text-center mt-6">
-              <button className="bg-green-600 text-white px-6 py-2 rounded-lg shadow hover:bg-green-700 transition">
+              <button 
+                  onClick={() => handleAdopt(selectedCat)}
+                  className="bg-green-600 text-white px-6 py-2 rounded-lg shadow hover:bg-green-700 transition"
+              >
                 🐾 Adoptar a {selectedCat.name}
               </button>
             </div>
