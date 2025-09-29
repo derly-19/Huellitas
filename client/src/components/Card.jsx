@@ -4,20 +4,33 @@ export default function Card({
   img, 
   description, 
   type = "pet", 
-  onAdopt 
+  onAdopt,
+  onCardClick,
+  petData
 }) {
   // Función para manejar el clic en "Adoptar"
-  const handleAdoptClick = () => {
+  const handleAdoptClick = (e) => {
+    e.stopPropagation(); // Evitar que se abra el modal
     if (onAdopt) {
-      onAdopt({ id, name, img, description, type });
+      onAdopt(petData || { id, name, img, description, type });
     } else {
       // Fallback si no se pasa la función onAdopt
       console.log(`Adoptar a ${name} (ID: ${id})`);
     }
   };
 
+  // Función para manejar el clic en la tarjeta
+  const handleCardClick = () => {
+    if (onCardClick && petData) {
+      onCardClick(petData);
+    }
+  };
+
   return (
-    <div className="bg-white rounded-2xl shadow-lg w-full max-w-xs mx-auto flex flex-col overflow-hidden transition-transform duration-300 hover:scale-105">
+    <div 
+      className="bg-white rounded-2xl shadow-lg w-full max-w-xs mx-auto flex flex-col overflow-hidden transition-transform duration-300 hover:scale-105 cursor-pointer"
+      onClick={handleCardClick}
+    >
       {/* Imagen grande */}
       <div className="w-full h-48 md:h-56 bg-gray-100 flex items-center justify-center overflow-hidden">
         <img
