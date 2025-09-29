@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { IoChevronDown } from "react-icons/io5";
 import { useAuth } from "../contexts/AuthContext";
 import { useAdoption } from "../contexts/AdoptionContext";
+import AdoptionNotification from "../components/AdoptionNotification";
 
 export default function Perritos() {
   const navigate = useNavigate();
@@ -13,6 +14,8 @@ export default function Perritos() {
   const { saveAdoptionIntent } = useAdoption();
   
   const [selectedDog, setSelectedDog] = useState(null);
+  const [showAdoptionNotification, setShowAdoptionNotification] = useState(false);
+  const [pendingAdoption, setPendingAdoption] = useState(null);
   // Estados para filtros y control de menú de filtros
   const [openFilter, setOpenFilter] = useState(null);
   const [selectedSize, setSelectedSize] = useState(null);
@@ -30,19 +33,40 @@ export default function Perritos() {
       // Si está autenticado, ir directamente al formulario
       navigate(`/formulario/${dog.id}`);
     } else {
-      // Si NO está autenticado, guardar intención y redirigir al login
+      // Si NO está autenticado, mostrar notificación personalizada
+      setPendingAdoption(dog);
+      setShowAdoptionNotification(true);
+    }
+  };
+
+  // Función para manejar el login desde la notificación
+  const handleLoginFromNotification = () => {
+    if (pendingAdoption) {
       saveAdoptionIntent({
-        id: dog.id,
-        name: dog.name,
-        img: dog.img,
-        description: dog.desc,
+        id: pendingAdoption.id,
+        name: pendingAdoption.name,
+        img: pendingAdoption.img,
+        description: pendingAdoption.desc,
         type: 'dog'
       });
-      
-      // Mostrar mensaje y redirigir
-      alert(`¡${dog.name} te está esperando! Necesitas iniciar sesión para adoptar.`);
-      navigate("/login");
     }
+    setShowAdoptionNotification(false);
+    navigate("/login");
+  };
+
+  // Función para manejar el registro desde la notificación
+  const handleRegisterFromNotification = () => {
+    if (pendingAdoption) {
+      saveAdoptionIntent({
+        id: pendingAdoption.id,
+        name: pendingAdoption.name,
+        img: pendingAdoption.img,
+        description: pendingAdoption.desc,
+        type: 'dog'
+      });
+    }
+    setShowAdoptionNotification(false);
+    navigate("/register");
   };
 
   // Función para obtener perros desde la API
@@ -316,6 +340,14 @@ export default function Perritos() {
         ))}
       </div>
 
+      {/* Notificación de adopción */}
+      <AdoptionNotification
+        isVisible={showAdoptionNotification}
+        onClose={() => setShowAdoptionNotification(false)}
+        petName={pendingAdoption?.name || ""}
+        onLogin={handleLoginFromNotification}
+        onRegister={handleRegisterFromNotification}
+      />
       
     </>
   );

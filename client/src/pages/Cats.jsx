@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { IoChevronDown } from "react-icons/io5";
 import { useAuth } from "../contexts/AuthContext";
 import { useAdoption } from "../contexts/AdoptionContext";
+import AdoptionNotification from "../components/AdoptionNotification";
 
 export default function Gatitos() {
   const navigate = useNavigate();
@@ -13,6 +14,8 @@ export default function Gatitos() {
   const { saveAdoptionIntent } = useAdoption();
   
   const [selectedCat, setSelectedCat] = useState(null);
+  const [showAdoptionNotification, setShowAdoptionNotification] = useState(false);
+  const [pendingAdoption, setPendingAdoption] = useState(null);
   // Estados para filtros y control de menú de filtros
   const [openFilter, setOpenFilter] = useState(null);
   const [selectedSize, setSelectedSize] = useState(null);
@@ -30,19 +33,40 @@ export default function Gatitos() {
       // Si está autenticado, ir directamente al formulario
       navigate(`/formulario/${cat.id}`);
     } else {
-      // Si NO está autenticado, guardar intención y redirigir al login
+      // Si NO está autenticado, mostrar notificación personalizada
+      setPendingAdoption(cat);
+      setShowAdoptionNotification(true);
+    }
+  };
+
+  // Función para manejar el login desde la notificación
+  const handleLoginFromNotification = () => {
+    if (pendingAdoption) {
       saveAdoptionIntent({
-        id: cat.id,
-        name: cat.name,
-        img: cat.img,
-        description: cat.desc,
+        id: pendingAdoption.id,
+        name: pendingAdoption.name,
+        img: pendingAdoption.img,
+        description: pendingAdoption.desc,
         type: 'cat'
       });
-      
-      // Mostrar mensaje y redirigir
-      alert(`¡${cat.name} te está esperando! Necesitas iniciar sesión para adoptar.`);
-      navigate("/login");
     }
+    setShowAdoptionNotification(false);
+    navigate("/login");
+  };
+
+  // Función para manejar el registro desde la notificación
+  const handleRegisterFromNotification = () => {
+    if (pendingAdoption) {
+      saveAdoptionIntent({
+        id: pendingAdoption.id,
+        name: pendingAdoption.name,
+        img: pendingAdoption.img,
+        description: pendingAdoption.desc,
+        type: 'cat'
+      });
+    }
+    setShowAdoptionNotification(false);
+    navigate("/register");
   };
 
   // Función para obtener gatos desde la API
@@ -319,6 +343,15 @@ export default function Gatitos() {
           </button>
         ))}
       </div>
+
+      {/* Notificación de adopción */}
+      <AdoptionNotification
+        isVisible={showAdoptionNotification}
+        onClose={() => setShowAdoptionNotification(false)}
+        petName={pendingAdoption?.name || ""}
+        onLogin={handleLoginFromNotification}
+        onRegister={handleRegisterFromNotification}
+      />
     </>
   );
 }
