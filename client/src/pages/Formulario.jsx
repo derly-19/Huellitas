@@ -1,8 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function Formulario() {
+  const { petId } = useParams();
+  const navigate = useNavigate();
+  const { user, isAuthenticated } = useAuth();
+  
   // Estados para el formulario
   const [formData, setFormData] = useState({
     // Datos personales
@@ -20,12 +26,56 @@ export default function Formulario() {
     motivacion: ""
   });
 
-  // Información de la mascota (esto vendría de props o router params en una app real)
-  const mascota = {
-    nombre: "Luna",
-    imagen: "/path-to-luna-image.jpg", // Reemplazar con imagen real
-    descripcion: "Luna fue rescatada estaba en la calle sola y así es como con amor se puede cambiar vidas"
+  // Estados para la mascota
+  const [mascota, setMascota] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  // Función para obtener datos de la mascota
+  const fetchPetData = async (id) => {
+    try {
+      setLoading(true);
+      const response = await fetch(`http://localhost:4000/api/pets/${id}`);
+      const result = await response.json();
+      
+      if (result.success) {
+        setMascota(result.data);
+      } else {
+        setError('Mascota no encontrada');
+      }
+    } catch (err) {
+      console.error('Error fetching pet data:', err);
+      setError('Error al cargar la información de la mascota');
+    } finally {
+      setLoading(false);
+    }
   };
+
+  // Cargar datos al montar el componente
+  useEffect(() => {
+    // Verificar autenticación
+    if (!isAuthenticated()) {
+      navigate('/login');
+      return;
+    }
+
+    // Pre-llenar datos del usuario si están disponibles
+    if (user) {
+      setFormData(prev => ({
+        ...prev,
+        correo: user.email || "",
+        nombre: user.username || ""
+      }));
+    }
+
+    // Cargar datos de la mascota si se proporciona un ID
+    if (petId) {
+      fetchPetData(petId);
+    } else {
+      setLoading(false);
+    }
+  }, [petId, user, isAuthenticated, navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -35,12 +85,65 @@ export default function Formulario() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Datos del formulario:", formData);
-    // Aquí enviarías los datos al backend
-    alert("Formulario enviado correctamente!");
+    setSubmitting(true);
+
+    try {
+      // Aquí enviarías los datos del formulario a tu API
+      const adoptionData = {
+        ...formData,
+        petId: petId,
+        petName: mascota?.name,
+        userId: user?.id,
+        timestamp: new Date().toISOString()
+      };
+
+      console.log("Datos de adopción:", adoptionData);
+      
+      // Simular envío a API
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      alert(`¡Solicitud de adopción enviada para ${mascota?.name || 'la mascota'}! Nos pondremos en contacto contigo pronto.`);
+      navigate("/");
+      
+    } catch (error) {
+      console.error('Error enviando formulario:', error);
+      alert('Error al enviar la solicitud. Inténtalo de nuevo.');
+    } finally {
+      setSubmitting(false);
+    }
   };
+
+  // Estados de carga para el UI
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#FFFCF4] flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#005017] mx-auto"></div>
+          <p className="mt-4 text-gray-600">Cargando información...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-[#FFFCF4] flex items-center justify-center">
+        <div className="text-center">
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded max-w-md">
+            <strong>Error:</strong> {error}
+            <button 
+              onClick={() => navigate('/')}
+              className="ml-3 underline hover:no-underline"
+            >
+              Volver al inicio
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#FFFCF4]">
@@ -54,16 +157,37 @@ export default function Formulario() {
           transition={{ duration: 0.6 }}
         >
           <div className="w-20 h-20 rounded-full border-4 border-green-600 overflow-hidden bg-gray-200 flex items-center justify-center">
-            {/* Placeholder para la imagen - reemplaza con imagen real */}
-            <span className="text-2xl">🐕</span>
+            {/* Imagen de la mascota */}
+            {mascota?.img ? (
+              <img 
+                src={mascota.img} 
+                alt={mascota.name}
+                className="w-24 h-24 rounded-full object-cover"
+                onError={(e) => {
+                  e.target.src = '/public/icon.png';
+                }}
+              />
+            ) : (
+              <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center">
+                <span className="text-2xl">{mascota?.type === 'cat' ? '🐱' : '🐕'}</span>
+              </div>
+            )}
           </div>
           <div>
             <h2 className="text-2xl font-bold text-gray-800 mb-2">
-              Conoce a {mascota.nombre}
+              {mascota ? `Conoce a ${mascota.name}` : 'Formulario de Adopción'}
             </h2>
             <p className="text-gray-700 mb-4 max-w-md">
-              {mascota.descripcion}
+              {mascota?.description || 'Completa el formulario para adoptar una mascota.'}
             </p>
+            {mascota && (
+              <div className="text-sm text-gray-600 mb-4">
+                <p><strong>Edad:</strong> {mascota.age}</p>
+                <p><strong>Tamaño:</strong> {mascota.size}</p>
+                <p><strong>Sexo:</strong> {mascota.sex}</p>
+                <p><strong>Fundación:</strong> {mascota.foundation}</p>
+              </div>
+            )}
             <button className="bg-[#A5A07A] text-white px-4 py-2 rounded hover:bg-[#8C8762] transition">
               Ver carnet
             </button>
@@ -222,9 +346,14 @@ export default function Formulario() {
             <div className="text-left">
               <button
                 type="submit"
-                className="bg-[#BCC990] text-white px-8 py-3 rounded-lg hover:bg-[#A5B67F] transition-colors font-medium"
+                disabled={submitting}
+                className={`px-8 py-3 rounded-lg font-medium transition-colors ${
+                  submitting 
+                    ? 'bg-gray-400 cursor-not-allowed' 
+                    : 'bg-[#BCC990] hover:bg-[#A5B67F] text-white'
+                }`}
               >
-                Enviar
+                {submitting ? 'Enviando solicitud...' : `Adoptar${mascota ? ` a ${mascota.name}` : ''}`}
               </button>
             </div>
           </form>

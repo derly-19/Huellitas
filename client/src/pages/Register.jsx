@@ -1,16 +1,24 @@
 //client\src\pages\Register.jsx
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
+import { useAuth } from "../contexts/AuthContext";
+import { useAdoption } from "../contexts/AdoptionContext";
 
 export default function Register() {
+  const navigate = useNavigate();
+  const { register } = useAuth();
+  const { getAdoptionIntent, clearAdoptionIntent } = useAdoption();
+  
   const [formData, setFormData] = useState({
-    name: "",
+    username: "",
     email: "",
     password: "",
   });
 
   const [message, setMessage] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   // Manejar cambios en los inputs
   const handleChange = (e) => {
@@ -20,25 +28,35 @@ export default function Register() {
   // Manejar el submit
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:4000/api/users/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
+      const result = await register(formData.username, formData.email, formData.password);
 
-      const data = await res.json();
-
-      if (res.ok) {
-        setMessage({ type: "success", text: data.message });
-        setFormData({ name: "", email: "", password: "" }); // limpiar
+      if (result.success) {
+        setMessage({ type: "success", text: "✅ Registro exitoso, bienvenido!" });
+        
+        // Verificar si hay una intención de adopción guardada
+        const adoptionIntent = getAdoptionIntent();
+        
+        if (adoptionIntent) {
+          // Limpiar la intención
+          clearAdoptionIntent();
+          
+          // Redirigir al formulario con la mascota seleccionada
+          navigate(`/formulario/${adoptionIntent.petId}`);
+        } else {
+          // Redirigir al inicio si no hay intención de adopción
+          navigate("/");
+        }
       } else {
-        setMessage({ type: "error", text: data.error });
+        setMessage({ type: "error", text: "❌ " + result.message });
       }
     } catch (error) {
       console.error(error);
-      setMessage({ type: "error", text: "Error de conexión con el servidor" });
+      setMessage({ type: "error", text: "❌ Error de conexión con el servidor" });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -85,10 +103,10 @@ export default function Register() {
         >
           <input
             type="text"
-            name="name"
-            value={formData.name}
+            name="username"
+            value={formData.username}
             onChange={handleChange}
-            placeholder="Nombre"
+            placeholder="Nombre de usuario"
             className="w-full border border-gray-200 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-[#BCC990]"
           />
 
@@ -112,11 +130,16 @@ export default function Register() {
 
           <motion.button
             type="submit"
-            className="mt-2 w-full bg-[#BCC990] hover:bg-[#9FB36F] text-white font-semibold py-2 rounded-lg shadow"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            disabled={loading}
+            className={`mt-2 w-full font-semibold py-2 rounded-lg shadow ${
+              loading 
+                ? 'bg-gray-400 cursor-not-allowed' 
+                : 'bg-[#BCC990] hover:bg-[#9FB36F] text-white'
+            }`}
+            whileHover={!loading ? { scale: 1.05 } : {}}
+            whileTap={!loading ? { scale: 0.95 } : {}}
           >
-            Crear cuenta
+            {loading ? "Creando cuenta..." : "Crear cuenta"}
           </motion.button>
         </motion.form>
 

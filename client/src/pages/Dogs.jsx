@@ -1,70 +1,85 @@
 // src/pages/dogs.jsx
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import { IoChevronDown } from "react-icons/io5";
-
-// Importar imágenes locales desde src/assets (si moviste las imágenes ahí)
-import p1 from "../assets/p1.jpg";
-import p2 from "../assets/p2.jpg";
-import p3 from "../assets/p3.jpg";
-import p4 from "../assets/p4.jpg";
-import p5 from "../assets/p5.jpg";
+import { useAuth } from "../contexts/AuthContext";
+import { useAdoption } from "../contexts/AdoptionContext";
 
 export default function Perritos() {
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+  const { saveAdoptionIntent } = useAdoption();
+  
   const [selectedDog, setSelectedDog] = useState(null);
   // Estados para filtros y control de menú de filtros
   const [openFilter, setOpenFilter] = useState(null);
   const [selectedSize, setSelectedSize] = useState(null);
   const [selectedAge, setSelectedAge] = useState(null);
   const [selectedSex, setSelectedSex] = useState(null);
-  const dogs = [
-    {
-      name: "Bella",
-      img: p1,
-      desc: "Bella es una perrita tranquila, le encanta jugar y busca un hogar lleno de cariño.",
-      edad: "Cachorra",
-      tamaño: "Pequeña",
-      sexo: "Hembra",
-      fundacion: "Huellitas de Amor",
-    },
-    {
-      name: "Rocky",
-      img: p2,
-      desc: "Rocky es un perro lleno de energía, ideal para familias activas.",
-      edad: "Adulto",
-      tamaño: "Grande",
-      sexo: "Macho",
-      fundacion: "Corazón Canino",
-    },
-    {
-      name: "Nina",
-      img: p3,
-      desc: "Nina es amorosa y muy sociable, perfecta para cualquier familia.",
-      edad: "Joven",
-      tamaño: "Mediana",
-      sexo: "Hembra",
-      fundacion: "Refugio Esperanza",
-    },
-    {
-      name: "Max",
-      img: p4,
-      desc: "Max es juguetón y muy noble, siempre está listo para recibir cariño.",
-      edad: "Cachorro",
-      tamaño: "Grande",
-      sexo: "Macho",
-      fundacion: "Amigos de 4 Patas",
-    },
-    {
-      name: "Toby",
-      img: p5,
-      desc: "Toby es tranquilo, le gusta descansar y disfrutar de la compañía.",
-      edad: "Adulto",
-      tamaño: "Mediano",
-      sexo: "Macho",
-      fundacion: "Patitas Felices",
-    },
-  ];
+  
+  // Estados para manejar los datos de la API
+  const [dogs, setDogs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Función para manejar la adopción
+  const handleAdopt = (dog) => {
+    if (isAuthenticated()) {
+      // Si está autenticado, ir directamente al formulario
+      navigate(`/formulario/${dog.id}`);
+    } else {
+      // Si NO está autenticado, guardar intención y redirigir al login
+      saveAdoptionIntent({
+        id: dog.id,
+        name: dog.name,
+        img: dog.img,
+        description: dog.desc,
+        type: 'dog'
+      });
+      
+      // Mostrar mensaje y redirigir
+      alert(`¡${dog.name} te está esperando! Necesitas iniciar sesión para adoptar.`);
+      navigate("/login");
+    }
+  };
+
+  // Función para obtener perros desde la API
+  const fetchDogs = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('http://localhost:4000/api/pets?type=dog');
+      const result = await response.json();
+      
+      if (result.success) {
+        // Mapear los datos de la API al formato que espera el componente
+        const formattedDogs = result.data.map(dog => ({
+          id: dog.id,
+          name: dog.name,
+          img: dog.img,
+          desc: dog.description,
+          edad: dog.age,
+          tamaño: dog.size,
+          sexo: dog.sex,
+          fundacion: dog.foundation,
+        }));
+        setDogs(formattedDogs);
+      } else {
+        setError('Error al cargar los perros');
+      }
+    } catch (err) {
+      console.error('Error fetching dogs:', err);
+      setError('Error de conexión con el servidor');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Cargar datos al montar el componente
+  useEffect(() => {
+    fetchDogs();
+  }, []);
 
   return (
     <>
@@ -162,8 +177,31 @@ export default function Perritos() {
         </div>
       </motion.div>
 
+      {/* Estados de carga y error */}
+      {loading && (
+        <div className="flex justify-center items-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#005017]"></div>
+          <span className="ml-3 text-gray-600">Cargando perritos...</span>
+        </div>
+      )}
+
+      {error && (
+        <div className="text-center py-12">
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded max-w-md mx-auto">
+            <strong>Error:</strong> {error}
+            <button 
+              onClick={fetchDogs}
+              className="ml-3 underline hover:no-underline"
+            >
+              Reintentar
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Grid de Perritos */}
-      <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 px-6 max-w-6xl mx-auto my-10">
+      {!loading && !error && (
+        <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 px-6 max-w-6xl mx-auto my-10">
         {dogs
       .filter((dog) => {
         const normalize = (s) => (s || "").toLowerCase().replace(/[ao]$/,'');
@@ -175,7 +213,6 @@ export default function Perritos() {
           .map((dog, i) => (
           <motion.div
             key={i}
-            onClick={() => setSelectedDog(dog)}
             className="bg-[#EDE4D6] rounded-lg shadow-md overflow-hidden hover:shadow-xl transition cursor-pointer"
             whileHover={{ scale: 1.05 }}
             initial={{ opacity: 0, y: 50 }}
@@ -194,10 +231,30 @@ export default function Perritos() {
               <p className="text-sm text-gray-500 mt-2">
                 {dog.desc.substring(0, 50)}...
               </p>
+              
+              {/* Botones de acción */}
+              <div className="flex gap-2 mt-4">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation(); // Evitar que se abra el modal
+                    handleAdopt(dog);
+                  }}
+                  className="flex-1 bg-[#005017] text-white py-2 px-4 rounded-lg font-semibold hover:bg-[#0e8c37] transition"
+                >
+                  ¡Adoptar!
+                </button>
+                <button
+                  onClick={() => setSelectedDog(dog)}
+                  className="flex-1 bg-gray-200 text-gray-700 py-2 px-4 rounded-lg font-semibold hover:bg-gray-300 transition"
+                >
+                  Ver más
+                </button>
+              </div>
             </div>
           </motion.div>
         ))}
-      </section>
+        </section>
+      )}
 
         {/* Modal */}
         {selectedDog && (

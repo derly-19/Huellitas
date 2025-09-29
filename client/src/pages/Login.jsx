@@ -2,37 +2,52 @@
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import { useAdoption } from "../contexts/AdoptionContext";
 
 export default function Login() {
+    const navigate = useNavigate();
+    const { login } = useAuth();
+    const { getAdoptionIntent, clearAdoptionIntent } = useAdoption();
+    
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [message, setMessage] = useState("");
+    const [loading, setLoading] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true);
 
         try {
-            const res = await fetch("http://localhost:4000/api/users/login", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ email, password }),
-            });
+            const result = await login(email, password);
 
-            const data = await res.json();
-
-            if (!res.ok) {
-                setMessage(data.error || "Error en el login ❌");
+            if (result.success) {
+                setMessage("✅ Login exitoso, bienvenido!");
+                
+                // Verificar si hay una intención de adopción guardada
+                const adoptionIntent = getAdoptionIntent();
+                
+                if (adoptionIntent) {
+                    // Limpiar la intención
+                    clearAdoptionIntent();
+                    
+                    // Redirigir al formulario con la mascota seleccionada
+                    navigate(`/formulario/${adoptionIntent.petId}`);
+                } else {
+                    // Redirigir al inicio si no hay intención de adopción
+                    navigate("/");
+                }
             } else {
-                setMessage("✅ Login exitoso, bienvenido " + data.user.name);
-                // Guardar usuario en localStorage (ejemplo)
-                localStorage.setItem("user", JSON.stringify(data.user));
+                setMessage("❌ " + result.message);
             }
-       } catch (error) {
-      console.error(error);
-      setMessage({ type: "error", text: "Error de conexión con el servidor" });
-    }
+        } catch (error) {
+            console.error(error);
+            setMessage("❌ Error de conexión con el servidor");
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -86,11 +101,16 @@ export default function Login() {
 
                     <motion.button
                         type="submit"
-                        className="mt-2 w-full bg-[#BCC990] hover:bg-[#9FB36F] text-white font-semibold py-2 rounded-lg shadow"
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
+                        disabled={loading}
+                        className={`mt-2 w-full font-semibold py-2 rounded-lg shadow ${
+                            loading 
+                                ? 'bg-gray-400 cursor-not-allowed' 
+                                : 'bg-[#BCC990] hover:bg-[#9FB36F] text-white'
+                        }`}
+                        whileHover={!loading ? { scale: 1.05 } : {}}
+                        whileTap={!loading ? { scale: 0.95 } : {}}
                     >
-                        Iniciar sesión
+                        {loading ? "Iniciando sesión..." : "Iniciar sesión"}
                     </motion.button>
                 </motion.form>
 

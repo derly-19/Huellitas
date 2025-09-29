@@ -1,4 +1,6 @@
 import { Routes, Route, useLocation } from "react-router-dom";
+import { AuthProvider } from "./contexts/AuthContext";
+import { AdoptionProvider } from "./contexts/AdoptionContext";
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import Perritos from "./pages/Dogs"; 
@@ -10,7 +12,7 @@ import Fundaciones from "./pages/Fundaciones";
 import Formulario from "./pages/Formulario";
 import Carnet from "./pages/Carnet";
 
-export default function App() {
+function AppContent() {
   const location = useLocation();
 
   // rutas donde no quieres mostrar navbar/footer
@@ -30,9 +32,20 @@ export default function App() {
         <Route path="/Register" element={<Register />} />
         <Route path="/Fundaciones" element={<Fundaciones />} />
         <Route path="/formulario" element={<Formulario />} />
+        <Route path="/formulario/:petId" element={<Formulario />} />
         <Route path="/carnet" element={<Carnet />} />
       </Routes>
       {!hideLayout && <Footer />}
     </>
+  );
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <AdoptionProvider>
+        <AppContent />
+      </AdoptionProvider>
+    </AuthProvider>
   );
 }

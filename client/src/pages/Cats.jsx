@@ -1,17 +1,17 @@
 // src/pages/cats.jsx
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import { IoChevronDown } from "react-icons/io5";
-
-// Importar imágenes locales desde src/assets (si moviste las imágenes ahí)
-import g1 from "../assets/g1.jpg";
-import g2 from "../assets/g2.jpg";
-import g3 from "../assets/g3.jpg";
-import g4 from "../assets/g4.jpg";
-import g5 from "../assets/g5.jpg";
+import { useAuth } from "../contexts/AuthContext";
+import { useAdoption } from "../contexts/AdoptionContext";
 
 export default function Gatitos() {
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+  const { saveAdoptionIntent } = useAdoption();
+  
   const [selectedCat, setSelectedCat] = useState(null);
   // Estados para filtros y control de menú de filtros
   const [openFilter, setOpenFilter] = useState(null);
@@ -19,53 +19,67 @@ export default function Gatitos() {
   const [selectedAge, setSelectedAge] = useState(null);
   const [selectedSex, setSelectedSex] = useState(null);
 
-  const cats = [
-    {
-      name: "Luna",
-      img: g1,
-      desc: "Luna es dulce y tranquila, disfruta acurrucarse en lugares soleados.",
-      edad: "Joven",
-      tamaño: "Pequeña",
-      sexo: "Hembra",
-      fundacion: "Patitas de Amor",
-    },
-    {
-      name: "Simba",
-      img: g2,
-      desc: "Simba es curioso y muy juguetón, le encanta explorar.",
-      edad: "Cachorro",
-      tamaño: "Mediano",
-      sexo: "Macho",
-      fundacion: "Gatitos Felices",
-    },
-    {
-      name: "Misu",
-      img: g3,
-      desc: "Misu es independiente, pero adora las caricias cuando tiene confianza.",
-      edad: "Adulto",
-      tamaño: "Mediano",
-      sexo: "Hembra",
-      fundacion: "Refugio Esperanza",
-    },
-    {
-      name: "Tom",
-      img: g4,
-      desc: "Tom es un gato cariñoso que siempre busca compañía.",
-      edad: "Adulto",
-      tamaño: "Grande",
-      sexo: "Macho",
-      fundacion: "Amigos Felinos",
-    },
-    {
-      name: "Nieve",
-      img: g5,
-      desc: "Nieve es tranquila, ideal para familias que busquen calma.",
-      edad: "Joven",
-      tamaño: "Pequeña",
-      sexo: "Hembra",
-      fundacion: "Colitas Suaves",
-    },
-  ];
+  // Estados para manejar los datos de la API
+  const [cats, setCats] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Función para manejar la adopción
+  const handleAdopt = (cat) => {
+    if (isAuthenticated()) {
+      // Si está autenticado, ir directamente al formulario
+      navigate(`/formulario/${cat.id}`);
+    } else {
+      // Si NO está autenticado, guardar intención y redirigir al login
+      saveAdoptionIntent({
+        id: cat.id,
+        name: cat.name,
+        img: cat.img,
+        description: cat.desc,
+        type: 'cat'
+      });
+      
+      // Mostrar mensaje y redirigir
+      alert(`¡${cat.name} te está esperando! Necesitas iniciar sesión para adoptar.`);
+      navigate("/login");
+    }
+  };
+
+  // Función para obtener gatos desde la API
+  const fetchCats = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('http://localhost:4000/api/pets?type=cat');
+      const result = await response.json();
+      
+      if (result.success) {
+        // Mapear los datos de la API al formato que espera el componente
+        const formattedCats = result.data.map(cat => ({
+          id: cat.id,
+          name: cat.name,
+          img: cat.img,
+          desc: cat.description,
+          edad: cat.age,
+          tamaño: cat.size,
+          sexo: cat.sex,
+          fundacion: cat.foundation,
+        }));
+        setCats(formattedCats);
+      } else {
+        setError('Error al cargar los gatos');
+      }
+    } catch (err) {
+      console.error('Error fetching cats:', err);
+      setError('Error de conexión con el servidor');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Cargar datos al montar el componente
+  useEffect(() => {
+    fetchCats();
+  }, []);
 
   return (
     <>
@@ -163,9 +177,31 @@ export default function Gatitos() {
 
       </motion.div>
       
+      {/* Estados de carga y error */}
+      {loading && (
+        <div className="flex justify-center items-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#005017]"></div>
+          <span className="ml-3 text-gray-600">Cargando gatitos...</span>
+        </div>
+      )}
+
+      {error && (
+        <div className="text-center py-12">
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded max-w-md mx-auto">
+            <strong>Error:</strong> {error}
+            <button 
+              onClick={fetchCats}
+              className="ml-3 underline hover:no-underline"
+            >
+              Reintentar
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Grid de Gatitos */}
-      <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 px-6 max-w-6xl mx-auto my-10">
+      {!loading && !error && (
+        <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 px-6 max-w-6xl mx-auto my-10">
         {cats
           .filter((cat) => {
             const normalize = (s) => (s || "").toLowerCase().replace(/[ao]$/,'');
@@ -177,7 +213,6 @@ export default function Gatitos() {
           .map((cat, i) => (
           <motion.div
             key={i}
-            onClick={() => setSelectedCat(cat)}
             className="bg-[#EDE4D6] rounded-lg shadow-md overflow-hidden hover:shadow-xl transition cursor-pointer"
             whileHover={{ scale: 1.05 }}
             initial={{ opacity: 0, y: 50 }}
@@ -196,10 +231,30 @@ export default function Gatitos() {
               <p className="text-sm text-gray-500 mt-2">
                 {cat.desc.substring(0, 50)}...
               </p>
+              
+              {/* Botones de acción */}
+              <div className="flex gap-2 mt-4">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation(); // Evitar que se abra el modal
+                    handleAdopt(cat);
+                  }}
+                  className="flex-1 bg-[#005017] text-white py-2 px-4 rounded-lg font-semibold hover:bg-[#0e8c37] transition"
+                >
+                  ¡Adoptar!
+                </button>
+                <button
+                  onClick={() => setSelectedCat(cat)}
+                  className="flex-1 bg-gray-200 text-gray-700 py-2 px-4 rounded-lg font-semibold hover:bg-gray-300 transition"
+                >
+                  Ver más
+                </button>
+              </div>
             </div>
           </motion.div>
         ))}
-      </section>
+        </section>
+      )}
 
       {/* Modal */}
       {selectedCat && (
