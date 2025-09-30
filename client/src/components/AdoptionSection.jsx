@@ -2,7 +2,7 @@
 import { motion } from "framer-motion";
 import Card from "./Card";
 
-export default function AdoptionSection({ title, pets }) {
+export default function AdoptionSection({ title, pets, onAdopt, onCardClick }) {
   return (
     <section className="my-12 px-4 md:px-8 lg:px-16">
       {/* Título animado */}
@@ -38,7 +38,16 @@ export default function AdoptionSection({ title, pets }) {
             }}
             whileTap={{ scale: 0.97 }}
           >
-            <Card name={pet.name} img={pet.img} />
+            <Card 
+              id={pet.id}
+              name={pet.name} 
+              img={pet.img} 
+              description={pet.description}
+              type={pet.type}
+              onAdopt={onAdopt}
+              onCardClick={onCardClick}
+              petData={pet}
+            />
           </motion.div>
         ))}
       </motion.div>

@@ -1,6 +1,6 @@
 export default function CarnetHeader({ mascota }) {
   return (
-    <div className="text-center py-8">
+    <div className="text-center py-8 pt-28">
       <h1 className="text-3xl font-bold text-gray-800">
         Carnet digital
       </h1>

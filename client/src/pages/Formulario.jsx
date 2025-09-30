@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import { useAuth } from "../contexts/AuthContext";
+import SuccessNotification from "../components/SuccessNotification";
 
 export default function Formulario() {
   const { petId } = useParams();
@@ -31,6 +32,7 @@ export default function Formulario() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+  const [showSuccessNotification, setShowSuccessNotification] = useState(false);
 
   // Función para obtener datos de la mascota
   const fetchPetData = async (id) => {
@@ -104,8 +106,8 @@ export default function Formulario() {
       // Simular envío a API
       await new Promise(resolve => setTimeout(resolve, 2000));
       
-      alert(`¡Solicitud de adopción enviada para ${mascota?.name || 'la mascota'}! Nos pondremos en contacto contigo pronto.`);
-      navigate("/");
+      // Mostrar notificación de éxito
+      setShowSuccessNotification(true);
       
     } catch (error) {
       console.error('Error enviando formulario:', error);
@@ -113,6 +115,11 @@ export default function Formulario() {
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const handleSuccessClose = () => {
+    setShowSuccessNotification(false);
+    navigate("/");
   };
 
   // Estados de carga para el UI
@@ -148,7 +155,7 @@ export default function Formulario() {
   return (
     <div className="min-h-screen bg-[#FFFCF4]">
 
-      <div className="max-w-4xl mx-auto p-6">
+      <div className="max-w-4xl mx-auto p-6 pt-24">
         {/* Sección de la mascota */}
         <motion.div
           className="bg-[#D6D3C4] rounded-lg p-6 mb-8 flex items-center gap-6"
@@ -367,6 +374,14 @@ export default function Formulario() {
           </form>
         </motion.div>
       </div>
+
+      {/* Notificación de éxito */}
+      <SuccessNotification
+        isVisible={showSuccessNotification}
+        onClose={handleSuccessClose}
+        petName={mascota?.name || 'la mascota'}
+        message="Nos pondremos en contacto contigo pronto."
+      />
     </div>
   );
 }

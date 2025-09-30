@@ -2,18 +2,31 @@ import { useState } from "react";
 import { Link } from "react-router-dom"; // ✅ Para Vite/React
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Home, HeartHandshake, Dog, Cat } from "lucide-react";
+import { Menu, X, Home, HeartHandshake, Dog, Cat, FileText, User } from "lucide-react";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
+  const { isAuthenticated, user, logout } = useAuth();
 
-  // ✅ Links principales
-  const links = [
+  // ✅ Links para usuarios no autenticados (público)
+  const publicLinks = [
     { name: "Inicio", path: "/", icon: <Home size={18} /> },
     { name: "Perritos", path: "/Dogs", icon: <Dog size={18} /> },
     { name: "Gatitos", path: "/cats", icon: <Cat size={18} /> },
     { name: "Fundaciones", path: "/fundaciones", icon: <HeartHandshake size={18} /> },
   ];
+
+  // ✅ Links para usuarios autenticados
+  const authenticatedLinks = [
+    { name: "Inicio", path: "/", icon: <Home size={18} /> },
+    { name: "Carnet", path: "/carnet", icon: <FileText size={18} /> },
+    { name: "Adopción", path: "/Dogs", icon: <HeartHandshake size={18} /> },
+    { name: "Perfil", path: "/perfil", icon: <User size={18} /> },
+  ];
+
+  // Usar los links apropiados según el estado de autenticación
+  const links = isAuthenticated() ? authenticatedLinks : publicLinks;
 
   return (
     <nav className="fixed top-0 left-0 w-full flex justify-between items-center px-6 py-4 bg-[var(--primary)] text-[var(--secondary)] shadow z-50">
@@ -45,18 +58,37 @@ export default function Navbar() {
 
       {/* Botones en desktop */}
       <div className="hidden md:flex gap-3">
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          className="bg-white text-[var(--secondary)] px-4 py-1 rounded hover:bg-gray-100"
-        >
-          <Link to="/login">Sign in</Link>
-        </motion.button>
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          className="bg-[var(--secondary)] text-white px-4 py-1 rounded hover:bg-opacity-90"
-        >
-          <Link to="/register">Register</Link>
-        </motion.button>
+        {isAuthenticated() ? (
+          // Usuario autenticado - mostrar saludo y logout
+          <div className="flex items-center gap-3">
+            <span className="text-[var(--secondary)]">
+              ¡Hola, {user?.username || 'Usuario'}! 👋
+            </span>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              className="bg-red-500 text-white px-4 py-1 rounded hover:bg-red-600"
+              onClick={logout}
+            >
+              Cerrar Sesión
+            </motion.button>
+          </div>
+        ) : (
+          // Usuario no autenticado - mostrar login y register
+          <>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              className="bg-white text-[var(--secondary)] px-4 py-1 rounded hover:bg-gray-100"
+            >
+              <Link to="/login">Sign in</Link>
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              className="bg-[var(--secondary)] text-white px-4 py-1 rounded hover:bg-opacity-90"
+            >
+              <Link to="/register">Register</Link>
+            </motion.button>
+          </>
+        )}
       </div>
 
       {/* Botón menú móvil */}
@@ -77,7 +109,7 @@ export default function Navbar() {
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
           >
-            {links.map((link, i) => (
+            {(isAuthenticated() ? authenticatedLinks : publicLinks).map((link, i) => (
               <motion.div
                 key={i}
                 whileHover={{ scale: 1.1, color: "#fff" }}
@@ -92,20 +124,39 @@ export default function Navbar() {
             ))}
 
             <div className="flex flex-col gap-3 mt-4">
-              <Link
-                to="/login"
-                className="bg-white text-[var(--secondary)] px-4 py-1 rounded hover:bg-gray-100 text-center"
-                onClick={() => setOpen(false)}
-              >
-                Sign in
-              </Link>
-              <Link
-                to="/register"
-                className="bg-[var(--secondary)] text-white px-4 py-1 rounded hover:bg-opacity-90 text-center"
-                onClick={() => setOpen(false)}
-              >
-                Register
-              </Link>
+              {isAuthenticated() ? (
+                <>
+                  <div className="text-center text-white font-medium">
+                    Hola, {user?.nombre || user?.name || 'Usuario'}!
+                  </div>
+                  <button
+                    onClick={() => {
+                      logout();
+                      setOpen(false);
+                    }}
+                    className="bg-red-500 text-white px-4 py-1 rounded hover:bg-red-600 text-center"
+                  >
+                    Cerrar Sesión
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    to="/login"
+                    className="bg-white text-[var(--secondary)] px-4 py-1 rounded hover:bg-gray-100 text-center"
+                    onClick={() => setOpen(false)}
+                  >
+                    Sign in
+                  </Link>
+                  <Link
+                    to="/register"
+                    className="bg-[var(--secondary)] text-white px-4 py-1 rounded hover:bg-opacity-90 text-center"
+                    onClick={() => setOpen(false)}
+                  >
+                    Register
+                  </Link>
+                </>
+              )}
             </div>
           </motion.div>
         )}
