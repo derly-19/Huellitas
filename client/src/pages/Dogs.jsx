@@ -244,10 +244,28 @@ export default function Perritos() {
           <motion.div
             key={i}
             className="bg-[#EDE4D6] rounded-lg shadow-md overflow-hidden hover:shadow-xl transition cursor-pointer"
-            whileHover={{ scale: 1.05 }}
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: i * 0.1 }}
+            transition={{
+              duration: 0.5,
+              delay: i * 0.1
+            }}
+            animate={{
+              y: [0, -15, 0],
+            }}
+            whileHover={{
+              scale: 1.05,
+              y: 0,
+              boxShadow: "0px 8px 20px rgba(0,0,0,0.15)",
+              transition: {
+                scale: { duration: 0.3 },
+                y: { duration: 0.3 },
+              }
+            }}
+            whileTap={{ scale: 0.97 }}
+            style={{
+              animation: `float 3s ease-in-out ${i * 0.2}s infinite`,
+            }}
             viewport={{ once: true }}
             onClick={() => setSelectedDog(dog)} // Abrir modal al hacer clic en la card
           >
