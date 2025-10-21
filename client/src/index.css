@@ -15,3 +15,13 @@ body {
   background-color: #FFFCF4;
   color: var(--text);
 }
+
+/* Animación de flotación suave para tarjetas */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-15px);
+  }
+}

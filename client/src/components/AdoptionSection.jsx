@@ -31,12 +31,26 @@ export default function AdoptionSection({ title, pets, onAdopt, onCardClick }) {
               hidden: { opacity: 0, y: 40 },
               visible: { opacity: 1, y: 0 },
             }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
+            transition={{
+              duration: 0.6,
+              ease: "easeOut",
+            }}
+            animate={{
+              y: [0, -15, 0],
+            }}
             whileHover={{
               scale: 1.05,
+              y: 0,
               boxShadow: "0px 8px 20px rgba(0,0,0,0.15)",
+              transition: {
+                scale: { duration: 0.3 },
+                y: { duration: 0.3 },
+              }
             }}
             whileTap={{ scale: 0.97 }}
+            style={{
+              animation: `float 3s ease-in-out ${i * 0.2}s infinite`,
+            }}
           >
             <Card 
               id={pet.id}
