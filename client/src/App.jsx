@@ -22,22 +22,24 @@ function AppContent() {
 
 
   return (
-    <>
+    <div className="flex flex-col min-h-screen">
       {!hideLayout && <Navbar />}
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/Dogs" element={<Perritos />} />
-        <Route path="/Cats" element={<HeroCats />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/Register" element={<Register />} />
-        <Route path="/Fundaciones" element={<Fundaciones />} />
-        <Route path="/formulario" element={<Formulario />} />
-        <Route path="/formulario/:petId" element={<Formulario />} />
-        <Route path="/carnet" element={<Carnet />} />
-        <Route path="/carnet/:petId" element={<Carnet />} />
-      </Routes>
+      <main className="flex-grow">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/Dogs" element={<Perritos />} />
+          <Route path="/Cats" element={<HeroCats />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/Register" element={<Register />} />
+          <Route path="/Fundaciones" element={<Fundaciones />} />
+          <Route path="/formulario" element={<Formulario />} />
+          <Route path="/formulario/:petId" element={<Formulario />} />
+          <Route path="/carnet" element={<Carnet />} />
+          <Route path="/carnet/:petId" element={<Carnet />} />
+        </Routes>
+      </main>
       {!hideLayout && <Footer />}
-    </>
+    </div>
   );
 }
 
