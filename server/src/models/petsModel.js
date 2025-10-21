@@ -123,7 +123,7 @@ export async function insertInitialPets() {
     {
       name: "Luna",
       type: "dog",
-      img: "/src/assets/p1.jpg",
+      img: "/src/assets/p7.jpg",
       description: "Luna es cariñosa y juguetona, le encanta correr en el parque.",
       age: "Joven",
       size: "Mediano",
@@ -133,7 +133,7 @@ export async function insertInitialPets() {
     {
       name: "Bruno",
       type: "dog",
-      img: "/src/assets/p2.jpg",
+      img: "/src/assets/p8.jpg",
       description: "Bruno es tranquilo y obediente, perfecto para personas mayores.",
       age: "Adulto",
       size: "Grande",
@@ -143,7 +143,7 @@ export async function insertInitialPets() {
     {
       name: "Coco",
       type: "dog",
-      img: "/src/assets/p3.jpg",
+      img: "/src/assets/p9.jpg",
       description: "Coco es pequeña pero valiente, adora jugar con niños.",
       age: "Cachorro",
       size: "Pequeño",
@@ -153,7 +153,7 @@ export async function insertInitialPets() {
     {
       name: "Duke",
       type: "dog",
-      img: "/src/assets/p4.jpg",
+      img: "/src/assets/p10.jpg",
       description: "Duke es enérgico y atlético, necesita ejercicio diario.",
       age: "Joven",
       size: "Grande",
@@ -163,7 +163,7 @@ export async function insertInitialPets() {
     {
       name: "Lola",
       type: "dog",
-      img: "/src/assets/p5.jpg",
+      img: "/src/assets/p11.jpg",
       description: "Lola es dulce y amorosa, le gusta estar en familia.",
       age: "Cachorro",
       size: "Pequeño",
@@ -173,7 +173,7 @@ export async function insertInitialPets() {
     {
       name: "Rex",
       type: "dog",
-      img: "/src/assets/p6.jpg",
+      img: "/src/assets/p12.jpg",
       description: "Rex es inteligente y fácil de entrenar, ideal para primera mascota.",
       age: "Joven",
       size: "Mediano",
@@ -183,7 +183,7 @@ export async function insertInitialPets() {
     {
       name: "Kira",
       type: "dog",
-      img: "/src/assets/p1.jpg",
+      img: "/src/assets/p13.jpg",
       description: "Kira es activa y sociable, perfecta para familias con niños.",
       age: "Joven",
       size: "Mediano",
@@ -193,22 +193,12 @@ export async function insertInitialPets() {
     {
       name: "Rocco",
       type: "dog",
-      img: "/src/assets/p2.jpg",
+      img: "/src/assets/p14.jpg",
       description: "Rocco es protector y leal, siempre cuida a su familia.",
       age: "Adulto",
       size: "Grande",
       sex: "Macho",
       foundation: "Amigos de 4 Patas"
-    },
-    {
-      name: "Daisy",
-      type: "dog",
-      img: "/src/assets/p3.jpg",
-      description: "Daisy es alegre y cariñosa, adora dar paseos.",
-      age: "Cachorro",
-      size: "Pequeño",
-      sex: "Hembra",
-      foundation: "Patitas Felices"
     }
   ];
 
@@ -267,7 +257,7 @@ export async function insertInitialPets() {
     {
       name: "Felix",
       type: "cat",
-      img: "/src/assets/g1.jpg",
+      img: "/src/assets/g6.jpg",
       description: "Felix es tranquilo y le gusta observar desde lugares altos.",
       age: "Adulto",
       size: "Mediano",
@@ -277,7 +267,7 @@ export async function insertInitialPets() {
     {
       name: "Nala",
       type: "cat",
-      img: "/src/assets/g2.jpg",
+      img: "/src/assets/g7.jpg",
       description: "Nala es elegante y cariñosa, busca un hogar tranquilo.",
       age: "Joven",
       size: "Pequeño",
@@ -287,7 +277,7 @@ export async function insertInitialPets() {
     {
       name: "Tom",
       type: "cat",
-      img: "/src/assets/g3.jpg",
+      img: "/src/assets/g8.jpg",
       description: "Tom es aventurero y curioso, le encanta explorar.",
       age: "Cachorro",
       size: "Mediano",
@@ -297,7 +287,7 @@ export async function insertInitialPets() {
     {
       name: "Bella",
       type: "cat",
-      img: "/src/assets/g4.jpg",
+      img: "/src/assets/g9.jpg",
       description: "Bella es mimosa y ronronea mucho, adora las caricias.",
       age: "Joven",
       size: "Pequeño",
@@ -307,7 +297,7 @@ export async function insertInitialPets() {
     {
       name: "Garfield",
       type: "cat",
-      img: "/src/assets/g5.jpg",
+      img: "/src/assets/g10.jpg",
       description: "Garfield es tranquilo y le encanta dormir largas siestas.",
       age: "Adulto",
       size: "Grande",
@@ -317,7 +307,7 @@ export async function insertInitialPets() {
     {
       name: "Cleo",
       type: "cat",
-      img: "/src/assets/g1.jpg",
+      img: "/src/assets/g11.jpg",
       description: "Cleo es independiente pero cariñosa cuando quiere mimos.",
       age: "Joven",
       size: "Mediano",
@@ -327,7 +317,7 @@ export async function insertInitialPets() {
     {
       name: "Tigre",
       type: "cat",
-      img: "/src/assets/g2.jpg",
+      img: "/src/assets/g12.jpg",
       description: "Tigre es juguetón y le encanta perseguir juguetes.",
       age: "Cachorro",
       size: "Pequeño",
@@ -337,7 +327,7 @@ export async function insertInitialPets() {
     {
       name: "Pelusa",
       type: "cat",
-      img: "/src/assets/g3.jpg",
+      img: "/src/assets/g13.jpg",
       description: "Pelusa es esponjosa y dulce, perfecta para abrazar.",
       age: "Joven",
       size: "Mediano",
@@ -347,7 +337,7 @@ export async function insertInitialPets() {
     {
       name: "Michi",
       type: "cat",
-      img: "/src/assets/g4.jpg",
+      img: "/src/assets/g14.jpg",
       description: "Michi es sociable y le gusta estar con la familia.",
       age: "Adulto",
       size: "Mediano",
@@ -357,7 +347,7 @@ export async function insertInitialPets() {
     {
       name: "Kitty",
       type: "cat",
-      img: "/src/assets/g5.jpg",
+      img: "/src/assets/g15.jpg",
       description: "Kitty es pequeña y juguetona, adora los ratones de juguete.",
       age: "Cachorro",
       size: "Pequeño",
