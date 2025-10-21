@@ -26,6 +26,10 @@ export default function Perritos() {
   const [dogs, setDogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  
+  // Estados para paginación
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
 
   // Función para manejar la adopción
   const handleAdopt = (dog) => {
@@ -235,6 +239,7 @@ export default function Perritos() {
         if (selectedSex && dog.sexo.toLowerCase() !== selectedSex.toLowerCase()) return false;
         return true;
           })
+          .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
           .map((dog, i) => (
           <motion.div
             key={i}
@@ -327,18 +332,88 @@ export default function Perritos() {
         )}
 
       {/* Paginación */}
-      <div className="flex justify-center items-center gap-2 my-10">
-        {[1, 2, 3, "...", 68].map((page, i) => (
-          <button
-            key={i}
-            className={`px-3 py-1 rounded ${
-              page === 1 ? "bg-[var(--primary)] text-white" : "bg-gray-200"
-            } hover:bg-[var(--secondary)] hover:text-white transition`}
-          >
-            {page}
-          </button>
-        ))}
-      </div>
+      {!loading && !error && (() => {
+        const filteredDogs = dogs.filter((dog) => {
+          const normalize = (s) => (s || "").toLowerCase().replace(/[ao]$/,'');
+          if (selectedSize && normalize(dog.tamaño) !== normalize(selectedSize)) return false;
+          if (selectedAge && normalize(dog.edad) !== normalize(selectedAge)) return false;
+          if (selectedSex && dog.sexo.toLowerCase() !== selectedSex.toLowerCase()) return false;
+          return true;
+        });
+        
+        const totalPages = Math.ceil(filteredDogs.length / itemsPerPage);
+        
+        if (totalPages <= 1) return null;
+        
+        const renderPageNumbers = () => {
+          const pages = [];
+          const maxVisiblePages = 5;
+          
+          if (totalPages <= maxVisiblePages) {
+            for (let i = 1; i <= totalPages; i++) {
+              pages.push(i);
+            }
+          } else {
+            if (currentPage <= 3) {
+              pages.push(1, 2, 3, 4, '...', totalPages);
+            } else if (currentPage >= totalPages - 2) {
+              pages.push(1, '...', totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
+            } else {
+              pages.push(1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages);
+            }
+          }
+          
+          return pages;
+        };
+        
+        return (
+          <div className="flex justify-center items-center gap-2 my-10">
+            {/* Botón anterior */}
+            <button
+              onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+              disabled={currentPage === 1}
+              className={`px-3 py-1 rounded ${
+                currentPage === 1 
+                  ? "bg-gray-200 text-gray-400 cursor-not-allowed" 
+                  : "bg-gray-200 hover:bg-[var(--secondary)] hover:text-white"
+              } transition`}
+            >
+              ‹
+            </button>
+            
+            {/* Números de página */}
+            {renderPageNumbers().map((page, i) => (
+              <button
+                key={i}
+                onClick={() => typeof page === 'number' && setCurrentPage(page)}
+                disabled={typeof page !== 'number'}
+                className={`px-3 py-1 rounded ${
+                  page === currentPage 
+                    ? "bg-[var(--primary)] text-white" 
+                    : typeof page === 'number'
+                    ? "bg-gray-200 hover:bg-[var(--secondary)] hover:text-white" 
+                    : "bg-transparent cursor-default"
+                } transition`}
+              >
+                {page}
+              </button>
+            ))}
+            
+            {/* Botón siguiente */}
+            <button
+              onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+              disabled={currentPage === totalPages}
+              className={`px-3 py-1 rounded ${
+                currentPage === totalPages 
+                  ? "bg-gray-200 text-gray-400 cursor-not-allowed" 
+                  : "bg-gray-200 hover:bg-[var(--secondary)] hover:text-white"
+              } transition`}
+            >
+              ›
+            </button>
+          </div>
+        );
+      })()}
 
       {/* Notificación de adopción */}
       <AdoptionNotification

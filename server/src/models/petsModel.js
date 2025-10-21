@@ -109,6 +109,106 @@ export async function insertInitialPets() {
       size: "Mediano", 
       sex: "Macho",
       foundation: "Patitas Felices"
+    },
+    {
+      name: "Zeus",
+      type: "dog",
+      img: "/src/assets/p6.jpg",
+      description: "Zeus es un perro guardián leal y protector, ideal para casas grandes.",
+      age: "Adulto",
+      size: "Grande",
+      sex: "Macho",
+      foundation: "Huellitas de Amor"
+    },
+    {
+      name: "Luna",
+      type: "dog",
+      img: "/src/assets/p1.jpg",
+      description: "Luna es cariñosa y juguetona, le encanta correr en el parque.",
+      age: "Joven",
+      size: "Mediano",
+      sex: "Hembra",
+      foundation: "Corazón Canino"
+    },
+    {
+      name: "Bruno",
+      type: "dog",
+      img: "/src/assets/p2.jpg",
+      description: "Bruno es tranquilo y obediente, perfecto para personas mayores.",
+      age: "Adulto",
+      size: "Grande",
+      sex: "Macho",
+      foundation: "Refugio Esperanza"
+    },
+    {
+      name: "Coco",
+      type: "dog",
+      img: "/src/assets/p3.jpg",
+      description: "Coco es pequeña pero valiente, adora jugar con niños.",
+      age: "Cachorro",
+      size: "Pequeño",
+      sex: "Hembra",
+      foundation: "Amigos de 4 Patas"
+    },
+    {
+      name: "Duke",
+      type: "dog",
+      img: "/src/assets/p4.jpg",
+      description: "Duke es enérgico y atlético, necesita ejercicio diario.",
+      age: "Joven",
+      size: "Grande",
+      sex: "Macho",
+      foundation: "Patitas Felices"
+    },
+    {
+      name: "Lola",
+      type: "dog",
+      img: "/src/assets/p5.jpg",
+      description: "Lola es dulce y amorosa, le gusta estar en familia.",
+      age: "Cachorro",
+      size: "Pequeño",
+      sex: "Hembra",
+      foundation: "Huellitas de Amor"
+    },
+    {
+      name: "Rex",
+      type: "dog",
+      img: "/src/assets/p6.jpg",
+      description: "Rex es inteligente y fácil de entrenar, ideal para primera mascota.",
+      age: "Joven",
+      size: "Mediano",
+      sex: "Macho",
+      foundation: "Corazón Canino"
+    },
+    {
+      name: "Kira",
+      type: "dog",
+      img: "/src/assets/p1.jpg",
+      description: "Kira es activa y sociable, perfecta para familias con niños.",
+      age: "Joven",
+      size: "Mediano",
+      sex: "Hembra",
+      foundation: "Refugio Esperanza"
+    },
+    {
+      name: "Rocco",
+      type: "dog",
+      img: "/src/assets/p2.jpg",
+      description: "Rocco es protector y leal, siempre cuida a su familia.",
+      age: "Adulto",
+      size: "Grande",
+      sex: "Macho",
+      foundation: "Amigos de 4 Patas"
+    },
+    {
+      name: "Daisy",
+      type: "dog",
+      img: "/src/assets/p3.jpg",
+      description: "Daisy es alegre y cariñosa, adora dar paseos.",
+      age: "Cachorro",
+      size: "Pequeño",
+      sex: "Hembra",
+      foundation: "Patitas Felices"
     }
   ];
 
@@ -159,6 +259,106 @@ export async function insertInitialPets() {
       type: "cat",
       img: "/src/assets/g5.jpg", 
       description: "Mía es juguetona y siempre está lista para una aventura.",
+      age: "Cachorro",
+      size: "Pequeño",
+      sex: "Hembra",
+      foundation: "Refugio Gatuno"
+    },
+    {
+      name: "Felix",
+      type: "cat",
+      img: "/src/assets/g1.jpg",
+      description: "Felix es tranquilo y le gusta observar desde lugares altos.",
+      age: "Adulto",
+      size: "Mediano",
+      sex: "Macho",
+      foundation: "Patitas de Amor"
+    },
+    {
+      name: "Nala",
+      type: "cat",
+      img: "/src/assets/g2.jpg",
+      description: "Nala es elegante y cariñosa, busca un hogar tranquilo.",
+      age: "Joven",
+      size: "Pequeño",
+      sex: "Hembra",
+      foundation: "Gatitos Felices"
+    },
+    {
+      name: "Tom",
+      type: "cat",
+      img: "/src/assets/g3.jpg",
+      description: "Tom es aventurero y curioso, le encanta explorar.",
+      age: "Cachorro",
+      size: "Mediano",
+      sex: "Macho",
+      foundation: "Refugio Esperanza"
+    },
+    {
+      name: "Bella",
+      type: "cat",
+      img: "/src/assets/g4.jpg",
+      description: "Bella es mimosa y ronronea mucho, adora las caricias.",
+      age: "Joven",
+      size: "Pequeño",
+      sex: "Hembra",
+      foundation: "Amigos Felinos"
+    },
+    {
+      name: "Garfield",
+      type: "cat",
+      img: "/src/assets/g5.jpg",
+      description: "Garfield es tranquilo y le encanta dormir largas siestas.",
+      age: "Adulto",
+      size: "Grande",
+      sex: "Macho",
+      foundation: "Refugio Gatuno"
+    },
+    {
+      name: "Cleo",
+      type: "cat",
+      img: "/src/assets/g1.jpg",
+      description: "Cleo es independiente pero cariñosa cuando quiere mimos.",
+      age: "Joven",
+      size: "Mediano",
+      sex: "Hembra",
+      foundation: "Patitas de Amor"
+    },
+    {
+      name: "Tigre",
+      type: "cat",
+      img: "/src/assets/g2.jpg",
+      description: "Tigre es juguetón y le encanta perseguir juguetes.",
+      age: "Cachorro",
+      size: "Pequeño",
+      sex: "Macho",
+      foundation: "Gatitos Felices"
+    },
+    {
+      name: "Pelusa",
+      type: "cat",
+      img: "/src/assets/g3.jpg",
+      description: "Pelusa es esponjosa y dulce, perfecta para abrazar.",
+      age: "Joven",
+      size: "Mediano",
+      sex: "Hembra",
+      foundation: "Refugio Esperanza"
+    },
+    {
+      name: "Michi",
+      type: "cat",
+      img: "/src/assets/g4.jpg",
+      description: "Michi es sociable y le gusta estar con la familia.",
+      age: "Adulto",
+      size: "Mediano",
+      sex: "Macho",
+      foundation: "Amigos Felinos"
+    },
+    {
+      name: "Kitty",
+      type: "cat",
+      img: "/src/assets/g5.jpg",
+      description: "Kitty es pequeña y juguetona, adora los ratones de juguete.",
       age: "Cachorro",
       size: "Pequeño",
       sex: "Hembra",
