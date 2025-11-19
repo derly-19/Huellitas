@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom"; // ✅ Para Vite/React
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from "framer-motion";
@@ -8,6 +8,17 @@ import { useAuth } from "../contexts/AuthContext";
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const { isAuthenticated, user, logout } = useAuth();
+  const [hasAdoptedPet, setHasAdoptedPet] = useState(false);
+
+  // Verificar si el usuario ha adoptado una mascota
+  useEffect(() => {
+    if (isAuthenticated()) {
+      const hasAdopted = localStorage.getItem('hasAdoptedPet') === 'true';
+      setHasAdoptedPet(hasAdopted);
+    } else {
+      setHasAdoptedPet(false);
+    }
+  }, [isAuthenticated, user]);
 
   // ✅ Links para usuarios no autenticados (público)
   const publicLinks = [
@@ -17,13 +28,22 @@ export default function Navbar() {
     { name: "Fundaciones", path: "/fundaciones", icon: <HeartHandshake size={18} /> },
   ];
 
-  // ✅ Links para usuarios autenticados
-  const authenticatedLinks = [
+  // ✅ Links para usuarios autenticados (sin carnet por defecto)
+  const baseAuthenticatedLinks = [
     { name: "Inicio", path: "/", icon: <Home size={18} /> },
-    { name: "Carnet", path: "/carnet", icon: <FileText size={18} /> },
     { name: "Adopción", path: "/Dogs", icon: <HeartHandshake size={18} /> },
     { name: "Perfil", path: "/perfil", icon: <User size={18} /> },
   ];
+
+  // Si el usuario ha adoptado una mascota, agregar el link de Carnet
+  const authenticatedLinks = hasAdoptedPet
+    ? [
+        { name: "Inicio", path: "/", icon: <Home size={18} /> },
+        { name: "Carnet", path: "/carnet", icon: <FileText size={18} /> },
+        { name: "Adopción", path: "/Dogs", icon: <HeartHandshake size={18} /> },
+        { name: "Perfil", path: "/perfil", icon: <User size={18} /> },
+      ]
+    : baseAuthenticatedLinks;
 
   // Usar los links apropiados según el estado de autenticación
   const links = isAuthenticated() ? authenticatedLinks : publicLinks;

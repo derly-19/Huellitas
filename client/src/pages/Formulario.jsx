@@ -3,12 +3,21 @@ import { useParams, useNavigate } from "react-router-dom";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import { useAuth } from "../contexts/AuthContext";
+import { FileText, Heart } from "lucide-react";
 import SuccessNotification from "../components/SuccessNotification";
+import CarnetCard from "../components/Carnet/CarnetCard";
 
 export default function Formulario() {
   const { petId } = useParams();
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
+  
+  // Estado para controlar qué tab está activo
+  const [activeTab, setActiveTab] = useState("formulario"); // "formulario" o "carnet"
+  
+  // Estados para el carnet
+  const [carnetData, setCarnetData] = useState(null);
+  const [loadingCarnet, setLoadingCarnet] = useState(false);
   
   // Estados para el formulario
   const [formData, setFormData] = useState({
@@ -54,6 +63,75 @@ export default function Formulario() {
     }
   };
 
+  // Función para obtener datos del carnet
+  const fetchCarnetData = async () => {
+    try {
+      setLoadingCarnet(true);
+      const response = await fetch(`http://localhost:4000/api/carnet/${petId}`);
+      const result = await response.json();
+
+      if (result.success) {
+        const transformedData = {
+          mascota: result.data.mascota,
+          vacunas: result.data.vacunas.map(v => ({
+            id: v.id,
+            nombre: v.nombre_vacuna,
+            fecha: v.fecha_aplicacion,
+            proximoRefuerzo: v.proxima_dosis,
+            lote: v.lote,
+            veterinario: v.veterinario,
+            observaciones: v.observaciones || 'Sin observaciones'
+          })),
+          desparasitaciones: result.data.desparasitaciones.map(d => ({
+            id: d.id,
+            tipo: d.tipo,
+            medicamento: d.medicamento,
+            fecha: d.fecha_aplicacion,
+            dosis: d.dosis,
+            peso: d.peso_mascota,
+            veterinario: d.veterinario,
+            proximaDosis: d.proxima_dosis,
+            observaciones: d.observaciones || 'Sin observaciones'
+          })),
+          baños: result.data.banos.map(b => ({
+            id: b.id,
+            fecha: b.fecha,
+            tipoShampoo: b.tipo_shampoo,
+            tratamientoEspecial: b.tratamiento_especial,
+            realizadoPor: b.realizado_por,
+            observaciones: b.observaciones || 'Sin observaciones'
+          })),
+          procedimientos: result.data.procedimientos.map(p => ({
+            id: p.id,
+            tipo: p.tipo_procedimiento,
+            descripcion: p.descripcion,
+            fecha: p.fecha,
+            veterinario: p.veterinario,
+            costo: p.costo,
+            observaciones: p.observaciones || 'Sin observaciones'
+          })),
+          medicamentos: result.data.medicamentos.map(m => ({
+            id: m.id,
+            medicamento: m.medicamento,
+            dosis: m.dosis,
+            frecuencia: m.frecuencia,
+            fechaInicio: m.fecha_inicio,
+            fechaFin: m.fecha_fin,
+            motivo: m.motivo,
+            veterinario: m.veterinario,
+            observaciones: m.observaciones || 'Sin observaciones'
+          }))
+        };
+
+        setCarnetData(transformedData);
+      }
+    } catch (err) {
+      console.error('Error fetching carnet:', err);
+    } finally {
+      setLoadingCarnet(false);
+    }
+  };
+
   // Cargar datos al montar el componente
   useEffect(() => {
     // Verificar autenticación
@@ -78,6 +156,13 @@ export default function Formulario() {
       setLoading(false);
     }
   }, [petId, user, isAuthenticated, navigate]);
+
+  // Cargar datos del carnet cuando se cambie al tab de carnet
+  useEffect(() => {
+    if (activeTab === "carnet" && !carnetData && petId) {
+      fetchCarnetData();
+    }
+  }, [activeTab, petId]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -105,6 +190,17 @@ export default function Formulario() {
       
       // Simular envío a API
       await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Guardar que el usuario ha adoptado una mascota
+      const adoptedPets = JSON.parse(localStorage.getItem('adoptedPets') || '[]');
+      adoptedPets.push({
+        petId: petId,
+        petName: mascota?.name,
+        adoptedAt: new Date().toISOString(),
+        userId: user?.id
+      });
+      localStorage.setItem('adoptedPets', JSON.stringify(adoptedPets));
+      localStorage.setItem('hasAdoptedPet', 'true');
       
       // Mostrar notificación de éxito
       setShowSuccessNotification(true);
@@ -154,62 +250,77 @@ export default function Formulario() {
 
   return (
     <div className="min-h-screen bg-[#FFFCF4]">
-
-      <div className="max-w-4xl mx-auto p-6 pt-24">
-        {/* Sección de la mascota */}
+      <div className="max-w-5xl mx-auto p-6 pt-24">
+        {/* Header con información de la mascota */}
         <motion.div
-          className="bg-[#D6D3C4] rounded-lg p-6 mb-8 flex items-center gap-6"
+          className="bg-white rounded-xl shadow-lg p-6 mb-6"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <div className="w-20 h-20 rounded-full border-4 border-green-600 overflow-hidden bg-gray-200 flex items-center justify-center">
-            {/* Imagen de la mascota */}
-            {mascota?.img ? (
-              <img 
-                src={mascota.img} 
-                alt={mascota.name}
-                className="w-24 h-24 rounded-full object-cover"
-                onError={(e) => {
-                  e.target.src = '/public/icon.png';
-                }}
-              />
-            ) : (
-              <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center">
-                <span className="text-2xl">{mascota?.type === 'cat' ? '🐱' : '🐕'}</span>
-              </div>
-            )}
-          </div>
-          <div>
-            <h2 className="text-2xl font-bold text-gray-800 mb-2">
-              {mascota ? `Conoce a ${mascota.name}` : 'Formulario de Adopción'}
-            </h2>
-            <p className="text-gray-700 mb-4 max-w-md">
-              {mascota?.description || 'Completa el formulario para adoptar una mascota.'}
-            </p>
-            {mascota && (
-              <div className="text-sm text-gray-600 mb-4">
-                <p><strong>Edad:</strong> {mascota.age}</p>
-                <p><strong>Tamaño:</strong> {mascota.size}</p>
-                <p><strong>Sexo:</strong> {mascota.sex}</p>
-                <p><strong>Fundación:</strong> {mascota.foundation}</p>
-              </div>
-            )}
-            <button 
-              onClick={() => navigate('/carnet', { 
-                state: { 
-                  petInfo: mascota,
-                  fromFormulario: true 
-                }
-              })}
-              className="bg-[#A5A07A] text-white px-4 py-2 rounded hover:bg-[#8C8762] transition"
-            >
-              Ver carnet
-            </button>
+          <div className="flex items-center gap-6">
+            <div className="w-24 h-24 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center border-4 border-[#BCC990]">
+              {mascota?.img ? (
+                <img 
+                  src={mascota.img} 
+                  alt={mascota.name}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.target.src = '/public/icon.png';
+                  }}
+                />
+              ) : (
+                <span className="text-4xl">{mascota?.type === 'cat' ? '🐱' : '🐕'}</span>
+              )}
+            </div>
+            <div className="flex-1">
+              <h2 className="text-3xl font-bold text-gray-800 mb-2">
+                {mascota ? `${mascota.name}` : 'Formulario de Adopción'}
+              </h2>
+              <p className="text-gray-600 mb-3">
+                {mascota?.description || 'Completa el formulario para adoptar una mascota.'}
+              </p>
+              {mascota && (
+                <div className="flex gap-4 text-sm text-gray-600">
+                  <span><strong>Edad:</strong> {mascota.age}</span>
+                  <span><strong>Tamaño:</strong> {mascota.size}</span>
+                  <span><strong>Sexo:</strong> {mascota.sex}</span>
+                </div>
+              )}
+            </div>
           </div>
         </motion.div>
 
-        {/* Formulario principal */}
+        {/* Tabs de navegación */}
+        <div className="bg-white rounded-xl shadow-lg mb-6 overflow-hidden">
+          <div className="flex border-b border-gray-200">
+            <button
+              onClick={() => setActiveTab("formulario")}
+              className={`flex-1 flex items-center justify-center gap-2 px-6 py-4 font-semibold transition-all ${
+                activeTab === "formulario"
+                  ? "bg-[#BCC990] text-white border-b-4 border-[#005017]"
+                  : "bg-gray-50 text-gray-600 hover:bg-gray-100"
+              }`}
+            >
+              <FileText className="w-5 h-5" />
+              <span>Formulario de Adopción</span>
+            </button>
+            <button
+              onClick={() => setActiveTab("carnet")}
+              className={`flex-1 flex items-center justify-center gap-2 px-6 py-4 font-semibold transition-all ${
+                activeTab === "carnet"
+                  ? "bg-[#BCC990] text-white border-b-4 border-[#005017]"
+                  : "bg-gray-50 text-gray-600 hover:bg-gray-100"
+              }`}
+            >
+              <Heart className="w-5 h-5" />
+              <span>Ver Carnet de {mascota?.name || 'la Mascota'}</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Contenido según el tab activo */}
+        {activeTab === "formulario" ? (
         <motion.div
           className="bg-white rounded-lg shadow-md p-8"
           initial={{ opacity: 0, y: 30 }}
@@ -373,6 +484,34 @@ export default function Formulario() {
             </div>
           </form>
         </motion.div>
+        ) : (
+          /* Tab de Carnet */
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="bg-white rounded-xl shadow-lg p-6"
+          >
+            {loadingCarnet ? (
+              <div className="text-center py-12">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#005017] mx-auto mb-4"></div>
+                <p className="text-gray-600">Cargando carnet médico...</p>
+              </div>
+            ) : carnetData ? (
+              <CarnetCard initialData={carnetData} readOnly={true} />
+            ) : (
+              <div className="text-center py-12">
+                <p className="text-gray-600">No se pudo cargar el carnet médico</p>
+                <button 
+                  onClick={fetchCarnetData}
+                  className="mt-4 bg-[#BCC990] text-white px-6 py-2 rounded-lg hover:bg-[#A5B67F] transition-colors"
+                >
+                  Reintentar
+                </button>
+              </div>
+            )}
+          </motion.div>
+        )}
       </div>
 
       {/* Notificación de éxito */}
@@ -380,7 +519,6 @@ export default function Formulario() {
         isVisible={showSuccessNotification}
         onClose={handleSuccessClose}
         petName={mascota?.name || 'la mascota'}
-        message="Nos pondremos en contacto contigo pronto."
       />
     </div>
   );

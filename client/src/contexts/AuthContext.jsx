@@ -92,6 +92,8 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     localStorage.removeItem('authToken');
     localStorage.removeItem('userData');
+    localStorage.removeItem('hasAdoptedPet');
+    localStorage.removeItem('adoptedPets');
     setUser(null);
   };
 

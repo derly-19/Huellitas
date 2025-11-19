@@ -108,9 +108,16 @@ export async function loginUser(req, res) {
 
 export async function getUsers(req, res) {
   try {
-    const users = await db.all("SELECT id, name as username, email FROM users");
-    res.json(users);
+    const users = await db.all("SELECT id, username, email FROM users");
+    res.json({
+      success: true,
+      users: users
+    });
   } catch (error) {
-    res.status(500).json({ error: "Error al obtener usuarios" });
+    console.error("Error al obtener usuarios:", error);
+    res.status(500).json({ 
+      success: false, 
+      error: "Error al obtener usuarios" 
+    });
   }
 }

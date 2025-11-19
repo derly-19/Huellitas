@@ -11,7 +11,8 @@ export default function CarnetSection({
   data, 
   onAddRecord,
   isExpanded, 
-  onToggle 
+  onToggle,
+  readOnly = false
 }) {
   const [showModal, setShowModal] = useState(false);
 
@@ -89,10 +90,12 @@ export default function CarnetSection({
       {/* Contenido expandible */}
       {isExpanded && (
         <div className="mt-4 bg-white rounded-lg border border-gray-200 p-4">
-          <AddRecordButton 
-            onClick={() => setShowModal(true)}
-            label={getButtonLabel()}
-          />
+          {!readOnly && (
+            <AddRecordButton 
+              onClick={() => setShowModal(true)}
+              label={getButtonLabel()}
+            />
+          )}
           
           <CarnetTable 
             columns={getColumns()}
@@ -100,12 +103,14 @@ export default function CarnetSection({
             sectionType={sectionType}
           />
 
-          <AddRecordModal
-            isOpen={showModal}
-            onClose={() => setShowModal(false)}
-            sectionType={sectionType}
-            onSubmit={handleAddRecord}
-          />
+          {!readOnly && (
+            <AddRecordModal
+              isOpen={showModal}
+              onClose={() => setShowModal(false)}
+              sectionType={sectionType}
+              onSubmit={handleAddRecord}
+            />
+          )}
         </div>
       )}
     </div>
