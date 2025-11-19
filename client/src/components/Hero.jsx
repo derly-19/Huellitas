@@ -30,31 +30,19 @@ export default function Hero() {
   return (
     <div>
       {/* Imagen de fondo responsive con carrusel */}
-      <motion.section
-        className="relative min-h-[70vh] md:min-h-[90vh] lg:min-h-[100vh] overflow-hidden"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1.2, ease: "easeOut" }}
-      >
-        <div className="absolute inset-0 overflow-hidden">
-          <AnimatePresence mode="wait">
-            <motion.img
-              key={currentIndex}
-              src={carouselImages[currentIndex]}
-              alt={`Mascota ${currentIndex + 1}`}
-              className="
-                absolute inset-0 
-                w-full h-full 
-                object-cover 
-                translate-y-6 sm:translate-y-8 md:translate-y-10 lg:translate-y-12
-              "
-              initial={{ opacity: 0, scale: 1.1 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              transition={{ duration: 1 }}
-            />
-          </AnimatePresence>
-        </div>
+      <section className="relative h-screen w-full overflow-hidden">
+        <AnimatePresence initial={false}>
+          <motion.img
+            key={currentIndex}
+            src={carouselImages[currentIndex]}
+            alt={`Mascota ${currentIndex + 1}`}
+            className="absolute inset-0 w-full h-full object-cover"
+            initial={{ x: "100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "-100%" }}
+            transition={{ duration: 0.7, ease: "easeInOut" }}
+          />
+        </AnimatePresence>
 
         {/* Indicadores del carrusel */}
         <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex gap-2 z-10">
@@ -71,16 +59,10 @@ export default function Hero() {
             />
           ))}
         </div>
-      </motion.section>
+      </section>
 
       {/* Sección crema con texto e imagen */}
-      <motion.section
-        className="bg-[#FFFCF4] py-12 sm:py-16 md:py-20 lg:py-24"
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-        viewport={{ once: true }}
-      >
+      <section className="bg-[#FFFCF4] py-12 sm:py-16 md:py-20 lg:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
           {/* Encabezado central */}
           <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-10 md:mb-14">
@@ -105,7 +87,7 @@ export default function Hero() {
             </div>
           </div>
         </div>
-      </motion.section>
+      </section>
     </div>
   );
 }
