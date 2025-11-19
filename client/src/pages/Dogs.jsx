@@ -77,7 +77,13 @@ export default function Perritos() {
   const fetchDogs = async () => {
     try {
       setLoading(true);
+      setError(null); // Limpiar errores previos
       const response = await fetch('http://localhost:4000/api/pets?type=dog');
+      
+      if (!response.ok) {
+        throw new Error(`Error del servidor: ${response.status}`);
+      }
+      
       const result = await response.json();
       
       if (result.success) {
@@ -99,7 +105,11 @@ export default function Perritos() {
       }
     } catch (err) {
       console.error('Error fetching dogs:', err);
-      setError('Error de conexión con el servidor');
+      if (err.message.includes('Failed to fetch')) {
+        setError('No se puede conectar al servidor. Asegúrate de que el servidor esté corriendo en el puerto 4000.');
+      } else {
+        setError('Error de conexión con el servidor: ' + err.message);
+      }
     } finally {
       setLoading(false);
     }
