@@ -4,6 +4,8 @@ import bcrypt from "bcrypt";
 export async function registerUser(req, res) {
   const { username, email, password } = req.body;
 
+  console.log("📝 Datos recibidos:", { username, email, password: "***" });
+
   if (!username || !email || !password) {
     return res.status(400).json({ 
       success: false, 
@@ -12,22 +14,29 @@ export async function registerUser(req, res) {
   }
 
   try {
+    console.log("🔍 Verificando si el email existe...");
     // Verificar si el email ya existe
     const existingUser = await db.get("SELECT * FROM users WHERE email = ?", [email]);
     
     if (existingUser) {
+      console.log("❌ Email ya existe");
       return res.status(400).json({ 
         success: false, 
         message: "El email ya está registrado" 
       });
     }
 
+    console.log("🔐 Hasheando contraseña...");
     const hashedPassword = await bcrypt.hash(password, 10);
+    console.log("✅ Contraseña hasheada");
 
+    console.log("💾 Insertando usuario en la base de datos...");
     const result = await db.run(
-      "INSERT INTO users (name, email, password) VALUES (?, ?, ?)",
+      "INSERT INTO users (username, email, password) VALUES (?, ?, ?)",
       [username, email, hashedPassword]
     );
+
+    console.log("✅ Usuario insertado con ID:", result.lastID);
 
     // Devolver el usuario creado
     const newUser = {
@@ -84,7 +93,7 @@ export async function loginUser(req, res) {
       message: "Login exitoso ✅",
       user: { 
         id: user.id, 
-        username: user.name, 
+        username: user.username, 
         email: user.email 
       },
     });
