@@ -55,6 +55,11 @@ export default function FoundationDashboard() {
   // Tab activo (mascotas o solicitudes)
   const [activeTab, setActiveTab] = useState("pets"); // "pets" o "requests"
 
+  // Debug: observar cambios en stats
+  useEffect(() => {
+    console.log('🔄 Stats cambió:', stats);
+  }, [stats]);
+
   // Verificar autenticación y tipo de usuario
   useEffect(() => {
     if (!isAuthenticated() || user?.user_type !== 'foundation') {
@@ -82,14 +87,27 @@ export default function FoundationDashboard() {
         setPets(result.data);
         setFilteredPets(result.data);
         
-        // Calcular estadísticas
+        // Calcular estadísticas (normalizar type a minúsculas)
         const total = result.data.length;
-        const dogs = result.data.filter(p => p.type === 'dog').length;
-        const cats = result.data.filter(p => p.type === 'cat').length;
-        const available = result.data.filter(p => p.available === 1).length;
-        const adopted = result.data.filter(p => p.available === 0).length;
+        const dogs = result.data.filter(p => {
+          const type = (p.type || '').toLowerCase();
+          return type === 'dog' || type === 'perro';
+        }).length;
+        const cats = result.data.filter(p => {
+          const type = (p.type || '').toLowerCase();
+          return type === 'cat' || type === 'gato';
+        }).length;
+        const available = result.data.filter(p => p.available === 1 || p.available === true || p.available === '1').length;
+        const adopted = result.data.filter(p => p.available === 0 || p.available === false || p.available === '0').length;
+        
+        console.log('📊 Estadísticas calculadas:', { total, dogs, cats, available, adopted });
+        console.log('📦 Datos recibidos:', result.data);
+        if (result.data.length > 0) {
+          console.log('🐾 Primera mascota - type:', result.data[0].type, '| available:', result.data[0].available);
+        }
         
         setStats({ total, dogs, cats, available, adopted });
+        console.log('✅ Estado actualizado. Stats:', { total, dogs, cats, available, adopted });
       }
     } catch (err) {
       console.error('Error:', err);
@@ -107,15 +125,22 @@ export default function FoundationDashboard() {
   useEffect(() => {
     let result = [...pets];
     
-    // Filtrar por tipo
+    // Filtrar por tipo (soporta múltiples formatos)
     if (filterType !== "all") {
-      result = result.filter(pet => pet.type === filterType);
+      if (filterType === "dog") {
+        result = result.filter(pet => pet.type === 'dog' || pet.type === 'Perro' || pet.type === 'perro');
+      } else if (filterType === "cat") {
+        result = result.filter(pet => pet.type === 'cat' || pet.type === 'Gato' || pet.type === 'gato');
+      }
     }
     
-    // Filtrar por estado
+    // Filtrar por estado (comparación robusta)
     if (filterStatus !== "all") {
-      const isAvailable = filterStatus === "available" ? 1 : 0;
-      result = result.filter(pet => pet.available === isAvailable);
+      if (filterStatus === "available") {
+        result = result.filter(pet => pet.available === 1 || pet.available === true);
+      } else {
+        result = result.filter(pet => pet.available === 0 || pet.available === false);
+      }
     }
     
     // Filtrar por búsqueda
@@ -579,37 +604,6 @@ export default function FoundationDashboard() {
                   </div>
                 </div>
               ))}
-            </div>
-          )}
-          
-          {/* Información adicional */}
-          {stats.available > 0 && (
-            <div className="mt-8 bg-green-50 border border-green-200 rounded-xl p-6">
-              <h3 className="text-lg font-semibold text-green-800 mb-2">
-                💡 ¡Tus mascotas están visibles para los adoptantes!
-              </h3>
-              <p className="text-green-700 mb-4">
-                Las mascotas marcadas como "Disponibles" aparecen automáticamente en las páginas de{' '}
-                <Link to="/Dogs" className="underline font-medium">Perritos</Link> y{' '}
-                <Link to="/Cats" className="underline font-medium">Gatitos</Link>{' '}
-                donde los usuarios pueden verlas y solicitar su adopción.
-              </p>
-              <div className="flex flex-wrap gap-3">
-                <Link 
-                  to="/Dogs" 
-                  className="inline-flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
-                >
-                  <FaDog />
-                  <span>Ver página de Perritos</span>
-                </Link>
-                <Link 
-                  to="/Cats" 
-                  className="inline-flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
-                >
-                  <FaCat />
-                  <span>Ver página de Gatitos</span>
-                </Link>
-              </div>
             </div>
           )}
         </div>
