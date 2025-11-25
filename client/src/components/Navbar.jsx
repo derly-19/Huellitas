@@ -1,24 +1,25 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom"; // ✅ Para Vite/React
+import { Link, useNavigate } from "react-router-dom"; // ✅ Para Vite/React
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Home, HeartHandshake, Dog, Cat, FileText, User } from "lucide-react";
+import { Menu, X, Home, HeartHandshake, Dog, Cat, FileText, User, Building2, LayoutDashboard } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
-  const { isAuthenticated, user, logout } = useAuth();
+  const { isAuthenticated, isFoundation, user, logout } = useAuth();
+  const navigate = useNavigate();
   const [hasAdoptedPet, setHasAdoptedPet] = useState(false);
 
   // Verificar si el usuario ha adoptado una mascota
   useEffect(() => {
-    if (isAuthenticated()) {
+    if (isAuthenticated() && !isFoundation()) {
       const hasAdopted = localStorage.getItem('hasAdoptedPet') === 'true';
       setHasAdoptedPet(hasAdopted);
     } else {
       setHasAdoptedPet(false);
     }
-  }, [isAuthenticated, user]);
+  }, [isAuthenticated, isFoundation, user]);
 
   // ✅ Links para usuarios no autenticados (público)
   const publicLinks = [
@@ -28,7 +29,7 @@ export default function Navbar() {
     { name: "Fundaciones", path: "/fundaciones", icon: <HeartHandshake size={18} /> },
   ];
 
-  // ✅ Links para usuarios autenticados (sin carnet por defecto)
+  // ✅ Links para usuarios autenticados normales (sin carnet por defecto)
   const baseAuthenticatedLinks = [
     { name: "Inicio", path: "/", icon: <Home size={18} /> },
     { name: "Adopción", path: "/Dogs", icon: <HeartHandshake size={18} /> },
@@ -45,8 +46,24 @@ export default function Navbar() {
       ]
     : baseAuthenticatedLinks;
 
+  // ✅ Links para fundaciones
+  const foundationLinks = [
+    { name: "Dashboard", path: "/foundation/dashboard", icon: <LayoutDashboard size={18} /> },
+    { name: "Inicio", path: "/", icon: <Home size={18} /> },
+    { name: "Ver Mascotas", path: "/Dogs", icon: <Dog size={18} /> },
+  ];
+
   // Usar los links apropiados según el estado de autenticación
-  const links = isAuthenticated() ? authenticatedLinks : publicLinks;
+  const links = isAuthenticated() 
+    ? (isFoundation() ? foundationLinks : authenticatedLinks) 
+    : publicLinks;
+
+  // Manejar logout
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+    setOpen(false);
+  };
 
   return (
     <nav className="fixed top-0 left-0 w-full flex justify-between items-center px-6 py-4 bg-[var(--primary)] text-[var(--secondary)] shadow z-50">
@@ -82,12 +99,23 @@ export default function Navbar() {
           // Usuario autenticado - mostrar saludo y logout
           <div className="flex items-center gap-3">
             <span className="text-[var(--secondary)]">
-              ¡Hola, {user?.username || 'Usuario'}! 👋
+              {isFoundation() 
+                ? `🏠 ${user?.foundation_name || user?.username}` 
+                : `¡Hola, ${user?.username || 'Usuario'}! 👋`
+              }
             </span>
+            {isFoundation() && (
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                className="bg-[#005017] text-white px-4 py-1 rounded hover:bg-[#0e8c37]"
+              >
+                <Link to="/foundation/dashboard">Mi Panel</Link>
+              </motion.button>
+            )}
             <motion.button
               whileHover={{ scale: 1.05 }}
               className="bg-red-500 text-white px-4 py-1 rounded hover:bg-red-600"
-              onClick={logout}
+              onClick={handleLogout}
             >
               Cerrar Sesión
             </motion.button>
@@ -147,13 +175,22 @@ export default function Navbar() {
               {isAuthenticated() ? (
                 <>
                   <div className="text-center text-white font-medium">
-                    Hola, {user?.nombre || user?.name || 'Usuario'}!
+                    {isFoundation() 
+                      ? `🏠 ${user?.foundation_name || user?.username}` 
+                      : `Hola, ${user?.username || 'Usuario'}!`
+                    }
                   </div>
+                  {isFoundation() && (
+                    <Link
+                      to="/foundation/dashboard"
+                      className="bg-[#005017] text-white px-4 py-1 rounded hover:bg-[#0e8c37] text-center"
+                      onClick={() => setOpen(false)}
+                    >
+                      Mi Panel
+                    </Link>
+                  )}
                   <button
-                    onClick={() => {
-                      logout();
-                      setOpen(false);
-                    }}
+                    onClick={handleLogout}
                     className="bg-red-500 text-white px-4 py-1 rounded hover:bg-red-600 text-center"
                   >
                     Cerrar Sesión

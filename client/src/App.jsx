@@ -8,9 +8,11 @@ import Footer from "./components/Footer";
 import HeroCats from "./pages/Cats";
 import Login from "./pages/Login";
 import Register from "./pages/Register"; 
+import RegisterFoundation from "./pages/RegisterFoundation";
 import Fundaciones from "./pages/Fundaciones";
 import Formulario from "./pages/Formulario";
 import Carnet from "./pages/Carnet";
+import FoundationDashboard from "./pages/FoundationDashboard";
 
 function AppContent() {
   const location = useLocation();
@@ -18,7 +20,7 @@ function AppContent() {
   // rutas donde no quieres mostrar navbar/footer
   // Normalizamos pathname: quitamos una barra final (si existe) y pasamos a minúsculas
   const normalizedPath = location.pathname.replace(/\/$/, "").toLowerCase();
-  const hideLayout = ["/login", "/register"].includes(normalizedPath);
+  const hideLayout = ["/login", "/register", "/register-foundation", "/foundation/dashboard"].includes(normalizedPath);
 
 
   return (
@@ -31,11 +33,13 @@ function AppContent() {
           <Route path="/Cats" element={<HeroCats />} />
           <Route path="/login" element={<Login />} />
           <Route path="/Register" element={<Register />} />
+          <Route path="/register-foundation" element={<RegisterFoundation />} />
           <Route path="/Fundaciones" element={<Fundaciones />} />
           <Route path="/formulario" element={<Formulario />} />
           <Route path="/formulario/:petId" element={<Formulario />} />
           <Route path="/carnet" element={<Carnet />} />
           <Route path="/carnet/:petId" element={<Carnet />} />
+          <Route path="/foundation/dashboard" element={<FoundationDashboard />} />
         </Routes>
       </main>
       {!hideLayout && <Footer />}

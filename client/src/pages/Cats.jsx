@@ -8,6 +8,18 @@ import { useAuth } from "../contexts/AuthContext";
 import { useAdoption } from "../contexts/AdoptionContext";
 import AdoptionNotification from "../components/AdoptionNotification";
 
+// Función helper para obtener la URL correcta de la imagen
+const getImageUrl = (imgPath) => {
+  if (!imgPath) return '/public/icon.png';
+  if (imgPath.startsWith('http') || imgPath.startsWith('https')) {
+    return imgPath;
+  }
+  if (imgPath.startsWith('/uploads')) {
+    return `http://localhost:4000${imgPath}`;
+  }
+  return imgPath;
+};
+
 export default function Gatitos() {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
@@ -280,7 +292,7 @@ export default function Gatitos() {
             viewport={{ once: true }}
             onClick={() => setSelectedCat(cat)} // Abrir modal al hacer clic en la card
           >
-            <img src={cat.img} alt={cat.name} className="w-full h-48 object-cover" />
+            <img src={getImageUrl(cat.img)} alt={cat.name} className="w-full h-48 object-cover" />
             <div className="p-4 text-left">
               <h3 className="font-bold text-lg">{cat.name}</h3>
               <p className="text-sm text-gray-600 mt-2">
@@ -325,7 +337,7 @@ export default function Gatitos() {
 
             <div className="flex flex-col md:flex-row gap-6 items-center">
               <img
-                src={selectedCat.img}
+                src={getImageUrl(selectedCat.img)}
                 alt={selectedCat.name}
                 className="w-48 h-40 object-cover rounded-lg"
               />

@@ -8,6 +8,18 @@ import { useAuth } from "../contexts/AuthContext";
 import { useAdoption } from "../contexts/AdoptionContext";
 import AdoptionNotification from "../components/AdoptionNotification";
 
+// Función helper para obtener la URL correcta de la imagen
+const getImageUrl = (imgPath) => {
+  if (!imgPath) return '/public/icon.png';
+  if (imgPath.startsWith('http') || imgPath.startsWith('https')) {
+    return imgPath;
+  }
+  if (imgPath.startsWith('/uploads')) {
+    return `http://localhost:4000${imgPath}`;
+  }
+  return imgPath;
+};
+
 export default function Perritos() {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
@@ -336,7 +348,7 @@ export default function Perritos() {
             onClick={() => setSelectedPet(pet)}
           >
             <div className="relative">
-              <img src={pet.img} alt={pet.name} className="w-full h-48 object-cover" />
+              <img src={getImageUrl(pet.img)} alt={pet.name} className="w-full h-48 object-cover" />
               <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-semibold">
                 {pet.type === 'dog' ? '🐕 Perro' : '🐱 Gato'}
               </div>
@@ -385,7 +397,7 @@ export default function Perritos() {
 
             <div className="flex flex-col md:flex-row gap-6 items-center">
                 <img
-                src={selectedPet.img}
+                src={getImageUrl(selectedPet.img)}
                 alt={selectedPet.name}
                 className="w-48 h-40 object-cover rounded-lg"
                 />

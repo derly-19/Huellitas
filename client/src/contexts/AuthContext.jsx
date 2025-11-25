@@ -88,6 +88,34 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Función para registrar una fundación
+  const registerFoundation = async (foundationData) => {
+    try {
+      const response = await fetch('http://localhost:4000/api/users/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...foundationData,
+          user_type: 'foundation'
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Después del registro exitoso, hacer login automático
+        return await login(foundationData.email, foundationData.password);
+      } else {
+        return { success: false, message: data.message || 'Error en el registro' };
+      }
+    } catch (error) {
+      console.error('Error en registro de fundación:', error);
+      return { success: false, message: 'Error de conexión' };
+    }
+  };
+
   // Función para hacer logout
   const logout = () => {
     localStorage.removeItem('authToken');
@@ -102,12 +130,19 @@ export const AuthProvider = ({ children }) => {
     return !!user && !!localStorage.getItem('authToken');
   };
 
+  // Función para verificar si es una fundación
+  const isFoundation = () => {
+    return user?.user_type === 'foundation';
+  };
+
   const value = {
     user,
     login,
     register,
+    registerFoundation,
     logout,
     isAuthenticated,
+    isFoundation,
     loading
   };
 

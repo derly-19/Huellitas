@@ -177,37 +177,52 @@ export default function Formulario() {
     setSubmitting(true);
 
     try {
-      // Aquí enviarías los datos del formulario a tu API
+      // Preparar datos para enviar al servidor
       const adoptionData = {
-        ...formData,
-        petId: petId,
-        petName: mascota?.name,
-        userId: user?.id,
-        timestamp: new Date().toISOString()
+        pet_id: parseInt(petId),
+        user_id: user?.id,
+        nombre: formData.nombre,
+        apellido: formData.apellido,
+        correo: formData.correo,
+        telefono: formData.telefono,
+        direccion: formData.direccion,
+        tipo_vivienda: formData.tipoVivienda,
+        tiene_mascotas: formData.tieneMascotas,
+        motivacion: formData.motivacion
       };
 
-      console.log("Datos de adopción:", adoptionData);
-      
-      // Simular envío a API
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Guardar que el usuario ha adoptado una mascota
-      const adoptedPets = JSON.parse(localStorage.getItem('adoptedPets') || '[]');
-      adoptedPets.push({
-        petId: petId,
-        petName: mascota?.name,
-        adoptedAt: new Date().toISOString(),
-        userId: user?.id
+      // Enviar solicitud al servidor
+      const response = await fetch('http://localhost:4000/api/adoption-requests', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(adoptionData),
       });
-      localStorage.setItem('adoptedPets', JSON.stringify(adoptedPets));
-      localStorage.setItem('hasAdoptedPet', 'true');
-      
-      // Mostrar notificación de éxito
-      setShowSuccessNotification(true);
+
+      const result = await response.json();
+
+      if (result.success) {
+        // Guardar referencia local para mostrar en el carnet
+        const adoptedPets = JSON.parse(localStorage.getItem('adoptedPets') || '[]');
+        adoptedPets.push({
+          petId: petId,
+          petName: mascota?.name,
+          adoptedAt: new Date().toISOString(),
+          userId: user?.id
+        });
+        localStorage.setItem('adoptedPets', JSON.stringify(adoptedPets));
+        localStorage.setItem('hasAdoptedPet', 'true');
+        
+        // Mostrar notificación de éxito
+        setShowSuccessNotification(true);
+      } else {
+        alert(result.message || 'Error al enviar la solicitud');
+      }
       
     } catch (error) {
       console.error('Error enviando formulario:', error);
-      alert('Error al enviar la solicitud. Inténtalo de nuevo.');
+      alert('Error de conexión. Verifica que el servidor esté funcionando.');
     } finally {
       setSubmitting(false);
     }

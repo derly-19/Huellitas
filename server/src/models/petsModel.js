@@ -13,8 +13,10 @@ export async function createPetsTable() {
       size TEXT,                    -- 'Pequeño', 'Mediano', 'Grande'
       sex TEXT,                     -- 'Macho', 'Hembra'
       foundation TEXT,              -- nombre de la fundación
+      foundation_id INTEGER,        -- ID de la fundación (usuario tipo fundación)
       available BOOLEAN DEFAULT 1,  -- 1 = disponible, 0 = adoptado
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (foundation_id) REFERENCES users(id)
     )
   `);
   console.log("Tabla 'pets' creada o ya existe");
@@ -35,18 +37,55 @@ export async function getPetById(id) {
   return db.get("SELECT * FROM pets WHERE id = ? AND available = 1", id);
 }
 
+// Función para obtener una mascota por ID (incluyendo no disponibles - para fundaciones)
+export async function getPetByIdAdmin(id) {
+  return db.get("SELECT * FROM pets WHERE id = ?", id);
+}
+
 // Función para crear una nueva mascota
-export async function createPet(name, type, img, description, age, size, sex, foundation) {
+export async function createPet(name, type, img, description, age, size, sex, foundation, foundation_id = null) {
   const result = await db.run(
-    "INSERT INTO pets (name, type, img, description, age, size, sex, foundation) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-    [name, type, img, description, age, size, sex, foundation]
+    "INSERT INTO pets (name, type, img, description, age, size, sex, foundation, foundation_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+    [name, type, img, description, age, size, sex, foundation, foundation_id]
   );
-  return { id: result.lastID, name, type, img, description, age, size, sex, foundation, available: 1 };
+  return { id: result.lastID, name, type, img, description, age, size, sex, foundation, foundation_id, available: 1 };
+}
+
+// Función para actualizar una mascota
+export async function updatePet(id, data) {
+  const { name, type, img, description, age, size, sex } = data;
+  return db.run(
+    "UPDATE pets SET name = ?, type = ?, img = ?, description = ?, age = ?, size = ?, sex = ? WHERE id = ?",
+    [name, type, img, description, age, size, sex, id]
+  );
 }
 
 // Función para marcar una mascota como adoptada
 export async function markPetAsAdopted(id) {
   return db.run("UPDATE pets SET available = 0 WHERE id = ?", id);
+}
+
+// Función para reactivar una mascota (ponerla de nuevo en adopción)
+export async function markPetAsAvailable(id) {
+  return db.run("UPDATE pets SET available = 1 WHERE id = ?", id);
+}
+
+// Función para actualizar la disponibilidad de una mascota
+export async function updatePetAvailability(id, available) {
+  return db.run("UPDATE pets SET available = ? WHERE id = ?", [available ? 1 : 0, id]);
+}
+
+// Función para obtener mascotas de una fundación específica
+export async function getPetsByFoundationId(foundationId) {
+  return db.all(
+    "SELECT * FROM pets WHERE foundation_id = ? ORDER BY created_at DESC",
+    [foundationId]
+  );
+}
+
+// Función para eliminar una mascota
+export async function deletePet(id) {
+  return db.run("DELETE FROM pets WHERE id = ?", id);
 }
 
 // Función para insertar datos iniciales (migración de datos hardcodeados)

@@ -2,13 +2,13 @@
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useAdoption } from "../contexts/AdoptionContext";
 
 export default function Login() {
     const navigate = useNavigate();
-    const { login } = useAuth();
+    const { login, user } = useAuth();
     const { getAdoptionIntent, clearAdoptionIntent } = useAdoption();
     
     const [email, setEmail] = useState("");
@@ -25,6 +25,15 @@ export default function Login() {
 
             if (result.success) {
                 setMessage("✅ Login exitoso, bienvenido!");
+                
+                // Obtener datos del usuario del localStorage para verificar el tipo
+                const userData = JSON.parse(localStorage.getItem('userData'));
+                
+                // Si es una fundación, redirigir al dashboard
+                if (userData?.user_type === 'foundation') {
+                    navigate('/foundation/dashboard');
+                    return;
+                }
                 
                 // Verificar si hay una intención de adopción guardada
                 const adoptionIntent = getAdoptionIntent();
@@ -130,6 +139,17 @@ export default function Login() {
                         Regístrate
                     </a>
                 </div>
+                
+                {/* Link para fundaciones */}
+                <div className="mt-2 text-center">
+                    <Link
+                        to="/register-foundation"
+                        className="text-xs sm:text-sm text-gray-500 hover:text-[#005017] hover:underline"
+                    >
+                        ¿Eres una fundación? Regístrate aquí
+                    </Link>
+                </div>
+                
                   {/* Botón volver al Home */}
                 <motion.a
                 href="/"

@@ -1,15 +1,24 @@
 import { db } from "../db/database.js";
 import bcrypt from "bcrypt";
+import { getAllFoundations, getFoundationById, updateFoundation } from "../models/usersModel.js";
 
 export async function registerUser(req, res) {
-  const { username, email, password } = req.body;
+  const { username, email, password, user_type, foundation_name, foundation_description, foundation_phone, foundation_address } = req.body;
 
-  console.log("📝 Datos recibidos:", { username, email, password: "***" });
+  console.log("📝 Datos recibidos:", { username, email, password: "***", user_type });
 
   if (!username || !email || !password) {
     return res.status(400).json({ 
       success: false, 
       message: "Todos los campos son obligatorios" 
+    });
+  }
+
+  // Si es fundación, validar campos adicionales
+  if (user_type === 'foundation' && !foundation_name) {
+    return res.status(400).json({ 
+      success: false, 
+      message: "El nombre de la fundación es obligatorio" 
     });
   }
 
@@ -31,9 +40,20 @@ export async function registerUser(req, res) {
     console.log("✅ Contraseña hasheada");
 
     console.log("💾 Insertando usuario en la base de datos...");
+    
     const result = await db.run(
-      "INSERT INTO users (username, email, password) VALUES (?, ?, ?)",
-      [username, email, hashedPassword]
+      `INSERT INTO users (username, email, password, user_type, foundation_name, foundation_description, foundation_phone, foundation_address) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        username, 
+        email, 
+        hashedPassword, 
+        user_type || 'user',
+        foundation_name || null,
+        foundation_description || null,
+        foundation_phone || null,
+        foundation_address || null
+      ]
     );
 
     console.log("✅ Usuario insertado con ID:", result.lastID);
@@ -42,12 +62,16 @@ export async function registerUser(req, res) {
     const newUser = {
       id: result.lastID,
       username: username,
-      email: email
+      email: email,
+      user_type: user_type || 'user',
+      foundation_name: foundation_name || null
     };
 
     res.status(201).json({ 
       success: true, 
-      message: "Usuario registrado con éxito ✅",
+      message: user_type === 'foundation' 
+        ? "Fundación registrada con éxito ✅" 
+        : "Usuario registrado con éxito ✅",
       user: newUser
     });
   } catch (error) {
@@ -94,7 +118,13 @@ export async function loginUser(req, res) {
       user: { 
         id: user.id, 
         username: user.username, 
-        email: user.email 
+        email: user.email,
+        user_type: user.user_type || 'user',
+        foundation_name: user.foundation_name,
+        foundation_description: user.foundation_description,
+        foundation_phone: user.foundation_phone,
+        foundation_address: user.foundation_address,
+        foundation_logo: user.foundation_logo
       },
     });
   } catch (error) {
@@ -108,7 +138,7 @@ export async function loginUser(req, res) {
 
 export async function getUsers(req, res) {
   try {
-    const users = await db.all("SELECT id, username, email FROM users");
+    const users = await db.all("SELECT id, username, email, user_type, foundation_name FROM users");
     res.json({
       success: true,
       users: users
@@ -118,6 +148,85 @@ export async function getUsers(req, res) {
     res.status(500).json({ 
       success: false, 
       error: "Error al obtener usuarios" 
+    });
+  }
+}
+
+// Obtener todas las fundaciones
+export async function getFoundations(req, res) {
+  try {
+    const foundations = await getAllFoundations();
+    res.json({
+      success: true,
+      data: foundations,
+      message: `Se encontraron ${foundations.length} fundaciones`
+    });
+  } catch (error) {
+    console.error("Error al obtener fundaciones:", error);
+    res.status(500).json({ 
+      success: false, 
+      message: "Error al obtener fundaciones" 
+    });
+  }
+}
+
+// Obtener una fundación por ID
+export async function getFoundation(req, res) {
+  try {
+    const { id } = req.params;
+    const foundation = await getFoundationById(id);
+    
+    if (!foundation) {
+      return res.status(404).json({
+        success: false,
+        message: "Fundación no encontrada"
+      });
+    }
+    
+    res.json({
+      success: true,
+      data: foundation
+    });
+  } catch (error) {
+    console.error("Error al obtener fundación:", error);
+    res.status(500).json({ 
+      success: false, 
+      message: "Error al obtener fundación" 
+    });
+  }
+}
+
+// Actualizar información de fundación
+export async function editFoundation(req, res) {
+  try {
+    const { id } = req.params;
+    const { foundation_name, foundation_description, foundation_phone, foundation_address, foundation_logo } = req.body;
+    
+    const foundation = await getFoundationById(id);
+    if (!foundation) {
+      return res.status(404).json({
+        success: false,
+        message: "Fundación no encontrada"
+      });
+    }
+    
+    await updateFoundation(id, {
+      foundation_name,
+      foundation_description,
+      foundation_phone,
+      foundation_address,
+      foundation_logo
+    });
+    
+    res.json({
+      success: true,
+      message: "Información de la fundación actualizada"
+    });
+  } catch (error) {
+    console.error("Error al actualizar fundación:", error);
+    res.status(500).json({ 
+      success: false, 
+      message: "Error al actualizar fundación" 
     });
   }
 }
