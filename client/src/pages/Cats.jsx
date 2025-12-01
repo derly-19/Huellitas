@@ -10,12 +10,16 @@ import AdoptionNotification from "../components/AdoptionNotification";
 
 // Función helper para obtener la URL correcta de la imagen
 const getImageUrl = (imgPath) => {
-  if (!imgPath) return '/public/icon.png';
+  if (!imgPath) return '/icon.png';
   if (imgPath.startsWith('http') || imgPath.startsWith('https')) {
     return imgPath;
   }
   if (imgPath.startsWith('/uploads')) {
     return `http://localhost:4000${imgPath}`;
+  }
+  // Manejar rutas de assets locales (/src/assets/...)
+  if (imgPath.startsWith('/src/assets/')) {
+    return imgPath.replace('/src/assets/', '/src/assets/');
   }
   return imgPath;
 };
@@ -90,7 +94,14 @@ export default function Gatitos() {
     try {
       setLoading(true);
       setError(null); // Limpiar errores previos
-      const response = await fetch('http://localhost:4000/api/pets?type=cat');
+      
+      // Agregar timeout para evitar esperas indefinidas
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 segundos timeout
+      
+      const response = await fetch('http://localhost:4000/api/pets?type=cat', { signal: controller.signal });
+      
+      clearTimeout(timeoutId);
       
       if (!response.ok) {
         throw new Error(`Error del servidor: ${response.status}`);
@@ -98,13 +109,13 @@ export default function Gatitos() {
       
       const result = await response.json();
       
-      if (result.success) {
+      if (result.success && Array.isArray(result.data)) {
         // Mapear los datos de la API al formato que espera el componente
         const formattedCats = result.data.map(cat => ({
           id: cat.id,
           name: cat.name,
           img: cat.img,
-          desc: cat.description,
+          desc: cat.description || '',
           edad: cat.age,
           tamaño: cat.size,
           sexo: cat.sex,
@@ -118,7 +129,9 @@ export default function Gatitos() {
       }
     } catch (err) {
       console.error('Error fetching cats:', err);
-      if (err.message.includes('Failed to fetch')) {
+      if (err.name === 'AbortError') {
+        setError('La conexión tardó demasiado. Por favor, intenta de nuevo.');
+      } else if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
         setError('No se puede conectar al servidor. Asegúrate de que el servidor esté corriendo en el puerto 4000.');
       } else {
         setError('Error de conexión con el servidor: ' + err.message);
@@ -251,21 +264,48 @@ export default function Gatitos() {
         </div>
       )}
 
+      {/* Mensaje cuando no hay gatitos */}
+      {!loading && !error && cats.length === 0 && (
+        <div className="text-center py-12">
+          <div className="text-gray-500 text-lg">
+            <p className="text-4xl mb-4">🐱</p>
+            <p>No hay gatitos disponibles en este momento.</p>
+            <button 
+              onClick={fetchCats}
+              className="mt-4 text-[#005017] underline hover:no-underline"
+            >
+              Actualizar
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Grid de Gatitos */}
-      {!loading && !error && (
+      {!loading && !error && cats.length > 0 && (
         <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 px-6 max-w-6xl mx-auto my-10">
-        {cats
-          .filter((cat) => {
+        {(() => {
+          const filteredCats = cats.filter((cat) => {
             const normalize = (s) => (s || "").toLowerCase().replace(/[ao]$/,'');
             if (selectedSize && normalize(cat.tamaño) !== normalize(selectedSize)) return false;
             if (selectedAge && normalize(cat.edad) !== normalize(selectedAge)) return false;
-            if (selectedSex && cat.sexo.toLowerCase() !== selectedSex.toLowerCase()) return false;
+            if (selectedSex && cat.sexo && cat.sexo.toLowerCase() !== selectedSex.toLowerCase()) return false;
             return true;
-          })
-          .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
-          .map((cat, i) => (
+          });
+          
+          if (filteredCats.length === 0) {
+            return (
+              <div className="col-span-3 text-center py-8 text-gray-500">
+                <p className="text-2xl mb-2">😿</p>
+                <p>No hay gatitos que coincidan con los filtros seleccionados.</p>
+              </div>
+            );
+          }
+          
+          return filteredCats
+            .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+            .map((cat, i) => (
           <motion.div
-            key={i}
+            key={cat.id}
             className="bg-[#EDE4D6] rounded-lg shadow-md overflow-hidden hover:shadow-xl transition cursor-pointer"
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -318,7 +358,8 @@ export default function Gatitos() {
               </div>
             </div>
           </motion.div>
-        ))}
+        ));
+        })()}
         </section>
       )}
 

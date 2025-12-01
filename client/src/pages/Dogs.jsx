@@ -10,12 +10,16 @@ import AdoptionNotification from "../components/AdoptionNotification";
 
 // Función helper para obtener la URL correcta de la imagen
 const getImageUrl = (imgPath) => {
-  if (!imgPath) return '/public/icon.png';
+  if (!imgPath) return '/icon.png';
   if (imgPath.startsWith('http') || imgPath.startsWith('https')) {
     return imgPath;
   }
   if (imgPath.startsWith('/uploads')) {
     return `http://localhost:4000${imgPath}`;
+  }
+  // Manejar rutas de assets locales (/src/assets/...)
+  if (imgPath.startsWith('/src/assets/')) {
+    return imgPath.replace('/src/assets/', '/src/assets/');
   }
   return imgPath;
 };
@@ -92,11 +96,16 @@ export default function Perritos() {
       setLoading(true);
       setError(null);
       
-      // Obtener perros y gatos en paralelo
+      // Obtener perros y gatos en paralelo con timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 segundos timeout
+      
       const [dogsResponse, catsResponse] = await Promise.all([
-        fetch('http://localhost:4000/api/pets?type=dog'),
-        fetch('http://localhost:4000/api/pets?type=cat')
+        fetch('http://localhost:4000/api/pets?type=dog', { signal: controller.signal }),
+        fetch('http://localhost:4000/api/pets?type=cat', { signal: controller.signal })
       ]);
+      
+      clearTimeout(timeoutId);
       
       if (!dogsResponse.ok || !catsResponse.ok) {
         throw new Error('Error del servidor');
@@ -107,12 +116,12 @@ export default function Perritos() {
       
       const allPets = [];
       
-      if (dogsResult.success) {
+      if (dogsResult.success && Array.isArray(dogsResult.data)) {
         const formattedDogs = dogsResult.data.map(dog => ({
           id: dog.id,
           name: dog.name,
           img: dog.img,
-          desc: dog.description,
+          desc: dog.description || '',
           edad: dog.age,
           tamaño: dog.size,
           sexo: dog.sex,
@@ -124,12 +133,12 @@ export default function Perritos() {
         allPets.push(...formattedDogs);
       }
       
-      if (catsResult.success) {
+      if (catsResult.success && Array.isArray(catsResult.data)) {
         const formattedCats = catsResult.data.map(cat => ({
           id: cat.id,
           name: cat.name,
           img: cat.img,
-          desc: cat.description,
+          desc: cat.description || '',
           edad: cat.age,
           tamaño: cat.size,
           sexo: cat.sex,
@@ -144,7 +153,9 @@ export default function Perritos() {
       setPets(allPets);
     } catch (err) {
       console.error('Error fetching pets:', err);
-      if (err.message.includes('Failed to fetch')) {
+      if (err.name === 'AbortError') {
+        setError('La conexión tardó demasiado. Por favor, intenta de nuevo.');
+      } else if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
         setError('No se puede conectar al servidor. Asegúrate de que el servidor esté corriendo en el puerto 4000.');
       } else {
         setError('Error de conexión con el servidor: ' + err.message);
@@ -305,20 +316,47 @@ export default function Perritos() {
         </div>
       )}
 
+      {/* Mensaje cuando no hay mascotas */}
+      {!loading && !error && pets.length === 0 && (
+        <div className="text-center py-12">
+          <div className="text-gray-500 text-lg">
+            <p className="text-4xl mb-4">🐾</p>
+            <p>No hay mascotas disponibles en este momento.</p>
+            <button 
+              onClick={fetchPets}
+              className="mt-4 text-[#005017] underline hover:no-underline"
+            >
+              Actualizar
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Grid de Mascotas */}
-      {!loading && !error && (
+      {!loading && !error && pets.length > 0 && (
         <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 px-6 max-w-6xl mx-auto my-10">
-        {pets
-      .filter((pet) => {
-        const normalize = (s) => (s || "").toLowerCase().replace(/[ao]$/,'');
-        if (selectedType && pet.type !== selectedType) return false;
-        if (selectedSize && normalize(pet.tamaño) !== normalize(selectedSize)) return false;
-        if (selectedAge && normalize(pet.edad) !== normalize(selectedAge)) return false;
-        if (selectedSex && pet.sexo.toLowerCase() !== selectedSex.toLowerCase()) return false;
-        return true;
-          })
-          .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
-          .map((pet, i) => (
+        {(() => {
+          const filteredPets = pets.filter((pet) => {
+            const normalize = (s) => (s || "").toLowerCase().replace(/[ao]$/,'');
+            if (selectedType && pet.type !== selectedType) return false;
+            if (selectedSize && normalize(pet.tamaño) !== normalize(selectedSize)) return false;
+            if (selectedAge && normalize(pet.edad) !== normalize(selectedAge)) return false;
+            if (selectedSex && pet.sexo && pet.sexo.toLowerCase() !== selectedSex.toLowerCase()) return false;
+            return true;
+          });
+          
+          if (filteredPets.length === 0) {
+            return (
+              <div className="col-span-3 text-center py-8 text-gray-500">
+                <p className="text-2xl mb-2">😿</p>
+                <p>No hay mascotas que coincidan con los filtros seleccionados.</p>
+              </div>
+            );
+          }
+          
+          return filteredPets
+            .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+            .map((pet, i) => (
           <motion.div
             key={`${pet.type}-${pet.id}`}
             className="bg-[#EDE4D6] rounded-lg shadow-md overflow-hidden hover:shadow-xl transition cursor-pointer"
@@ -378,7 +416,8 @@ export default function Perritos() {
               </div>
             </div>
           </motion.div>
-        ))}
+        ));
+        })()}
         </section>
       )}
 
