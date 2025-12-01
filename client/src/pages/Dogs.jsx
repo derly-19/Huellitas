@@ -117,7 +117,7 @@ export default function Perritos() {
       const allPets = [];
       
       if (dogsResult.success && Array.isArray(dogsResult.data)) {
-        const formattedDogs = dogsResult.data.map(dog => ({
+        const formattedDogs = (dogsResult.data || []).map(dog => ({
           id: dog.id,
           name: dog.name,
           img: dog.img,
@@ -134,7 +134,7 @@ export default function Perritos() {
       }
       
       if (catsResult.success && Array.isArray(catsResult.data)) {
-        const formattedCats = catsResult.data.map(cat => ({
+        const formattedCats = (catsResult.data || []).map(cat => ({
           id: cat.id,
           name: cat.name,
           img: cat.img,
@@ -525,7 +525,7 @@ export default function Perritos() {
             {/* Números de página */}
             {renderPageNumbers().map((page, i) => (
               <button
-                key={i}
+                key={typeof page === 'number' ? `page-${page}` : `ellipsis-${i}`}
                 onClick={() => typeof page === 'number' && setCurrentPage(page)}
                 disabled={typeof page !== 'number'}
                 className={`px-3 py-1 rounded ${

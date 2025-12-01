@@ -24,9 +24,9 @@ export default function AdoptionSection({ title, pets, onAdopt, onCardClick }) {
         transition={{ staggerChildren: 0.2 }}
         viewport={{ once: false }}
       >
-        {pets.map((pet, i) => (
+        {pets && pets.length > 0 && pets.map((pet) => (
           <motion.div
-            key={i}
+            key={pet.id || pet.name}
             variants={{
               hidden: { opacity: 0, y: 40 },
               visible: { opacity: 1, y: 0 },

@@ -174,9 +174,27 @@ export default function Formulario() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Prevenir envíos duplicados
+    if (submitting) {
+      console.log('⚠️ Ya hay una solicitud en proceso, ignorando...');
+      return;
+    }
+    
     setSubmitting(true);
 
     try {
+      console.log('🔍 Usuario actual:', user);
+      console.log('🔍 Datos del formulario:', formData);
+      
+      // Validar que todos los campos requeridos estén completos
+      if (!formData.nombre || !formData.apellido || !formData.correo || 
+          !formData.telefono || !formData.direccion || !formData.tipoVivienda || 
+          !formData.motivacion) {
+        alert('Por favor completa todos los campos requeridos');
+        setSubmitting(false);
+        return;
+      }
       // Preparar datos para enviar al servidor
       const adoptionData = {
         pet_id: parseInt(petId),
@@ -191,6 +209,8 @@ export default function Formulario() {
         motivacion: formData.motivacion
       };
 
+      console.log('📤 Enviando solicitud de adopción:', adoptionData);
+
       // Enviar solicitud al servidor
       const response = await fetch('http://localhost:4000/api/adoption-requests', {
         method: 'POST',
@@ -202,7 +222,7 @@ export default function Formulario() {
 
       const result = await response.json();
 
-      if (result.success) {
+      if (response.ok && result.success) {
         // Guardar referencia local para mostrar en el carnet
         const adoptedPets = JSON.parse(localStorage.getItem('adoptedPets') || '[]');
         adoptedPets.push({
@@ -217,6 +237,7 @@ export default function Formulario() {
         // Mostrar notificación de éxito
         setShowSuccessNotification(true);
       } else {
+        console.error('Error del servidor:', result);
         alert(result.message || 'Error al enviar la solicitud');
       }
       

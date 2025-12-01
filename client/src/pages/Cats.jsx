@@ -469,7 +469,7 @@ export default function Gatitos() {
             {/* Números de página */}
             {renderPageNumbers().map((page, i) => (
               <button
-                key={i}
+                key={typeof page === 'number' ? `page-${page}` : `ellipsis-${i}`}
                 onClick={() => typeof page === 'number' && setCurrentPage(page)}
                 disabled={typeof page !== 'number'}
                 className={`px-3 py-1 rounded ${

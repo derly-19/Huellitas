@@ -34,7 +34,7 @@ export default function Carnet() {
         // Transformar datos de la API al formato que espera CarnetCard
         const transformedData = {
           mascota: result.data.mascota,
-          vacunas: result.data.vacunas.map(v => ({
+          vacunas: (result.data.vacunas || []).map(v => ({
             id: v.id,
             nombre: v.nombre_vacuna,
             fecha: v.fecha_aplicacion,
@@ -43,7 +43,7 @@ export default function Carnet() {
             veterinario: v.veterinario,
             observaciones: v.observaciones || 'Sin observaciones'
           })),
-          desparasitaciones: result.data.desparasitaciones.map(d => ({
+          desparasitaciones: (result.data.desparasitaciones || []).map(d => ({
             id: d.id,
             tipo: d.tipo,
             medicamento: d.medicamento,
@@ -54,7 +54,7 @@ export default function Carnet() {
             proximaDosis: d.proxima_dosis,
             observaciones: d.observaciones || 'Sin observaciones'
           })),
-          baños: result.data.banos.map(b => ({
+          baños: (result.data.banos || []).map(b => ({
             id: b.id,
             fecha: b.fecha,
             tipoShampoo: b.tipo_shampoo,
@@ -62,7 +62,7 @@ export default function Carnet() {
             realizadoPor: b.realizado_por,
             observaciones: b.observaciones || 'Sin observaciones'
           })),
-          procedimientos: result.data.procedimientos.map(p => ({
+          procedimientos: (result.data.procedimientos || []).map(p => ({
             id: p.id,
             tipo: p.tipo_procedimiento,
             descripcion: p.descripcion,
@@ -71,7 +71,7 @@ export default function Carnet() {
             costo: p.costo,
             observaciones: p.observaciones || 'Sin observaciones'
           })),
-          medicamentos: result.data.medicamentos.map(m => ({
+          medicamentos: (result.data.medicamentos || []).map(m => ({
             id: m.id,
             medicamento: m.medicamento,
             dosis: m.dosis,

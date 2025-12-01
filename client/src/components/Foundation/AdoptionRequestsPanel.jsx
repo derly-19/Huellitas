@@ -1,9 +1,7 @@
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { 
   FaUser, FaEnvelope, FaPhone, FaHome, FaPaw, FaHeart,
-  FaCheck, FaTimes, FaEye, FaClock, FaFilter,
-  FaChevronDown, FaChevronUp
+  FaCheck, FaTimes, FaEye, FaClock, FaFilter
 } from "react-icons/fa";
 import { MdPets } from "react-icons/md";
 
@@ -62,13 +60,20 @@ const RequestDetailModal = ({ request, onClose, onUpdateStatus }) => {
     setUpdating(false);
   };
 
+  const handleBackdropClick = (e) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <motion.div 
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.9 }}
-        className="bg-white rounded-2xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto"
+    <div 
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 animate-fadeIn"
+      onClick={handleBackdropClick}
+    >
+      <div 
+        className="bg-white rounded-2xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto animate-scaleIn"
+        onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="bg-gradient-to-r from-[#005017] to-[#0e8c37] text-white p-6 rounded-t-2xl">
@@ -98,7 +103,7 @@ const RequestDetailModal = ({ request, onClose, onUpdateStatus }) => {
             <div>
               <h3 className="font-bold text-lg text-gray-800">{request.pet_name}</h3>
               <p className="text-gray-600">
-                {request.pet_type === 'dog' ? '🐕 Perro' : '🐱 Gato'} • {request.pet_breed} • {request.pet_age}
+                {request.pet_type === 'dog' ? '🐕 Perro' : '🐱 Gato'} • {request.pet_size} • {request.pet_age}
               </p>
               <StatusBadge status={request.status} />
             </div>
@@ -201,7 +206,7 @@ const RequestDetailModal = ({ request, onClose, onUpdateStatus }) => {
             </div>
           )}
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 };
@@ -210,9 +215,18 @@ const RequestDetailModal = ({ request, onClose, onUpdateStatus }) => {
 const RequestCard = ({ request, onViewDetail }) => {
   const [expanded, setExpanded] = useState(false);
 
+  const handleToggleExpand = (e) => {
+    e.stopPropagation();
+    setExpanded(!expanded);
+  };
+
+  const handleViewDetail = (e) => {
+    e.stopPropagation();
+    onViewDetail(request);
+  };
+
   return (
-    <motion.div 
-      layout
+    <div 
       className={`bg-white rounded-xl shadow-sm border overflow-hidden transition-all ${
         request.status === 'pending' ? 'border-l-4 border-l-yellow-400' : 
         request.status === 'approved' ? 'border-l-4 border-l-green-400' :
@@ -247,56 +261,61 @@ const RequestCard = ({ request, onViewDetail }) => {
           <div className="flex flex-col items-end gap-2">
             <StatusBadge status={request.status} />
             <button
-              onClick={() => setExpanded(!expanded)}
-              className="text-gray-400 hover:text-gray-600 text-sm flex items-center gap-1"
+              onClick={handleToggleExpand}
+              className="text-gray-400 hover:text-gray-600 text-sm flex items-center gap-1 transition-colors hover:bg-gray-100 px-2 py-1 rounded"
+              aria-expanded={expanded}
+              aria-label={expanded ? 'Mostrar menos información' : 'Mostrar más información'}
             >
-              {expanded ? <FaChevronUp /> : <FaChevronDown />}
-              {expanded ? 'Menos' : 'Más'}
+              {expanded ? (
+                <>
+                  <span>▲</span> Menos
+                </>
+              ) : (
+                <>
+                  <span>▼</span> Más
+                </>
+              )}
             </button>
           </div>
         </div>
 
         {/* Preview expandida */}
-        <AnimatePresence>
-          {expanded && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              className="mt-4 pt-4 border-t"
-            >
-              <div className="grid grid-cols-2 gap-4 text-sm mb-4">
-                <div>
-                  <p className="text-gray-500">Email</p>
-                  <p className="font-medium truncate">{request.correo}</p>
-                </div>
-                <div>
-                  <p className="text-gray-500">Teléfono</p>
-                  <p className="font-medium">{request.telefono}</p>
-                </div>
-                <div>
-                  <p className="text-gray-500">Vivienda</p>
-                  <p className="font-medium">{request.tipo_vivienda}</p>
-                </div>
-                <div>
-                  <p className="text-gray-500">¿Tiene mascotas?</p>
-                  <p className="font-medium">{request.tiene_mascotas}</p>
-                </div>
+        {expanded && (
+          <div className="mt-4 pt-4 border-t animate-fadeIn">
+            <div className="grid grid-cols-2 gap-4 text-sm mb-4">
+              <div>
+                <p className="text-gray-500">Email</p>
+                <p className="font-medium truncate">{request.correo || 'No especificado'}</p>
               </div>
-              <p className="text-sm text-gray-600 line-clamp-2 mb-3">
-                <span className="font-medium">Motivación:</span> {request.motivacion}
+              <div>
+                <p className="text-gray-500">Teléfono</p>
+                <p className="font-medium">{request.telefono || 'No especificado'}</p>
+              </div>
+              <div>
+                <p className="text-gray-500">Vivienda</p>
+                <p className="font-medium">{request.tipo_vivienda || 'No especificado'}</p>
+              </div>
+              <div>
+                <p className="text-gray-500">¿Tiene mascotas?</p>
+                <p className="font-medium">{request.tiene_mascotas || 'No especificado'}</p>
+              </div>
+            </div>
+            <div className="mb-3">
+              <p className="text-gray-500 text-sm mb-1">Motivación:</p>
+              <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded-lg">
+                {request.motivacion || 'No proporcionada'}
               </p>
-              <button
-                onClick={() => onViewDetail(request)}
-                className="w-full py-2 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors flex items-center justify-center gap-2 font-medium"
-              >
-                <FaEye /> Ver solicitud completa
-              </button>
-            </motion.div>
-          )}
-        </AnimatePresence>
+            </div>
+            <button
+              onClick={handleViewDetail}
+              className="w-full py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2 font-medium shadow-sm"
+            >
+              <FaEye /> Ver solicitud completa
+            </button>
+          </div>
+        )}
       </div>
-    </motion.div>
+    </div>
   );
 };
 
@@ -465,7 +484,7 @@ export default function AdoptionRequestsPanel({ foundationId }) {
         </div>
       ) : (
         <div className="space-y-4">
-          {requests.map((request) => (
+          {requests && requests.length > 0 && requests.map((request) => (
             <RequestCard
               key={request.id}
               request={request}
@@ -476,15 +495,13 @@ export default function AdoptionRequestsPanel({ foundationId }) {
       )}
 
       {/* Modal de detalle */}
-      <AnimatePresence>
-        {selectedRequest && (
-          <RequestDetailModal
-            request={selectedRequest}
-            onClose={() => setSelectedRequest(null)}
-            onUpdateStatus={handleUpdateStatus}
-          />
-        )}
-      </AnimatePresence>
+      {selectedRequest && (
+        <RequestDetailModal
+          request={selectedRequest}
+          onClose={() => setSelectedRequest(null)}
+          onUpdateStatus={handleUpdateStatus}
+        />
+      )}
     </div>
   );
 }

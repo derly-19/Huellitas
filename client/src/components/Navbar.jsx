@@ -80,9 +80,9 @@ export default function Navbar() {
 
       {/* Links en desktop */}
       <ul className="hidden md:flex gap-6 font-medium">
-        {links.map((link, i) => (
+        {links.map((link) => (
           <motion.li
-            key={i}
+            key={link.path}
             whileHover={{ scale: 1.1, color: "#fff" }}
             whileTap={{ scale: 0.95 }}
             className="flex items-center gap-2"
@@ -157,9 +157,9 @@ export default function Navbar() {
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
           >
-            {(isAuthenticated() ? authenticatedLinks : publicLinks).map((link, i) => (
+            {(isAuthenticated() ? authenticatedLinks : publicLinks).map((link) => (
               <motion.div
-                key={i}
+                key={link.path}
                 whileHover={{ scale: 1.1, color: "#fff" }}
                 whileTap={{ scale: 0.95 }}
                 className="flex items-center gap-2 text-lg font-medium"

@@ -12,7 +12,7 @@ export default function CarnetTable({ columns, data, sectionType }) {
         <table className="w-full">
           <thead>
             <tr className="border-b-2 border-gray-300">
-              {columns.map((column) => (
+              {columns && columns.length > 0 && columns.map((column) => (
                 <th key={column.key} className="text-left py-3 px-2 font-semibold text-gray-700">
                   {column.label}
                 </th>
@@ -22,7 +22,7 @@ export default function CarnetTable({ columns, data, sectionType }) {
           <tbody>
             {data.length > 0 ? (
               data.map((item, index) => (
-                <tr key={index} className="border-b border-gray-200">
+                <tr key={item.id || `${sectionType}-${index}-${item.fecha}`} className="border-b border-gray-200">
                   {columns.map((column) => (
                     <td key={column.key} className="py-3 px-2 text-gray-600">
                       {renderCellContent(item, column.key)}

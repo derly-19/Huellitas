@@ -94,6 +94,8 @@ export async function insertInitialPets() {
   const existingPets = await db.get("SELECT COUNT(*) as count FROM pets");
   if (existingPets.count > 0) {
     console.log("Ya existen mascotas en la base de datos");
+    // Asignar foundation_id a mascotas que no lo tienen
+    await assignFoundationIdsToPets();
     return;
   }
 
@@ -406,4 +408,39 @@ export async function insertInitialPets() {
   }
   
   console.log(`Se insertaron ${allPets.length} mascotas en la base de datos`);
+  
+  // Asignar foundation_id a las mascotas recién insertadas
+  await assignFoundationIdsToPets();
+}
+
+// Función para asignar foundation_id a mascotas que no lo tienen
+async function assignFoundationIdsToPets() {
+  try {
+    // Mapeo de nombres de fundaciones a IDs (asumiendo que hay usuarios tipo fundación)
+    // Por ahora, vamos a asignar un ID genérico (2) que debe ser una fundación
+    // En producción, esto debería hacerse correctamente con fundaciones reales
+    
+    const petsWithoutFoundation = await db.all(
+      "SELECT * FROM pets WHERE foundation_id IS NULL"
+    );
+    
+    if (petsWithoutFoundation.length === 0) {
+      return;
+    }
+    
+    console.log(`🏥 Asignando foundation_id a ${petsWithoutFoundation.length} mascotas...`);
+    
+    // Asignar foundation_id = 2 a todas las mascotas sin fundación
+    // (En un sistema real, buscaríamos la fundación por nombre)
+    for (const pet of petsWithoutFoundation) {
+      await db.run(
+        "UPDATE pets SET foundation_id = ? WHERE id = ?",
+        [2, pet.id]
+      );
+    }
+    
+    console.log(`✅ Foundation_id asignado a todas las mascotas`);
+  } catch (error) {
+    console.error("Error asignando foundation_id:", error);
+  }
 }

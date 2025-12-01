@@ -46,9 +46,9 @@ export default function Hero() {
 
         {/* Indicadores del carrusel */}
         <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex gap-2 z-10">
-          {carouselImages.map((_, index) => (
+          {carouselImages.map((img, index) => (
             <button
-              key={index}
+              key={`carousel-${index}-${img}`}
               onClick={() => setCurrentIndex(index)}
               className={`w-2 h-2 rounded-full transition-all duration-300 ${
                 index === currentIndex 

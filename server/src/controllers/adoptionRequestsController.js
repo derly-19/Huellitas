@@ -18,10 +18,22 @@ export const createRequest = async (req, res) => {
     } = req.body;
 
     // Validar campos requeridos
-    if (!pet_id || !nombre || !apellido || !correo || !telefono || !direccion || !tipo_vivienda || !motivacion) {
+    const camposFaltantes = [];
+    if (!pet_id) camposFaltantes.push('pet_id');
+    if (!nombre) camposFaltantes.push('nombre');
+    if (!apellido) camposFaltantes.push('apellido');
+    if (!correo) camposFaltantes.push('correo');
+    if (!telefono) camposFaltantes.push('telefono');
+    if (!direccion) camposFaltantes.push('direccion');
+    if (!tipo_vivienda) camposFaltantes.push('tipo_vivienda');
+    if (!motivacion) camposFaltantes.push('motivacion');
+    
+    if (camposFaltantes.length > 0) {
+      console.log('❌ Campos faltantes:', camposFaltantes);
+      console.log('📦 Datos recibidos:', req.body);
       return res.status(400).json({
         success: false,
-        message: "Todos los campos requeridos deben ser completados"
+        message: `Faltan los siguientes campos: ${camposFaltantes.join(', ')}`
       });
     }
 
@@ -34,6 +46,8 @@ export const createRequest = async (req, res) => {
       });
     }
 
+    console.log('🐾 Mascota encontrada:', pet);
+
     // Verificar que la mascota esté disponible
     if (pet.available === 0) {
       return res.status(400).json({
@@ -42,13 +56,24 @@ export const createRequest = async (req, res) => {
       });
     }
 
-    // Verificar si ya existe una solicitud pendiente del mismo usuario para esta mascota
-    const existingRequest = await AdoptionRequestsModel.checkExistingRequest(user_id, pet_id);
-    if (existingRequest) {
+    // Verificar que la mascota tenga una fundación asignada
+    if (!pet.foundation_id) {
+      console.error('❌ La mascota no tiene foundation_id asignado');
       return res.status(400).json({
         success: false,
-        message: "Ya tienes una solicitud pendiente para esta mascota"
+        message: "Esta mascota no está asociada a ninguna fundación. Por favor contacta al administrador."
       });
+    }
+
+    // Verificar si ya existe una solicitud pendiente del mismo usuario para esta mascota
+    if (user_id) {
+      const existingRequest = await AdoptionRequestsModel.checkExistingRequest(user_id, pet_id);
+      if (existingRequest) {
+        return res.status(400).json({
+          success: false,
+          message: "Ya tienes una solicitud pendiente para esta mascota"
+        });
+      }
     }
 
     // Crear la solicitud
@@ -92,6 +117,8 @@ export const getFoundationRequests = async (req, res) => {
     const { foundationId } = req.params;
     const { status } = req.query;
 
+    console.log(`🔍 Obteniendo solicitudes para fundación ${foundationId}, status: ${status || 'all'}`);
+
     let requests;
     if (status && status !== 'all') {
       requests = await AdoptionRequestsModel.getRequestsByStatus(foundationId, status);
@@ -99,16 +126,20 @@ export const getFoundationRequests = async (req, res) => {
       requests = await AdoptionRequestsModel.getRequestsByFoundation(foundationId);
     }
 
+    console.log(`✅ Encontradas ${requests.length} solicitudes`);
+
     res.json({
       success: true,
       data: requests
     });
 
   } catch (error) {
-    console.error("Error fetching foundation requests:", error);
+    console.error("❌ Error fetching foundation requests:", error);
+    console.error("Stack trace:", error.stack);
     res.status(500).json({
       success: false,
-      message: "Error al obtener las solicitudes"
+      message: "Error al obtener las solicitudes",
+      error: error.message
     });
   }
 };
@@ -117,7 +148,11 @@ export const getFoundationRequests = async (req, res) => {
 export const getFoundationRequestStats = async (req, res) => {
   try {
     const { foundationId } = req.params;
+    console.log(`📊 Obteniendo estadísticas para fundación ${foundationId}`);
+    
     const counts = await AdoptionRequestsModel.countRequestsByFoundation(foundationId);
+    
+    console.log(`✅ Estadísticas obtenidas:`, counts);
 
     res.json({
       success: true,
@@ -125,10 +160,12 @@ export const getFoundationRequestStats = async (req, res) => {
     });
 
   } catch (error) {
-    console.error("Error fetching request stats:", error);
+    console.error("❌ Error fetching request stats:", error);
+    console.error("Stack trace:", error.stack);
     res.status(500).json({
       success: false,
-      message: "Error al obtener estadísticas"
+      message: "Error al obtener estadísticas",
+      error: error.message
     });
   }
 };

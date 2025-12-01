@@ -73,7 +73,7 @@ export default function CarnetCard({ initialData = {}, readOnly = false }) {
         </div>
       )}
       <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-6">
-        {sections.map((section) => (
+        {sections && sections.length > 0 && sections.map((section) => (
           <CarnetSection
             key={section.id}
             title={section.title}

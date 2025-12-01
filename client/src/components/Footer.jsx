@@ -61,9 +61,9 @@ export default function Footer() {
             { Icon: FaFacebook, label: "Facebook" },
             { Icon: FaInstagram, label: "Instagram" },
             { Icon: FaTwitter, label: "Twitter" },
-          ].map(({ Icon, label }, i) => (
+          ].map(({ Icon, label }) => (
             <motion.a
-              key={i}
+              key={label}
               href="#"
               aria-label={label}
               className="hover:text-white transition"

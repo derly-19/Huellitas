@@ -2,6 +2,19 @@ import { db } from "../db/database.js";
 
 // Crear tabla de solicitudes de adopción si no existe
 export const createAdoptionRequestsTable = async () => {
+  // Verificar si la tabla existe y tiene las columnas correctas
+  try {
+    const tableInfo = await db.all("PRAGMA table_info(adoption_requests)");
+    const hasCorrectColumns = tableInfo.some(col => col.name === 'pet_name');
+    
+    if (!hasCorrectColumns && tableInfo.length > 0) {
+      console.log("⚠️  Tabla adoption_requests tiene esquema antiguo, recreando...");
+      await db.exec("DROP TABLE IF EXISTS adoption_requests");
+    }
+  } catch (error) {
+    // La tabla no existe, continuar con la creación
+  }
+  
   await db.exec(`
     CREATE TABLE IF NOT EXISTS adoption_requests (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -16,7 +29,7 @@ export const createAdoptionRequestsTable = async () => {
       foundation_name TEXT,
       
       -- Datos del adoptante (usuario)
-      user_id INTEGER NOT NULL,
+      user_id INTEGER,
       
       -- Información personal del adoptante
       nombre TEXT NOT NULL,
@@ -84,7 +97,7 @@ export const createAdoptionRequest = async (requestData) => {
 // Obtener todas las solicitudes de una fundación
 export const getRequestsByFoundation = async (foundationId) => {
   const requests = await db.all(
-    `SELECT ar.*, p.img as pet_img, p.breed as pet_breed, p.age as pet_age
+    `SELECT ar.*, p.img as pet_img, p.age as pet_age, p.size as pet_size
      FROM adoption_requests ar
      LEFT JOIN pets p ON ar.pet_id = p.id
      WHERE ar.foundation_id = ?
@@ -97,7 +110,7 @@ export const getRequestsByFoundation = async (foundationId) => {
 // Obtener solicitudes por estado
 export const getRequestsByStatus = async (foundationId, status) => {
   const requests = await db.all(
-    `SELECT ar.*, p.img as pet_img, p.breed as pet_breed, p.age as pet_age
+    `SELECT ar.*, p.img as pet_img, p.age as pet_age, p.size as pet_size
      FROM adoption_requests ar
      LEFT JOIN pets p ON ar.pet_id = p.id
      WHERE ar.foundation_id = ? AND ar.status = ?
@@ -110,7 +123,7 @@ export const getRequestsByStatus = async (foundationId, status) => {
 // Obtener una solicitud por ID
 export const getRequestById = async (requestId) => {
   const request = await db.get(
-    `SELECT ar.*, p.img as pet_img, p.breed as pet_breed, p.age as pet_age, p.size as pet_size, p.description as pet_description
+    `SELECT ar.*, p.img as pet_img, p.age as pet_age, p.size as pet_size, p.description as pet_description, p.sex as pet_sex
      FROM adoption_requests ar
      LEFT JOIN pets p ON ar.pet_id = p.id
      WHERE ar.id = ?`,
@@ -170,7 +183,14 @@ export const countRequestsByFoundation = async (foundationId) => {
      WHERE foundation_id = ?`,
     [foundationId]
   );
-  return counts;
+  
+  // Asegurar que siempre devolvamos un objeto válido con valores numéricos
+  return {
+    total: counts?.total || 0,
+    pending: counts?.pending || 0,
+    approved: counts?.approved || 0,
+    rejected: counts?.rejected || 0
+  };
 };
 
 // Obtener solicitudes de un usuario

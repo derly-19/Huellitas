@@ -6,11 +6,12 @@ const router = Router();
 // Crear nueva solicitud de adopción
 router.post("/", AdoptionRequestsController.createRequest);
 
+// IMPORTANTE: Las rutas más específicas deben ir primero
+// Obtener estadísticas de solicitudes de una fundación (debe ir antes de /foundation/:foundationId)
+router.get("/foundation/:foundationId/stats", AdoptionRequestsController.getFoundationRequestStats);
+
 // Obtener solicitudes de una fundación
 router.get("/foundation/:foundationId", AdoptionRequestsController.getFoundationRequests);
-
-// Obtener estadísticas de solicitudes de una fundación
-router.get("/foundation/:foundationId/stats", AdoptionRequestsController.getFoundationRequestStats);
 
 // Obtener solicitudes de un usuario
 router.get("/user/:userId", AdoptionRequestsController.getUserRequests);
