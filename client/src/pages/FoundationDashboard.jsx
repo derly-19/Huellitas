@@ -295,21 +295,21 @@ export default function FoundationDashboard() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header del Dashboard */}
-      <div className="bg-gradient-to-r from-[#005017] to-[#0e8c37] text-white py-8 px-4">
+      <div className="bg-[#BCC990] py-8 px-4">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between">
             <div>
-              <h1 className="text-3xl font-bold mb-2">
+              <h1 className="text-3xl font-bold mb-2 text-gray-800">
                 ¡Bienvenido, {user.foundation_name || user.username}!
               </h1>
-              <p className="text-green-100">Panel de administración de mascotas</p>
+              <p className="text-gray-700">Panel de administración de mascotas</p>
             </div>
             
             {/* Enlaces a páginas públicas */}
             <div className="mt-4 md:mt-0 flex flex-wrap gap-3">
               <Link 
                 to="/Dogs" 
-                className="flex items-center gap-2 bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition-colors"
+                className="flex items-center gap-2 bg-white hover:bg-gray-50 px-4 py-2 rounded-lg transition-colors text-gray-800 font-medium shadow-sm"
               >
                 <FaEye />
                 <span>Ver página de Perritos</span>
@@ -317,7 +317,7 @@ export default function FoundationDashboard() {
               </Link>
               <Link 
                 to="/Cats" 
-                className="flex items-center gap-2 bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition-colors"
+                className="flex items-center gap-2 bg-white hover:bg-gray-50 px-4 py-2 rounded-lg transition-colors text-gray-800 font-medium shadow-sm"
               >
                 <FaEye />
                 <span>Ver página de Gatitos</span>
@@ -388,7 +388,7 @@ export default function FoundationDashboard() {
             onClick={() => setActiveTab("pets")}
             className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-lg font-semibold transition-colors ${
               activeTab === "pets"
-                ? "bg-[#005017] text-white"
+                ? "bg-[#BCC990] text-white"
                 : "bg-gray-100 text-gray-600 hover:bg-gray-200"
             }`}
           >
@@ -399,7 +399,7 @@ export default function FoundationDashboard() {
             onClick={() => setActiveTab("requests")}
             className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-lg font-semibold transition-colors ${
               activeTab === "requests"
-                ? "bg-[#005017] text-white"
+                ? "bg-[#BCC990] text-white"
                 : "bg-gray-100 text-gray-600 hover:bg-gray-200"
             }`}
           >
@@ -420,10 +420,10 @@ export default function FoundationDashboard() {
             </h2>
             <button
               onClick={() => setShowAddModal(true)}
-              className="flex items-center justify-center space-x-2 bg-[#005017] hover:bg-[#0e8c37] text-white px-6 py-3 rounded-xl font-semibold transition-colors"
+              className="flex items-center justify-center space-x-2 bg-[#BCC990] hover:bg-[#9FB36F] text-white px-6 py-3 rounded-xl font-semibold transition-colors shadow"
             >
               <FaPlus />
-              <span>Agregar Mascota</span>
+              <span>Agregar mascota</span>
             </button>
           </div>
 
@@ -437,7 +437,7 @@ export default function FoundationDashboard() {
                 placeholder="Buscar por nombre..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#BCC990] focus:outline-none"
               />
             </div>
             
@@ -445,7 +445,7 @@ export default function FoundationDashboard() {
             <select
               value={filterType}
               onChange={(e) => setFilterType(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#BCC990] focus:outline-none"
             >
               <option value="all">Todos los tipos</option>
               <option value="dog">🐕 Solo Perros</option>
@@ -456,7 +456,7 @@ export default function FoundationDashboard() {
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#BCC990] focus:outline-none"
             >
               <option value="all">Todos los estados</option>
               <option value="available">✅ Disponibles</option>
@@ -467,7 +467,7 @@ export default function FoundationDashboard() {
           {/* Lista de mascotas */}
           {loading ? (
             <div className="text-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#BCC990] mx-auto"></div>
               <p className="mt-4 text-gray-600">Cargando mascotas...</p>
             </div>
           ) : error ? (
@@ -475,7 +475,7 @@ export default function FoundationDashboard() {
               <p className="text-red-500">{error}</p>
               <button 
                 onClick={fetchPets}
-                className="mt-4 text-green-600 hover:underline"
+                className="mt-4 text-[#BCC990] hover:underline font-semibold"
               >
                 Intentar de nuevo
               </button>
@@ -492,7 +492,7 @@ export default function FoundationDashboard() {
               {pets.length === 0 && (
                 <button
                   onClick={() => setShowAddModal(true)}
-                  className="mt-4 text-green-600 hover:underline font-semibold"
+                  className="mt-4 text-[#BCC990] hover:underline font-semibold"
                 >
                   ¡Agrega tu primera mascota!
                 </button>
