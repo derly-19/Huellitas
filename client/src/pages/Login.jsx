@@ -1,7 +1,7 @@
 // client/src/pages/Login.jsx
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useAdoption } from "../contexts/AdoptionContext";
@@ -16,6 +16,14 @@ export default function Login() {
     const [message, setMessage] = useState("");
     const [loading, setLoading] = useState(false);
 
+    // Cargar el último email guardado al montar el componente
+    useEffect(() => {
+        const savedEmail = localStorage.getItem('lastLoginEmail');
+        if (savedEmail) {
+            setEmail(savedEmail);
+        }
+    }, []);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -24,6 +32,9 @@ export default function Login() {
             const result = await login(email, password);
 
             if (result.success) {
+                // Guardar el email para recordarlo en futuros logins
+                localStorage.setItem('lastLoginEmail', email);
+                
                 setMessage("✅ Login exitoso, bienvenido!");
                 
                 // Obtener datos del usuario del localStorage para verificar el tipo
@@ -89,6 +100,7 @@ export default function Login() {
                 <motion.form
                     onSubmit={handleSubmit}
                     className="flex flex-col gap-3"
+                    autoComplete="on"
                 >
                     <input
                         type="email"
@@ -97,6 +109,8 @@ export default function Login() {
                         onChange={(e) => setEmail(e.target.value)}
                         className="w-full border border-gray-200 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-[#BCC990]"
                         required
+                        autoComplete="email"
+                        name="email"
                     />
 
                     <input
@@ -106,6 +120,8 @@ export default function Login() {
                         onChange={(e) => setPassword(e.target.value)}
                         className="w-full border border-gray-200 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-[#BCC990]"
                         required
+                        autoComplete="current-password"
+                        name="password"
                     />
 
                     <motion.button

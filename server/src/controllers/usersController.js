@@ -1,6 +1,6 @@
 import { db } from "../db/database.js";
 import bcrypt from "bcrypt";
-import { getAllFoundations, getFoundationById, updateFoundation } from "../models/usersModel.js";
+import { getAllFoundations, getFoundationById, updateFoundation, updateUser, getUserById } from "../models/usersModel.js";
 
 export async function registerUser(req, res) {
   const { username, email, password, user_type, foundation_name, foundation_description, foundation_phone, foundation_address } = req.body;
@@ -119,12 +119,19 @@ export async function loginUser(req, res) {
         id: user.id, 
         username: user.username, 
         email: user.email,
+        correo: user.email,
         user_type: user.user_type || 'user',
+        nombre: user.nombre,
+        apellido: user.apellido,
+        telefono: user.telefono,
+        direccion: user.direccion,
+        ciudad: user.ciudad,
         foundation_name: user.foundation_name,
         foundation_description: user.foundation_description,
         foundation_phone: user.foundation_phone,
         foundation_address: user.foundation_address,
-        foundation_logo: user.foundation_logo
+        foundation_logo: user.foundation_logo,
+        created_at: user.created_at
       },
     });
   } catch (error) {
@@ -227,6 +234,46 @@ export async function editFoundation(req, res) {
     res.status(500).json({ 
       success: false, 
       message: "Error al actualizar fundación" 
+    });
+  }
+}
+
+// Actualizar información de usuario
+export async function editUser(req, res) {
+  try {
+    const { id } = req.params;
+    const { nombre, apellido, telefono, direccion, ciudad } = req.body;
+    
+    console.log(`📝 Actualizando usuario ${id}:`, { nombre, apellido, telefono, direccion, ciudad });
+    
+    const user = await getUserById(id);
+    if (!user) {
+      console.log(`❌ Usuario ${id} no encontrado`);
+      return res.status(404).json({
+        success: false,
+        message: "Usuario no encontrado"
+      });
+    }
+    
+    const result = await updateUser(id, {
+      nombre,
+      apellido,
+      telefono,
+      direccion,
+      ciudad
+    });
+    
+    console.log(`✅ Usuario ${id} actualizado:`, result);
+    
+    res.json({
+      success: true,
+      message: "Información del usuario actualizada"
+    });
+  } catch (error) {
+    console.error("❌ Error al actualizar usuario:", error);
+    res.status(500).json({ 
+      success: false, 
+      message: "Error al actualizar usuario: " + error.message
     });
   }
 }

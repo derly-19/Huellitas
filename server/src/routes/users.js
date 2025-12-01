@@ -5,7 +5,8 @@ import {
   getUsers,
   getFoundations,
   getFoundation,
-  editFoundation
+  editFoundation,
+  editUser
 } from "../controllers/usersController.js";
 
 const router = express.Router();
@@ -27,5 +28,8 @@ router.get("/foundations/:id", getFoundation);
 
 // Actualizar información de fundación
 router.put("/foundations/:id", editFoundation);
+
+// Actualizar información de usuario
+router.put("/:id", editUser);
 
 export default router;

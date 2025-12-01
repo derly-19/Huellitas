@@ -135,6 +135,13 @@ export const AuthProvider = ({ children }) => {
     return user?.user_type === 'foundation';
   };
 
+  // Función para actualizar datos del usuario
+  const updateUser = (updatedData) => {
+    const updatedUser = { ...user, ...updatedData };
+    setUser(updatedUser);
+    localStorage.setItem('userData', JSON.stringify(updatedUser));
+  };
+
   const value = {
     user,
     login,
@@ -143,6 +150,7 @@ export const AuthProvider = ({ children }) => {
     logout,
     isAuthenticated,
     isFoundation,
+    updateUser,
     loading
   };
 

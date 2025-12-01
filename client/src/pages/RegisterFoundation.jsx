@@ -73,21 +73,21 @@ export default function RegisterFoundation() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex items-center justify-center py-12 px-4">
+    <div className="min-h-screen bg-[#BCC990] flex items-center justify-center py-12 px-4">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden">
-        {/* Header */}
-        <div className="bg-gradient-to-r from-[#005017] to-[#0e8c37] p-8 text-center">
-          <div className="flex justify-center mb-4">
-            <div className="bg-white/20 p-4 rounded-full">
-              <MdPets className="text-white text-4xl" />
+        {/* Header con icono circular */}
+        <div className="pt-6 pb-2">
+          <div className="flex justify-center mb-3">
+            <div className="w-16 h-16 bg-[#BCC990] rounded-full flex items-center justify-center shadow-md">
+              <MdPets className="text-white text-3xl" />
             </div>
           </div>
-          <h1 className="text-3xl font-bold text-white mb-2">Registra tu Fundación</h1>
-          <p className="text-green-100">Únete a Huellitas y ayuda a más mascotas a encontrar un hogar</p>
+          <h1 className="text-2xl font-extrabold text-gray-800 text-center mb-1">Registra tu Fundación</h1>
+          <p className="text-center text-sm text-gray-500 mb-5">Únete a Huellitas y ayuda a más mascotas a encontrar un hogar</p>
         </div>
 
         {/* Formulario */}
-        <form onSubmit={handleSubmit} className="p-8 space-y-6">
+        <form onSubmit={handleSubmit} className="px-6 pb-6 space-y-5">
           {error && (
             <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg text-center">
               {error}
@@ -114,7 +114,7 @@ export default function RegisterFoundation() {
                   value={formData.foundation_name}
                   onChange={handleChange}
                   placeholder="Ej: Huellitas de Amor"
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#BCC990] focus:outline-none"
                 />
               </div>
             </div>
@@ -131,7 +131,7 @@ export default function RegisterFoundation() {
                 onChange={handleChange}
                 placeholder="Cuéntanos sobre tu fundación, misión y valores..."
                 rows={3}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#BCC990] focus:outline-none resize-none"
               />
             </div>
 
@@ -150,7 +150,7 @@ export default function RegisterFoundation() {
                     value={formData.foundation_phone}
                     onChange={handleChange}
                     placeholder="Ej: +57 300 123 4567"
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#BCC990] focus:outline-none"
                   />
                 </div>
               </div>
@@ -169,7 +169,7 @@ export default function RegisterFoundation() {
                     value={formData.foundation_address}
                     onChange={handleChange}
                     placeholder="Ciudad, País"
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#BCC990] focus:outline-none"
                   />
                 </div>
               </div>
@@ -194,7 +194,7 @@ export default function RegisterFoundation() {
                 value={formData.username}
                 onChange={handleChange}
                 placeholder="Nombre para identificarte en el sistema"
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#BCC990] focus:outline-none"
               />
             </div>
 
@@ -212,7 +212,7 @@ export default function RegisterFoundation() {
                   value={formData.email}
                   onChange={handleChange}
                   placeholder="fundacion@ejemplo.com"
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#BCC990] focus:outline-none"
                 />
               </div>
             </div>
@@ -232,7 +232,7 @@ export default function RegisterFoundation() {
                     value={formData.password}
                     onChange={handleChange}
                     placeholder="Mínimo 6 caracteres"
-                    className="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full pl-10 pr-10 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#BCC990] focus:outline-none"
                   />
                   <button
                     type="button"
@@ -258,7 +258,7 @@ export default function RegisterFoundation() {
                     value={formData.confirmPassword}
                     onChange={handleChange}
                     placeholder="Repite la contraseña"
-                    className="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full pl-10 pr-10 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#BCC990] focus:outline-none"
                   />
                   <button
                     type="button"
@@ -276,26 +276,35 @@ export default function RegisterFoundation() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-4 bg-[#005017] text-white rounded-xl font-semibold text-lg hover:bg-[#0e8c37] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-3 bg-[#BCC990] text-white rounded-lg font-semibold hover:bg-[#9FB36F] transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow"
           >
-            {loading ? "Registrando..." : "Registrar Fundación"}
+            {loading ? "Registrando..." : "Fundación Registrada"}
           </button>
 
           {/* Links */}
-          <div className="text-center space-y-2">
+          <div className="text-center space-y-1 text-sm">
             <p className="text-gray-600">
               ¿Ya tienes cuenta?{" "}
-              <Link to="/login" className="text-green-600 hover:underline font-medium">
+              <Link to="/login" className="text-[#BCC990] hover:underline font-semibold">
                 Inicia sesión
               </Link>
             </p>
             <p className="text-gray-600">
               ¿Eres un usuario adoptante?{" "}
-              <Link to="/register" className="text-green-600 hover:underline font-medium">
+              <Link to="/register" className="text-[#BCC990] hover:underline font-semibold">
                 Regístrate aquí
               </Link>
             </p>
           </div>
+          
+          {/* Botón volver al Home */}
+          <button
+            type="button"
+            onClick={() => navigate('/')}
+            className="w-full py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg shadow-sm transition-colors"
+          >
+            ⬅ Volver al Home
+          </button>
         </form>
       </div>
     </div>

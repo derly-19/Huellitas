@@ -13,6 +13,7 @@ import Fundaciones from "./pages/Fundaciones";
 import Formulario from "./pages/Formulario";
 import Carnet from "./pages/Carnet";
 import FoundationDashboard from "./pages/FoundationDashboard";
+import Perfil from "./pages/Perfil";
 
 function AppContent() {
   const location = useLocation();
@@ -39,6 +40,7 @@ function AppContent() {
           <Route path="/formulario/:petId" element={<Formulario />} />
           <Route path="/carnet" element={<Carnet />} />
           <Route path="/carnet/:petId" element={<Carnet />} />
+          <Route path="/perfil" element={<Perfil />} />
           <Route path="/foundation/dashboard" element={<FoundationDashboard />} />
         </Routes>
       </main>
