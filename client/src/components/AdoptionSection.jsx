@@ -24,7 +24,7 @@ export default function AdoptionSection({ title, pets, onAdopt, onCardClick }) {
         transition={{ staggerChildren: 0.2 }}
         viewport={{ once: false }}
       >
-        {pets && pets.length > 0 && pets.map((pet) => (
+        {pets && pets.length > 0 && pets.map((pet, index) => (
           <motion.div
             key={pet.id || pet.name}
             variants={{
@@ -49,7 +49,7 @@ export default function AdoptionSection({ title, pets, onAdopt, onCardClick }) {
             }}
             whileTap={{ scale: 0.97 }}
             style={{
-              animation: `float 3s ease-in-out ${i * 0.2}s infinite`,
+              animation: `float 3s ease-in-out ${index * 0.2}s infinite`,
             }}
           >
             <Card 

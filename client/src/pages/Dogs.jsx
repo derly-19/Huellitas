@@ -3,8 +3,8 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
-import { IoChevronDown } from "react-icons/io5";
 import { useAuth } from "../contexts/AuthContext";
+import { IoChevronDown } from "react-icons/io5";
 import { useAdoption } from "../contexts/AdoptionContext";
 import AdoptionNotification from "../components/AdoptionNotification";
 
@@ -26,7 +26,7 @@ const getImageUrl = (imgPath) => {
 
 export default function Perritos() {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isFoundation } = useAuth();
   const { saveAdoptionIntent } = useAdoption();
   
   const [selectedPet, setSelectedPet] = useState(null);
@@ -50,6 +50,11 @@ export default function Perritos() {
 
   // Función para manejar la adopción
   const handleAdopt = (pet) => {
+    // Las fundaciones no pueden adoptar
+    if (isFoundation()) {
+      return;
+    }
+    
     if (isAuthenticated()) {
       // Si está autenticado, ir directamente al formulario
       navigate(`/formulario/${pet.id}`);
@@ -403,17 +408,19 @@ export default function Perritos() {
               </p>
               
               {/* Botón de acción */}
-              <div className="w-full mt-4">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleAdopt(pet);
+              {!isFoundation() && (
+                <div className="w-full mt-4">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleAdopt(pet);
                   }}
                   className="w-full bg-[#005017] text-white py-3 px-4 rounded-lg font-semibold hover:bg-[#0e8c37] transition"
                 >
-                  ¡Adoptar!
-                </button>
-              </div>
+                    ¡Adóptame!
+                  </button>
+                </div>
+              )}
             </div>
           </motion.div>
         ));

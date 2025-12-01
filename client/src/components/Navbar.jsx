@@ -49,8 +49,6 @@ export default function Navbar() {
   // ✅ Links para fundaciones
   const foundationLinks = [
     { name: "Dashboard", path: "/foundation/dashboard", icon: <LayoutDashboard size={18} /> },
-    { name: "Inicio", path: "/", icon: <Home size={18} /> },
-    { name: "Ver Mascotas", path: "/Dogs", icon: <Dog size={18} /> },
   ];
 
   // Usar los links apropiados según el estado de autenticación

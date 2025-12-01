@@ -24,9 +24,9 @@ const getImageUrl = (imgPath) => {
   return imgPath;
 };
 
-export default function Gatitos() {
+export default function Cats() {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isFoundation } = useAuth();
   const { saveAdoptionIntent } = useAdoption();
   
   const [selectedCat, setSelectedCat] = useState(null);
@@ -49,6 +49,11 @@ export default function Gatitos() {
 
   // Función para manejar la adopción
   const handleAdopt = (cat) => {
+    // Las fundaciones no pueden adoptar
+    if (isFoundation()) {
+      return;
+    }
+    
     if (isAuthenticated()) {
       // Si está autenticado, ir directamente al formulario
       navigate(`/formulario/${cat.id}`);
@@ -345,17 +350,19 @@ export default function Gatitos() {
               </p>
               
               {/* Botón de acción */}
-              <div className="w-full mt-4">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation(); // Evitar que se abra el modal
-                    handleAdopt(cat);
-                  }}
-                  className="w-full bg-[#005017] text-white py-3 px-4 rounded-lg font-semibold hover:bg-[#0e8c37] transition"
-                >
-                  ¡Adoptar!
-                </button>
-              </div>
+              {!isFoundation() && (
+                <div className="w-full mt-4">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation(); // Evitar que se abra el modal
+                      handleAdopt(cat);
+                    }}
+                    className="w-full bg-[#005017] text-white py-3 px-4 rounded-lg font-semibold hover:bg-[#0e8c37] transition"
+                  >
+                    ¡Adoptar!
+                  </button>
+                </div>
+              )}
             </div>
           </motion.div>
         ));

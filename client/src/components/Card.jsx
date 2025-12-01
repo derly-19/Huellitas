@@ -1,3 +1,5 @@
+import { useAuth } from '../contexts/AuthContext';
+
 export default function Card({ 
   id, 
   name, 
@@ -8,6 +10,8 @@ export default function Card({
   onCardClick,
   petData
 }) {
+  const { isFoundation } = useAuth();
+
   // Función para manejar el clic en "Adoptar"
   const handleAdoptClick = (e) => {
     e.stopPropagation(); // Evitar que se abra el modal
@@ -54,14 +58,16 @@ export default function Card({
           }
         </p>
         
-        <div className="w-full">
-          <button 
-            onClick={handleAdoptClick}
-            className="w-full py-3 rounded-xl bg-[#005017] text-white font-semibold text-base shadow hover:bg-[#0e8c37] transition"
-          >
-            ¡Adóptame!
-          </button>
-        </div>
+        {!isFoundation() && (
+          <div className="w-full">
+            <button 
+              onClick={handleAdoptClick}
+              className="w-full py-3 rounded-xl bg-[#005017] text-white font-semibold text-base shadow hover:bg-[#0e8c37] transition"
+            >
+              ¡Adóptame!
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

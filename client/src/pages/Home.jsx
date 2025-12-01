@@ -18,7 +18,7 @@ import p3 from "../assets/p3.jpg";
 
 export default function Home() {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isFoundation } = useAuth();
   const { saveAdoptionIntent } = useAdoption();
   const [selectedPet, setSelectedPet] = useState(null);
   const [showAdoptionNotification, setShowAdoptionNotification] = useState(false);
@@ -26,6 +26,11 @@ export default function Home() {
 
   // Función para manejar la adopción
   const handleAdopt = (pet) => {
+    // Las fundaciones no pueden adoptar
+    if (isFoundation()) {
+      return;
+    }
+    
     if (isAuthenticated()) {
       // Si está autenticado, ir directamente al formulario
       navigate(`/formulario/${pet.id}`);
