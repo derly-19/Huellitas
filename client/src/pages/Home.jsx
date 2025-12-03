@@ -31,6 +31,16 @@ export default function Home() {
       return;
     }
     
+    // Si es una mascota de ejemplo (sin ID), redirigir a las páginas de adopción
+    if (!pet.id) {
+      if (pet.type === 'cat') {
+        navigate('/Cats');
+      } else {
+        navigate('/Dogs');
+      }
+      return;
+    }
+    
     if (isAuthenticated()) {
       // Si está autenticado, ir directamente al formulario
       navigate(`/formulario/${pet.id}`);
@@ -71,9 +81,11 @@ export default function Home() {
     navigate("/register");
   };
 
+  // Nota: Estas son mascotas de ejemplo solo para mostrar el diseño
+  // Para adoptar mascotas reales, visita las páginas de Perritos o Gatitos
   const cats = [
     { 
-      id: 'cat_1', 
+      id: null, // Sin ID para evitar navegación al formulario
       name: "Bella", 
       img: g1, 
       description: "Una gatita muy cariñosa y tranquila, perfecta para familias.",
@@ -84,7 +96,7 @@ export default function Home() {
       historial: "Bella fue rescatada de las calles cuando era muy pequeña. Estaba muy asustada pero con mucho amor y paciencia logró confiar nuevamente en los humanos."
     },
     { 
-      id: 'cat_2', 
+      id: null, 
       name: "Luna", 
       img: g2, 
       description: "Gatita juguetona que ama explorar y recibir mimos.",
@@ -95,7 +107,7 @@ export default function Home() {
       historial: "Luna llegó a nosotros junto con su hermano cuando su mamá los abandonó. Es muy curiosa y le encanta jugar con todo lo que encuentra."
     },
     { 
-      id: 'cat_3', 
+      id: null, 
       name: "Milo", 
       img: g3, 
       description: "Un gatito muy activo y sociable, ideal para hogares con niños.",
@@ -109,7 +121,7 @@ export default function Home() {
 
   const dogs = [
     { 
-      id: 'dog_1', 
+      id: null, 
       name: "Rocky", 
       img: p1, 
       description: "Perrito muy leal y protector, perfecto compañero para toda la familia.",
@@ -120,7 +132,7 @@ export default function Home() {
       historial: "Rocky fue abandonado en la puerta del refugio cuando era cachorro. A pesar de esto, nunca perdió su fe en los humanos y siempre está dispuesto a dar amor."
     },
     { 
-      id: 'dog_2', 
+      id: null, 
       name: "Máximo", 
       img: p2, 
       description: "Un perro muy inteligente y obediente, fácil de entrenar.",
@@ -131,7 +143,7 @@ export default function Home() {
       historial: "Máximo llegó al refugio después de que su familia anterior se mudara y no pudiera llevárselo. Es muy inteligente y ya conoce varios comandos básicos."
     },
     { 
-      id: 'dog_3', 
+      id: null, 
       name: "Nina", 
       img: p3, 
       description: "Perrita muy dulce y cariñosa, ama los paseos y jugar en el parque.",

@@ -1,5 +1,6 @@
 import * as AdoptionRequestsModel from "../models/adoptionRequestsModel.js";
 import { getPetById, updatePetAvailability } from "../models/petsModel.js";
+import { createNotification } from "../models/notificationsModel.js";
 
 // Crear una nueva solicitud de adopción
 export const createRequest = async (req, res) => {
@@ -224,6 +225,40 @@ export const updateRequestStatus = async (req, res) => {
     // Actualizar estado
     await AdoptionRequestsModel.updateRequestStatus(id, status, notes);
 
+    // Crear notificación para el usuario
+    if (request.user_id) {
+      let notificationTitle = '';
+      let notificationMessage = '';
+      
+      if (status === 'approved') {
+        notificationTitle = '¡Solicitud Aprobada! 🎉';
+        notificationMessage = `Tu solicitud para adoptar a ${request.pet_name} ha sido aprobada. La fundación se pondrá en contacto contigo pronto.`;
+      } else if (status === 'rejected') {
+        notificationTitle = 'Solicitud Rechazada';
+        notificationMessage = `Lamentablemente, tu solicitud para adoptar a ${request.pet_name} no fue aprobada. ${notes || 'Puedes buscar otras mascotas disponibles.'}`;
+      } else if (status === 'contacted') {
+        notificationTitle = 'Te hemos contactado';
+        notificationMessage = `La fundación ${request.foundation_name} se ha puesto en contacto contigo sobre ${request.pet_name}.`;
+      }
+      
+      if (notificationTitle) {
+        try {
+          await createNotification({
+            user_id: request.user_id,
+            type: status,
+            title: notificationTitle,
+            message: notificationMessage,
+            request_id: id,
+            pet_name: request.pet_name
+          });
+          console.log(`📧 Notificación enviada a usuario ${request.user_id}`);
+        } catch (notifError) {
+          console.error('Error creando notificación:', notifError);
+          // No fallar la operación si falla la notificación
+        }
+      }
+    }
+
     // Si se aprueba la solicitud, marcar la mascota como no disponible
     if (status === 'approved') {
       await updatePetAvailability(request.pet_id, false);
@@ -237,6 +272,22 @@ export const updateRequestStatus = async (req, res) => {
             'rejected', 
             'La mascota fue adoptada por otro solicitante'
           );
+          
+          // Notificar a los otros solicitantes
+          if (otherReq.user_id) {
+            try {
+              await createNotification({
+                user_id: otherReq.user_id,
+                type: 'rejected',
+                title: 'Solicitud Rechazada',
+                message: `Lamentablemente, ${request.pet_name} ya fue adoptado por otra persona. Te invitamos a ver otras mascotas disponibles.`,
+                request_id: otherReq.id,
+                pet_name: request.pet_name
+              });
+            } catch (notifError) {
+              console.error('Error creando notificación:', notifError);
+            }
+          }
         }
       }
     }

@@ -76,15 +76,15 @@ const RequestDetailModal = ({ request, onClose, onUpdateStatus }) => {
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="bg-gradient-to-r from-[#005017] to-[#0e8c37] text-white p-6 rounded-t-2xl">
+        <div className="bg-[#BCC990] p-6 rounded-t-2xl">
           <div className="flex justify-between items-start">
             <div>
-              <h2 className="text-2xl font-bold">Solicitud de Adopción</h2>
-              <p className="text-green-100 mt-1">Recibida el {formatDate(request.created_at)}</p>
+              <h2 className="text-2xl font-bold text-gray-800">Solicitud de Adopción</h2>
+              <p className="text-gray-700 mt-1">Recibida el {formatDate(request.created_at)}</p>
             </div>
             <button 
               onClick={onClose}
-              className="text-white/80 hover:text-white text-2xl"
+              className="text-gray-600 hover:text-gray-800 text-2xl"
             >
               ×
             </button>
@@ -114,7 +114,7 @@ const RequestDetailModal = ({ request, onClose, onUpdateStatus }) => {
             {/* Información personal */}
             <div className="bg-gray-50 rounded-xl p-4">
               <h4 className="font-bold text-gray-800 mb-3 flex items-center gap-2">
-                <FaUser className="text-green-600" /> Información Personal
+                <FaUser className="text-[#BCC990]" /> Información Personal
               </h4>
               <div className="space-y-2 text-sm">
                 <p><span className="font-medium">Nombre:</span> {request.nombre} {request.apellido}</p>
@@ -136,7 +136,7 @@ const RequestDetailModal = ({ request, onClose, onUpdateStatus }) => {
             {/* Información del hogar */}
             <div className="bg-gray-50 rounded-xl p-4">
               <h4 className="font-bold text-gray-800 mb-3 flex items-center gap-2">
-                <FaHome className="text-green-600" /> Información del Hogar
+                <FaHome className="text-[#BCC990]" /> Información del Hogar
               </h4>
               <div className="space-y-2 text-sm">
                 <p><span className="font-medium">Dirección:</span> {request.direccion}</p>
@@ -147,7 +147,7 @@ const RequestDetailModal = ({ request, onClose, onUpdateStatus }) => {
           </div>
 
           {/* Motivación */}
-          <div className="bg-green-50 rounded-xl p-4 mb-6">
+          <div className="bg-amber-50 rounded-xl p-4 mb-6">
             <h4 className="font-bold text-gray-800 mb-3 flex items-center gap-2">
               <FaHeart className="text-red-500" /> ¿Por qué quiere adoptar?
             </h4>
@@ -163,7 +163,7 @@ const RequestDetailModal = ({ request, onClose, onUpdateStatus }) => {
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Agrega notas sobre esta solicitud..."
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#BCC990] focus:outline-none"
               rows={3}
             />
           </div>
@@ -188,7 +188,7 @@ const RequestDetailModal = ({ request, onClose, onUpdateStatus }) => {
               <button
                 onClick={() => handleStatusChange('approved')}
                 disabled={updating}
-                className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
+                className="flex items-center gap-2 px-4 py-2 bg-[#BCC990] text-white rounded-lg hover:bg-[#9FB36F] transition-colors disabled:opacity-50"
               >
                 <FaCheck /> Aprobar Adopción
               </button>
@@ -308,7 +308,7 @@ const RequestCard = ({ request, onViewDetail }) => {
             </div>
             <button
               onClick={handleViewDetail}
-              className="w-full py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2 font-medium shadow-sm"
+              className="w-full py-2 bg-[#BCC990] text-white rounded-lg hover:bg-[#9FB36F] transition-colors flex items-center justify-center gap-2 font-medium shadow-sm"
             >
               <FaEye /> Ver solicitud completa
             </button>
@@ -412,7 +412,7 @@ export default function AdoptionRequestsPanel({ foundationId }) {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
         <div>
           <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-            <MdPets className="text-green-600" />
+            <MdPets className="text-[#BCC990]" />
             Solicitudes de Adopción
           </h2>
           <p className="text-gray-500 text-sm mt-1">
@@ -443,7 +443,7 @@ export default function AdoptionRequestsPanel({ foundationId }) {
         <select
           value={filterStatus}
           onChange={(e) => setFilterStatus(e.target.value)}
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#BCC990] focus:outline-none"
         >
           <option value="all">Todas las solicitudes</option>
           <option value="pending">⏳ Pendientes</option>
@@ -453,7 +453,7 @@ export default function AdoptionRequestsPanel({ foundationId }) {
         </select>
         <button
           onClick={() => { fetchRequests(); fetchStats(); }}
-          className="px-4 py-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+          className="px-4 py-2 text-[#BCC990] hover:bg-gray-100 rounded-lg transition-colors font-medium"
         >
           🔄 Actualizar
         </button>
@@ -462,13 +462,13 @@ export default function AdoptionRequestsPanel({ foundationId }) {
       {/* Lista de solicitudes */}
       {loading ? (
         <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#BCC990] mx-auto"></div>
           <p className="mt-4 text-gray-600">Cargando solicitudes...</p>
         </div>
       ) : error ? (
         <div className="text-center py-12">
           <p className="text-red-500">{error}</p>
-          <button onClick={fetchRequests} className="mt-4 text-green-600 hover:underline">
+          <button onClick={fetchRequests} className="mt-4 text-[#BCC990] hover:underline font-medium">
             Intentar de nuevo
           </button>
         </div>

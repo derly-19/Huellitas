@@ -7,10 +7,9 @@ export default function SuccessNotification({
   petName, 
   message 
 }) {
-  if (!isVisible) return null;
-
   return (
     <AnimatePresence>
+      {isVisible && (
       <motion.div
         className="fixed inset-0 flex items-center justify-center z-50 pt-20"
         initial={{ opacity: 0 }}
@@ -59,13 +58,14 @@ export default function SuccessNotification({
           <div className="flex justify-center">
             <button
               onClick={onClose}
-              className="bg-[#005017] text-white py-3 px-6 rounded-lg text-sm font-medium hover:bg-[#0e8c37] transition-colors"
+              className="bg-[#BCC990] text-white py-3 px-6 rounded-lg text-sm font-medium hover:bg-[#9FB36F] transition-colors"
             >
               Entendido
             </button>
           </div>
         </motion.div>
       </motion.div>
+      )}
     </AnimatePresence>
   );
 }

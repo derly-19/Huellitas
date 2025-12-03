@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom"; // ✅ Para Vite/React
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Home, HeartHandshake, Dog, Cat, FileText, User, Building2, LayoutDashboard } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
+import NotificationBell from "./NotificationBell";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
@@ -92,32 +93,37 @@ export default function Navbar() {
       </ul>
 
       {/* Botones en desktop */}
-      <div className="hidden md:flex gap-3">
+      <div className="hidden md:flex gap-3 items-center">
         {isAuthenticated() ? (
           // Usuario autenticado - mostrar saludo y logout
-          <div className="flex items-center gap-3">
-            <span className="text-[var(--secondary)]">
-              {isFoundation() 
-                ? `🏠 ${user?.foundation_name || user?.username}` 
-                : `¡Hola, ${user?.username || 'Usuario'}! 👋`
-              }
-            </span>
-            {isFoundation() && (
+          <>
+            {/* Campana de notificaciones (solo para usuarios normales) */}
+            {!isFoundation() && <NotificationBell />}
+            
+            <div className="flex items-center gap-3">
+              <span className="text-[var(--secondary)]">
+                {isFoundation() 
+                  ? `🏠 ${user?.foundation_name || user?.username}` 
+                  : `¡Hola, ${user?.username || 'Usuario'}! 👋`
+                }
+              </span>
+              {isFoundation() && (
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  className="bg-[#BCC990] text-white px-4 py-1 rounded hover:bg-[#9FB36F]"
+                >
+                  <Link to="/foundation/dashboard">Mi Panel</Link>
+                </motion.button>
+              )}
               <motion.button
                 whileHover={{ scale: 1.05 }}
-                className="bg-[#005017] text-white px-4 py-1 rounded hover:bg-[#0e8c37]"
+                className="bg-red-500 text-white px-4 py-1 rounded hover:bg-red-600"
+                onClick={handleLogout}
               >
-                <Link to="/foundation/dashboard">Mi Panel</Link>
+                Cerrar Sesión
               </motion.button>
-            )}
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              className="bg-red-500 text-white px-4 py-1 rounded hover:bg-red-600"
-              onClick={handleLogout}
-            >
-              Cerrar Sesión
-            </motion.button>
-          </div>
+            </div>
+          </>
         ) : (
           // Usuario no autenticado - mostrar login y register
           <>
@@ -181,7 +187,7 @@ export default function Navbar() {
                   {isFoundation() && (
                     <Link
                       to="/foundation/dashboard"
-                      className="bg-[#005017] text-white px-4 py-1 rounded hover:bg-[#0e8c37] text-center"
+                      className="bg-[#BCC990] text-white px-4 py-1 rounded hover:bg-[#9FB36F] text-center"
                       onClick={() => setOpen(false)}
                     >
                       Mi Panel
