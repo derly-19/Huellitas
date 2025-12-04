@@ -53,8 +53,8 @@ insertInitialPets();
 // Crear carnets para todas las mascotas
 createCarnetsForAllPets();
 
-// Insertar datos de ejemplo en los carnets
-insertSampleCarnetData();
+// Insertar datos de ejemplo en los carnets (comentado para evitar duplicados)
+// insertSampleCarnetData();
 
 // Rutas
 app.use("/api/users", usersRoutes);

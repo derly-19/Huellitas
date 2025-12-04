@@ -1,8 +1,4 @@
 import { useState, useEffect } from "react";
-import { 
-  FaSyringe, FaBug, FaStethoscope, FaCut, 
-  FaPills, FaPlus, FaTrash, FaTimes 
-} from "react-icons/fa";
 
 const PetCarnetModal = ({ pet, onClose }) => {
   const [carnetData, setCarnetData] = useState({
@@ -63,15 +59,14 @@ const PetCarnetModal = ({ pet, onClose }) => {
   };
 
   const tabs = [
-    { id: 'vacunas', label: 'Vacunas', icon: FaSyringe, color: 'blue' },
-    { id: 'desparasitaciones', label: 'Desparasitaciones', icon: FaBug, color: 'green' },
-    { id: 'banos', label: 'Baños', icon: FaStethoscope, color: 'purple' },
-    { id: 'procedimientos', label: 'Procedimientos', icon: FaCut, color: 'red' },
-    { id: 'medicamentos', label: 'Medicamentos', icon: FaPills, color: 'pink' }
+    { id: 'vacunas', label: 'Vacunas', emoji: '💉', color: 'blue' },
+    { id: 'desparasitaciones', label: 'Desparasitaciones', emoji: '🐛', color: 'green' },
+    { id: 'banos', label: 'Baños', emoji: '🛁', color: 'purple' },
+    { id: 'procedimientos', label: 'Procedimientos', emoji: '⚕️', color: 'red' },
+    { id: 'medicamentos', label: 'Medicamentos', emoji: '💊', color: 'pink' }
   ];
 
   const currentTab = tabs.find(t => t.id === activeTab);
-  const Icon = currentTab?.icon;
 
   const formatDate = (dateString) => {
     if (!dateString) return 'No especificada';
@@ -88,13 +83,15 @@ const PetCarnetModal = ({ pet, onClose }) => {
     if (records.length === 0) {
       return (
         <div className="text-center py-12">
-          <Icon className="text-6xl text-gray-300 mx-auto mb-4" />
+          <div className="text-6xl mx-auto mb-4">
+            {currentTab.emoji}
+          </div>
           <p className="text-gray-500">No hay registros de {currentTab.label.toLowerCase()}</p>
           <button
             onClick={() => setShowAddModal(true)}
-            className="mt-4 px-4 py-2 bg-[#BCC990] text-white rounded-lg hover:bg-[#9FB36F] transition-colors"
+            className="mt-4 px-4 py-2 bg-[#BCC990] text-white rounded-lg hover:bg-[#9FB36F] transition-colors flex items-center gap-2 mx-auto"
           >
-            <FaPlus className="inline mr-2" />
+            <span>➕</span>
             Agregar {currentTab.label}
           </button>
         </div>
@@ -171,7 +168,7 @@ const PetCarnetModal = ({ pet, onClose }) => {
                   className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                   title="Eliminar"
                 >
-                  <FaTrash />
+                  <span className="text-lg">🗑️</span>
                 </button>
               </div>
             </div>
@@ -203,7 +200,7 @@ const PetCarnetModal = ({ pet, onClose }) => {
               onClick={onClose}
               className="text-gray-600 hover:text-gray-800 text-2xl"
             >
-              <FaTimes />
+              ✕
             </button>
           </div>
         </div>
@@ -212,7 +209,6 @@ const PetCarnetModal = ({ pet, onClose }) => {
         <div className="border-b border-gray-200 px-6 overflow-x-auto">
           <div className="flex gap-2 min-w-max">
             {tabs.map((tab) => {
-              const TabIcon = tab.icon;
               const isActive = activeTab === tab.id;
               return (
                 <button
@@ -224,7 +220,7 @@ const PetCarnetModal = ({ pet, onClose }) => {
                       : 'border-transparent text-gray-500 hover:text-gray-700'
                   }`}
                 >
-                  <TabIcon />
+                  <span className="text-xl">{tab.emoji}</span>
                   {tab.label}
                   {carnetData[tab.id]?.length > 0 && (
                     <span className="bg-gray-200 text-gray-700 text-xs px-2 py-0.5 rounded-full">
@@ -248,7 +244,7 @@ const PetCarnetModal = ({ pet, onClose }) => {
             <>
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-                  <Icon className={`text-${currentTab.color}-500`} />
+                  <span className="text-2xl">{currentTab.emoji}</span>
                   {currentTab.label}
                 </h3>
                 {carnetData[activeTab]?.length > 0 && (
@@ -256,7 +252,7 @@ const PetCarnetModal = ({ pet, onClose }) => {
                     onClick={() => setShowAddModal(true)}
                     className="px-4 py-2 bg-[#BCC990] text-white rounded-lg hover:bg-[#9FB36F] transition-colors flex items-center gap-2"
                   >
-                    <FaPlus />
+                    <span>➕</span>
                     Agregar
                   </button>
                 )}
