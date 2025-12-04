@@ -5,7 +5,8 @@ import {
   addDesparasitacion, 
   addBano, 
   addProcedimiento, 
-  addMedicamento 
+  addMedicamento,
+  deleteRecord
 } from "../controllers/carnetController.js";
 
 const router = Router();
@@ -19,5 +20,8 @@ router.post('/:petId/desparasitaciones', addDesparasitacion);
 router.post('/:petId/banos', addBano);
 router.post('/:petId/procedimientos', addProcedimiento);
 router.post('/:petId/medicamentos', addMedicamento);
+
+// Eliminar registros del carnet
+router.delete('/:petId/:tipo/:recordId', deleteRecord);
 
 export default router;

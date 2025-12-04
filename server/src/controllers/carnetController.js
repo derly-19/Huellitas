@@ -66,7 +66,8 @@ export async function getCarnetByPetId(req, res) {
 export async function addVacuna(req, res) {
   try {
     const { petId } = req.params;
-    const { nombre_vacuna, fecha_aplicacion, lote, veterinario, proxima_dosis, observaciones } = req.body;
+    const { nombre_vacuna, fecha, lote, veterinario, proxima_dosis, observaciones } = req.body;
+    const fecha_aplicacion = fecha || req.body.fecha_aplicacion;
 
     // Obtener carnet
     const carnet = await db.get("SELECT id FROM carnet WHERE pet_id = ?", [petId]);
@@ -112,7 +113,10 @@ export async function addVacuna(req, res) {
 export async function addDesparasitacion(req, res) {
   try {
     const { petId } = req.params;
-    const { tipo, medicamento, dosis, fecha_aplicacion, peso_mascota, veterinario, proxima_dosis, observaciones } = req.body;
+    const { producto, dosis, fecha, veterinario, proxima_dosis, observaciones } = req.body;
+    const fecha_aplicacion = fecha || req.body.fecha_aplicacion;
+    const tipo = req.body.tipo || 'Desparasitación interna';
+    const medicamento = producto || req.body.medicamento;
 
     // Obtener carnet
     const carnet = await db.get("SELECT id FROM carnet WHERE pet_id = ?", [petId]);
@@ -126,9 +130,9 @@ export async function addDesparasitacion(req, res) {
     // Insertar desparasitación
     const result = await db.run(`
       INSERT INTO carnet_desparasitaciones
-      (carnet_id, tipo, medicamento, dosis, fecha_aplicacion, peso_mascota, veterinario, proxima_dosis, observaciones)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `, [carnet.id, tipo, medicamento, dosis, fecha_aplicacion, peso_mascota, veterinario, proxima_dosis, observaciones]);
+      (carnet_id, tipo, medicamento, dosis, fecha_aplicacion, veterinario, proxima_dosis, observaciones)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `, [carnet.id, tipo, medicamento, dosis, fecha_aplicacion, veterinario, proxima_dosis, observaciones]);
 
     res.status(201).json({
       success: true,
@@ -137,10 +141,9 @@ export async function addDesparasitacion(req, res) {
         id: result.lastID,
         carnet_id: carnet.id,
         tipo,
-        medicamento,
+        producto: medicamento,
         dosis,
         fecha_aplicacion,
-        peso_mascota,
         veterinario,
         proxima_dosis,
         observaciones
@@ -160,7 +163,9 @@ export async function addDesparasitacion(req, res) {
 export async function addBano(req, res) {
   try {
     const { petId } = req.params;
-    const { fecha, tipo_shampoo, tratamiento_especial, observaciones, realizado_por } = req.body;
+    const { fecha, producto, responsable, observaciones } = req.body;
+    const tipo_shampoo = producto || req.body.tipo_shampoo;
+    const realizado_por = responsable || req.body.realizado_por;
 
     // Obtener carnet
     const carnet = await db.get("SELECT id FROM carnet WHERE pet_id = ?", [petId]);
@@ -174,9 +179,9 @@ export async function addBano(req, res) {
     // Insertar baño
     const result = await db.run(`
       INSERT INTO carnet_banos
-      (carnet_id, fecha, tipo_shampoo, tratamiento_especial, observaciones, realizado_por)
-      VALUES (?, ?, ?, ?, ?, ?)
-    `, [carnet.id, fecha, tipo_shampoo, tratamiento_especial, observaciones, realizado_por]);
+      (carnet_id, fecha, tipo_shampoo, observaciones, realizado_por)
+      VALUES (?, ?, ?, ?, ?)
+    `, [carnet.id, fecha, tipo_shampoo, observaciones, realizado_por]);
 
     res.status(201).json({
       success: true,
@@ -185,10 +190,9 @@ export async function addBano(req, res) {
         id: result.lastID,
         carnet_id: carnet.id,
         fecha,
-        tipo_shampoo,
-        tratamiento_especial,
+        producto: tipo_shampoo,
         observaciones,
-        realizado_por
+        responsable: realizado_por
       }
     });
 
@@ -205,7 +209,8 @@ export async function addBano(req, res) {
 export async function addProcedimiento(req, res) {
   try {
     const { petId } = req.params;
-    const { tipo_procedimiento, descripcion, fecha, veterinario, costo, observaciones } = req.body;
+    const { tipo, descripcion, fecha, veterinario, observaciones } = req.body;
+    const tipo_procedimiento = tipo || req.body.tipo_procedimiento;
 
     // Obtener carnet
     const carnet = await db.get("SELECT id FROM carnet WHERE pet_id = ?", [petId]);
@@ -219,9 +224,9 @@ export async function addProcedimiento(req, res) {
     // Insertar procedimiento
     const result = await db.run(`
       INSERT INTO carnet_procedimientos
-      (carnet_id, tipo_procedimiento, descripcion, fecha, veterinario, costo, observaciones)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-    `, [carnet.id, tipo_procedimiento, descripcion, fecha, veterinario, costo, observaciones]);
+      (carnet_id, tipo_procedimiento, descripcion, fecha, veterinario, observaciones)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `, [carnet.id, tipo_procedimiento, descripcion, fecha, veterinario, observaciones]);
 
     res.status(201).json({
       success: true,
@@ -229,11 +234,10 @@ export async function addProcedimiento(req, res) {
       data: {
         id: result.lastID,
         carnet_id: carnet.id,
-        tipo_procedimiento,
+        tipo: tipo_procedimiento,
         descripcion,
         fecha,
         veterinario,
-        costo,
         observaciones
       }
     });
@@ -251,7 +255,8 @@ export async function addProcedimiento(req, res) {
 export async function addMedicamento(req, res) {
   try {
     const { petId } = req.params;
-    const { medicamento, dosis, frecuencia, fecha_inicio, fecha_fin, motivo, veterinario, observaciones } = req.body;
+    const { medicamento, dosis, duracion, fecha, fecha_fin, observaciones } = req.body;
+    const fecha_inicio = fecha || req.body.fecha_inicio;
 
     // Obtener carnet
     const carnet = await db.get("SELECT id FROM carnet WHERE pet_id = ?", [petId]);
@@ -265,9 +270,9 @@ export async function addMedicamento(req, res) {
     // Insertar medicamento
     const result = await db.run(`
       INSERT INTO carnet_medicamentos
-      (carnet_id, medicamento, dosis, frecuencia, fecha_inicio, fecha_fin, motivo, veterinario, observaciones)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `, [carnet.id, medicamento, dosis, frecuencia, fecha_inicio, fecha_fin, motivo, veterinario, observaciones]);
+      (carnet_id, medicamento, dosis, fecha_inicio, fecha_fin, observaciones)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `, [carnet.id, medicamento, dosis, fecha_inicio, fecha_fin, observaciones]);
 
     res.status(201).json({
       success: true,
@@ -277,17 +282,74 @@ export async function addMedicamento(req, res) {
         carnet_id: carnet.id,
         medicamento,
         dosis,
-        frecuencia,
+        duracion,
         fecha_inicio,
         fecha_fin,
-        motivo,
-        veterinario,
         observaciones
       }
     });
 
   } catch (error) {
     console.error("Error agregando medicamento:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error interno del servidor"
+    });
+  }
+}
+
+// Eliminar registro del carnet
+export async function deleteRecord(req, res) {
+  try {
+    const { petId, tipo, recordId } = req.params;
+
+    // Mapear el tipo al nombre de la tabla
+    const tablaMap = {
+      'vacunas': 'carnet_vacunas',
+      'desparasitaciones': 'carnet_desparasitaciones',
+      'banos': 'carnet_banos',
+      'procedimientos': 'carnet_procedimientos',
+      'medicamentos': 'carnet_medicamentos'
+    };
+
+    const tabla = tablaMap[tipo];
+    
+    if (!tabla) {
+      return res.status(400).json({
+        success: false,
+        message: "Tipo de registro no válido"
+      });
+    }
+
+    // Verificar que el registro existe y pertenece a la mascota
+    const carnet = await db.get("SELECT id FROM carnet WHERE pet_id = ?", [petId]);
+    if (!carnet) {
+      return res.status(404).json({
+        success: false,
+        message: "Carnet no encontrado"
+      });
+    }
+
+    // Eliminar el registro
+    const result = await db.run(
+      `DELETE FROM ${tabla} WHERE id = ? AND carnet_id = ?`,
+      [recordId, carnet.id]
+    );
+
+    if (result.changes === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Registro no encontrado"
+      });
+    }
+
+    res.json({
+      success: true,
+      message: "Registro eliminado exitosamente"
+    });
+
+  } catch (error) {
+    console.error("Error eliminando registro:", error);
     res.status(500).json({
       success: false,
       message: "Error interno del servidor"

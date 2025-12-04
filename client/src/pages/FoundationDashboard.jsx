@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import { FaDog, FaCat, FaPlus, FaEdit, FaTrash, FaToggleOn, FaToggleOff, FaSearch, FaEye, FaExternalLinkAlt, FaClipboardList } from "react-icons/fa";
+import { FaDog, FaCat, FaPlus, FaEdit, FaTrash, FaToggleOn, FaToggleOff, FaSearch, FaEye, FaExternalLinkAlt, FaClipboardList, FaFileMedical } from "react-icons/fa";
 import { MdPets } from "react-icons/md";
 import AddPetModal from "../components/Foundation/AddPetModal";
 import EditPetModal from "../components/Foundation/EditPetModal";
 import ConfirmModal from "../components/Foundation/ConfirmModal";
 import AdoptionRequestsPanel from "../components/Foundation/AdoptionRequestsPanel";
+import PetCarnetModal from "../components/Foundation/PetCarnetModal";
 
 // Función helper para obtener la URL correcta de la imagen
 const getImageUrl = (imgPath) => {
@@ -40,6 +41,7 @@ export default function FoundationDashboard() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showCarnetModal, setShowCarnetModal] = useState(false);
   const [selectedPet, setSelectedPet] = useState(null);
   const [confirmAction, setConfirmAction] = useState(null);
   
@@ -286,6 +288,12 @@ export default function FoundationDashboard() {
   const openEditModal = (pet) => {
     setSelectedPet(pet);
     setShowEditModal(true);
+  };
+
+  // Abrir modal de carnet digital
+  const openCarnetModal = (pet) => {
+    setSelectedPet(pet);
+    setShowCarnetModal(true);
   };
 
   if (!user || user.user_type !== 'foundation') {
@@ -568,6 +576,15 @@ export default function FoundationDashboard() {
                       </Link>
                     )}
                     
+                    {/* Botón de Carnet Digital */}
+                    <button
+                      onClick={() => openCarnetModal(pet)}
+                      className="flex items-center justify-center gap-2 w-full mb-3 py-2 bg-teal-100 text-teal-700 rounded-lg hover:bg-teal-200 transition-colors text-sm font-medium"
+                    >
+                      <FaFileMedical />
+                      <span>Carnet Digital</span>
+                    </button>
+                    
                     {/* Acciones */}
                     <div className="flex gap-2">
                       <button
@@ -626,6 +643,16 @@ export default function FoundationDashboard() {
             setSelectedPet(null);
           }}
           onSubmit={handleEditPet}
+        />
+      )}
+
+      {showCarnetModal && selectedPet && (
+        <PetCarnetModal
+          pet={selectedPet}
+          onClose={() => {
+            setShowCarnetModal(false);
+            setSelectedPet(null);
+          }}
         />
       )}
 
