@@ -462,6 +462,7 @@ export default function Formulario() {
                       className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                       required
                     >
+                      <option value="" disabled>Selecciona una opción</option>
                       <option value="casa">Casa</option>
                       <option value="apartamento">Apartamento</option>
                     </select>
@@ -478,6 +479,7 @@ export default function Formulario() {
                       className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                       required
                     >
+                      <option value="" disabled>Selecciona una opción</option>
                       <option value="si">Sí</option>
                       <option value="no">No</option>
                     </select>

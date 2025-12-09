@@ -8,13 +8,29 @@ const PetCarnetModal = ({ pet, onClose }) => {
     procedimientos: [],
     medicamentos: []
   });
+  const [adoptionRequests, setAdoptionRequests] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('vacunas');
+  const [activeTab, setActiveTab] = useState('solicitudes');
   const [showAddModal, setShowAddModal] = useState(false);
+  const [updatingStatus, setUpdatingStatus] = useState(false);
 
   useEffect(() => {
     fetchCarnetData();
+    fetchAdoptionRequests();
   }, [pet.id]);
+
+  const fetchAdoptionRequests = async () => {
+    try {
+      const response = await fetch(`http://localhost:4000/api/adoption-requests/pet/${pet.id}`);
+      const result = await response.json();
+      
+      if (result.success) {
+        setAdoptionRequests(result.data || []);
+      }
+    } catch (error) {
+      console.error('Error al cargar solicitudes:', error);
+    }
+  };
 
   const fetchCarnetData = async () => {
     try {
@@ -58,7 +74,34 @@ const PetCarnetModal = ({ pet, onClose }) => {
     }
   };
 
+  const handleUpdateRequestStatus = async (requestId, newStatus) => {
+    if (!confirm(`¿Cambiar estado a "${newStatus}"?`)) return;
+
+    setUpdatingStatus(true);
+    try {
+      const response = await fetch(`http://localhost:4000/api/adoption-requests/${requestId}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        await fetchAdoptionRequests();
+      } else {
+        alert('Error al actualizar el estado');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Error al actualizar el estado');
+    } finally {
+      setUpdatingStatus(false);
+    }
+  };
+
   const tabs = [
+    { id: 'solicitudes', label: 'Solicitudes', emoji: '📋', color: 'orange' },
     { id: 'vacunas', label: 'Vacunas', emoji: '💉', color: 'blue' },
     { id: 'desparasitaciones', label: 'Desparasitaciones', emoji: '🐛', color: 'green' },
     { id: 'banos', label: 'Baños', emoji: '🛁', color: 'purple' },
@@ -78,6 +121,116 @@ const PetCarnetModal = ({ pet, onClose }) => {
   };
 
   const renderRecords = () => {
+    // Caso especial para solicitudes de adopción
+    if (activeTab === 'solicitudes') {
+      if (adoptionRequests.length === 0) {
+        return (
+          <div className="text-center py-12">
+            <div className="text-6xl mx-auto mb-4">📋</div>
+            <p className="text-gray-500">No hay solicitudes de adopción para esta mascota</p>
+          </div>
+        );
+      }
+
+      return (
+        <div className="space-y-4">
+          {adoptionRequests.map((request) => {
+            const statusConfig = {
+              pending: { label: 'Pendiente', color: 'yellow', emoji: '⏳' },
+              contacted: { label: 'Contactado', color: 'blue', emoji: '📞' },
+              rejected: { label: 'Rechazada', color: 'red', emoji: '❌' },
+              approved: { label: 'Aprobada', color: 'green', emoji: '✅' }
+            };
+            const config = statusConfig[request.status] || statusConfig.pending;
+
+            return (
+              <div key={request.id} className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                <div className="flex justify-between items-start mb-4">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <h4 className="font-bold text-gray-800">{request.user_name}</h4>
+                      <span className={`px-3 py-1 rounded-full text-xs font-semibold bg-${config.color}-100 text-${config.color}-800`}>
+                        {config.emoji} {config.label}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <span className="text-gray-500">Email:</span>
+                        <p className="font-medium">{request.user_email}</p>
+                      </div>
+                      <div>
+                        <span className="text-gray-500">Teléfono:</span>
+                        <p className="font-medium">{request.phone || 'No proporcionado'}</p>
+                      </div>
+                      <div>
+                        <span className="text-gray-500">Fecha de solicitud:</span>
+                        <p className="font-medium">{formatDate(request.created_at)}</p>
+                      </div>
+                    </div>
+                    {request.message && (
+                      <div className="mt-3 pt-3 border-t">
+                        <span className="text-gray-500 text-sm">Mensaje:</span>
+                        <p className="text-gray-700 mt-1">{request.message}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Botones de estado */}
+                <div className="flex gap-2 flex-wrap pt-3 border-t">
+                  <button
+                    onClick={() => handleUpdateRequestStatus(request.id, 'pending')}
+                    disabled={request.status === 'pending' || updatingStatus}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      request.status === 'pending'
+                        ? 'bg-yellow-500 text-white ring-2 ring-yellow-300'
+                        : 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200 disabled:opacity-50'
+                    }`}
+                  >
+                    ⏳ Pendiente
+                  </button>
+                  <button
+                    onClick={() => handleUpdateRequestStatus(request.id, 'contacted')}
+                    disabled={request.status === 'contacted' || updatingStatus}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      request.status === 'contacted'
+                        ? 'bg-blue-500 text-white ring-2 ring-blue-300'
+                        : 'bg-blue-100 text-blue-700 hover:bg-blue-200 disabled:opacity-50'
+                    }`}
+                  >
+                    📞 Contactado
+                  </button>
+                  <button
+                    onClick={() => handleUpdateRequestStatus(request.id, 'rejected')}
+                    disabled={request.status === 'rejected' || updatingStatus}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      request.status === 'rejected'
+                        ? 'bg-red-500 text-white ring-2 ring-red-300'
+                        : 'bg-red-100 text-red-700 hover:bg-red-200 disabled:opacity-50'
+                    }`}
+                  >
+                    ❌ Rechazada
+                  </button>
+                  <button
+                    onClick={() => handleUpdateRequestStatus(request.id, 'approved')}
+                    disabled={request.status === 'approved' || updatingStatus}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      request.status === 'approved'
+                        ? 'bg-green-500 text-white ring-2 ring-green-300'
+                        : 'bg-green-100 text-green-700 hover:bg-green-200 disabled:opacity-50'
+                    }`}
+                  >
+                    ✅ Aprobada
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      );
+    }
+
+    // Caso normal para registros médicos
     const records = carnetData[activeTab] || [];
     
     if (records.length === 0) {
@@ -222,10 +375,18 @@ const PetCarnetModal = ({ pet, onClose }) => {
                 >
                   <span className="text-xl">{tab.emoji}</span>
                   {tab.label}
-                  {carnetData[tab.id]?.length > 0 && (
-                    <span className="bg-gray-200 text-gray-700 text-xs px-2 py-0.5 rounded-full">
-                      {carnetData[tab.id].length}
-                    </span>
+                  {tab.id === 'solicitudes' ? (
+                    adoptionRequests.length > 0 && (
+                      <span className="bg-gray-200 text-gray-700 text-xs px-2 py-0.5 rounded-full">
+                        {adoptionRequests.length}
+                      </span>
+                    )
+                  ) : (
+                    carnetData[tab.id]?.length > 0 && (
+                      <span className="bg-gray-200 text-gray-700 text-xs px-2 py-0.5 rounded-full">
+                        {carnetData[tab.id].length}
+                      </span>
+                    )
                   )}
                 </button>
               );

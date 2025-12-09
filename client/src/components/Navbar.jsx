@@ -107,14 +107,6 @@ export default function Navbar() {
                   : `¡Hola, ${user?.username || 'Usuario'}! 👋`
                 }
               </span>
-              {isFoundation() && (
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  className="bg-[#BCC990] text-white px-4 py-1 rounded hover:bg-[#9FB36F]"
-                >
-                  <Link to="/foundation/dashboard">Mi Panel</Link>
-                </motion.button>
-              )}
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 className="bg-red-500 text-white px-4 py-1 rounded hover:bg-red-600"
@@ -184,15 +176,6 @@ export default function Navbar() {
                       : `Hola, ${user?.username || 'Usuario'}!`
                     }
                   </div>
-                  {isFoundation() && (
-                    <Link
-                      to="/foundation/dashboard"
-                      className="bg-[#BCC990] text-white px-4 py-1 rounded hover:bg-[#9FB36F] text-center"
-                      onClick={() => setOpen(false)}
-                    >
-                      Mi Panel
-                    </Link>
-                  )}
                   <button
                     onClick={handleLogout}
                     className="bg-red-500 text-white px-4 py-1 rounded hover:bg-red-600 text-center"
