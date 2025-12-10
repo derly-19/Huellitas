@@ -213,7 +213,7 @@ export default function Carnet() {
       ) : carnetData ? (
         <>
           <CarnetHeader mascota={carnetData?.mascota} />
-          <CarnetCard initialData={carnetData} />
+          <CarnetCard initialData={carnetData} petId={selectedPet?.pet_id} />
         </>
       ) : (
         <div className="py-20 text-center">
