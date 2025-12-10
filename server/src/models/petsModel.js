@@ -48,6 +48,15 @@ export async function createPet(name, type, img, description, age, size, sex, fo
     "INSERT INTO pets (name, type, img, description, age, size, sex, foundation, foundation_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
     [name, type, img, description, age, size, sex, foundation, foundation_id]
   );
+  
+  // Crear automáticamente un carnet vacío para la mascota
+  try {
+    await db.run("INSERT INTO carnet (pet_id) VALUES (?)", [result.lastID]);
+    console.log(`📋 Carnet creado automáticamente para la mascota ${name} (ID: ${result.lastID})`);
+  } catch (error) {
+    console.error(`Error al crear carnet para mascota ${name}:`, error);
+  }
+  
   return { id: result.lastID, name, type, img, description, age, size, sex, foundation, foundation_id, available: 1 };
 }
 

@@ -4,6 +4,7 @@ import {
   FaCheck, FaTimes, FaEye, FaClock, FaFilter
 } from "react-icons/fa";
 import { MdPets } from "react-icons/md";
+import Toast from "../Toast";
 
 // Función helper para obtener la URL correcta de la imagen
 const getImageUrl = (imgPath) => {
@@ -327,6 +328,7 @@ export default function AdoptionRequestsPanel({ foundationId }) {
   const [stats, setStats] = useState({ total: 0, pending: 0, approved: 0, rejected: 0 });
   const [filterStatus, setFilterStatus] = useState('all');
   const [selectedRequest, setSelectedRequest] = useState(null);
+  const [toast, setToast] = useState({ isVisible: false, message: '', type: 'success' });
 
   // Cargar solicitudes
   const fetchRequests = async () => {
@@ -380,14 +382,43 @@ export default function AdoptionRequestsPanel({ foundationId }) {
       const result = await response.json();
 
       if (result.success) {
+        // Mostrar mensaje de éxito según el estado
+        let message = '';
+        if (status === 'approved') {
+          message = '✅ Solicitud aprobada exitosamente';
+        } else if (status === 'rejected') {
+          message = '❌ Solicitud rechazada';
+        } else if (status === 'contacted') {
+          message = '📞 Solicitante marcado como contactado';
+        }
+
+        setToast({
+          isVisible: true,
+          message: message,
+          type: 'success'
+        });
+
+        // Auto-cerrar el toast después de 3 segundos
+        setTimeout(() => {
+          setToast({ ...toast, isVisible: false });
+        }, 3000);
+
         fetchRequests();
         fetchStats();
         setSelectedRequest(null);
       } else {
-        alert(result.message);
+        setToast({
+          isVisible: true,
+          message: `❌ Error: ${result.message}`,
+          type: 'error'
+        });
       }
     } catch (err) {
-      alert('Error al actualizar la solicitud');
+      setToast({
+        isVisible: true,
+        message: '❌ Error al actualizar la solicitud',
+        type: 'error'
+      });
     }
   };
 
@@ -502,6 +533,14 @@ export default function AdoptionRequestsPanel({ foundationId }) {
           onUpdateStatus={handleUpdateStatus}
         />
       )}
+
+      {/* Toast de notificaciones */}
+      <Toast
+        isVisible={toast.isVisible}
+        onClose={() => setToast({ ...toast, isVisible: false })}
+        message={toast.message}
+        type={toast.type}
+      />
     </div>
   );
 }

@@ -26,144 +26,121 @@ export const createNotificationsTable = async () => {
 };
 
 // Crear una notificación
-export const createNotification = (notificationData) => {
-  return new Promise((resolve, reject) => {
-    const { user_id, type, title, message, request_id, pet_name } = notificationData;
-    
-    const sql = `
-      INSERT INTO notifications (user_id, type, title, message, request_id, pet_name)
-      VALUES (?, ?, ?, ?, ?, ?)
-    `;
-    
-    db.run(sql, [user_id, type, title, message, request_id, pet_name], function(err) {
-      if (err) {
-        console.error("Error creating notification:", err);
-        reject(err);
-      } else {
-        console.log(`✅ Notificación creada para usuario ${user_id}`);
-        resolve({ id: this.lastID });
-      }
-    });
-  });
+export const createNotification = async (notificationData) => {
+  const { user_id, type, title, message, request_id, pet_name } = notificationData;
+  
+  try {
+    const result = await db.run(
+      `INSERT INTO notifications (user_id, type, title, message, request_id, pet_name)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+      [user_id, type, title, message, request_id, pet_name]
+    );
+    console.log(`✅ Notificación creada para usuario ${user_id}`);
+    return { id: result.lastID };
+  } catch (err) {
+    console.error("Error creating notification:", err);
+    throw err;
+  }
 };
 
 // Obtener notificaciones de un usuario
-export const getUserNotifications = (userId, limit = 50) => {
-  return new Promise((resolve, reject) => {
-    const sql = `
-      SELECT * FROM notifications
-      WHERE user_id = ?
-      ORDER BY created_at DESC
-      LIMIT ?
-    `;
-    
-    db.all(sql, [userId, limit], (err, rows) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(rows || []);
-      }
-    });
-  });
+export const getUserNotifications = async (userId, limit = 50) => {
+  try {
+    const rows = await db.all(
+      `SELECT * FROM notifications
+       WHERE user_id = ?
+       ORDER BY created_at DESC
+       LIMIT ?`,
+      [userId, limit]
+    );
+    return rows || [];
+  } catch (err) {
+    console.error("Error getting user notifications:", err);
+    throw err;
+  }
 };
 
 // Obtener notificaciones no leídas de un usuario
-export const getUnreadNotifications = (userId) => {
-  return new Promise((resolve, reject) => {
-    const sql = `
-      SELECT * FROM notifications
-      WHERE user_id = ? AND is_read = 0
-      ORDER BY created_at DESC
-    `;
-    
-    db.all(sql, [userId], (err, rows) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(rows || []);
-      }
-    });
-  });
+export const getUnreadNotifications = async (userId) => {
+  try {
+    const rows = await db.all(
+      `SELECT * FROM notifications
+       WHERE user_id = ? AND is_read = 0
+       ORDER BY created_at DESC`,
+      [userId]
+    );
+    return rows || [];
+  } catch (err) {
+    console.error("Error getting unread notifications:", err);
+    throw err;
+  }
 };
 
 // Contar notificaciones no leídas
-export const countUnreadNotifications = (userId) => {
-  return new Promise((resolve, reject) => {
-    const sql = `
-      SELECT COUNT(*) as count FROM notifications
-      WHERE user_id = ? AND is_read = 0
-    `;
-    
-    db.get(sql, [userId], (err, row) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(row.count || 0);
-      }
-    });
-  });
+export const countUnreadNotifications = async (userId) => {
+  try {
+    const row = await db.get(
+      `SELECT COUNT(*) as count FROM notifications
+       WHERE user_id = ? AND is_read = 0`,
+      [userId]
+    );
+    return row?.count || 0;
+  } catch (err) {
+    console.error("Error counting unread notifications:", err);
+    throw err;
+  }
 };
 
 // Marcar notificación como leída
-export const markAsRead = (notificationId) => {
-  return new Promise((resolve, reject) => {
-    const sql = `UPDATE notifications SET is_read = 1 WHERE id = ?`;
-    
-    db.run(sql, [notificationId], (err) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve();
-      }
-    });
-  });
+export const markAsRead = async (notificationId) => {
+  try {
+    await db.run(
+      `UPDATE notifications SET is_read = 1 WHERE id = ?`,
+      [notificationId]
+    );
+  } catch (err) {
+    console.error("Error marking notification as read:", err);
+    throw err;
+  }
 };
 
 // Marcar todas las notificaciones de un usuario como leídas
-export const markAllAsRead = (userId) => {
-  return new Promise((resolve, reject) => {
-    const sql = `UPDATE notifications SET is_read = 1 WHERE user_id = ?`;
-    
-    db.run(sql, [userId], (err) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve();
-      }
-    });
-  });
+export const markAllAsRead = async (userId) => {
+  try {
+    await db.run(
+      `UPDATE notifications SET is_read = 1 WHERE user_id = ?`,
+      [userId]
+    );
+  } catch (err) {
+    console.error("Error marking all notifications as read:", err);
+    throw err;
+  }
 };
 
 // Eliminar una notificación
-export const deleteNotification = (notificationId) => {
-  return new Promise((resolve, reject) => {
-    const sql = `DELETE FROM notifications WHERE id = ?`;
-    
-    db.run(sql, [notificationId], (err) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve();
-      }
-    });
-  });
+export const deleteNotification = async (notificationId) => {
+  try {
+    await db.run(
+      `DELETE FROM notifications WHERE id = ?`,
+      [notificationId]
+    );
+  } catch (err) {
+    console.error("Error deleting notification:", err);
+    throw err;
+  }
 };
 
 // Eliminar notificaciones antiguas (más de 30 días)
-export const deleteOldNotifications = () => {
-  return new Promise((resolve, reject) => {
-    const sql = `
-      DELETE FROM notifications 
-      WHERE created_at < datetime('now', '-30 days')
-    `;
-    
-    db.run(sql, [], function(err) {
-      if (err) {
-        reject(err);
-      } else {
-        console.log(`🗑️ ${this.changes} notificaciones antiguas eliminadas`);
-        resolve(this.changes);
-      }
-    });
-  });
+export const deleteOldNotifications = async () => {
+  try {
+    const result = await db.run(
+      `DELETE FROM notifications 
+       WHERE created_at < datetime('now', '-30 days')`
+    );
+    console.log(`🗑️ ${result.changes} notificaciones antiguas eliminadas`);
+    return result.changes;
+  } catch (err) {
+    console.error("Error deleting old notifications:", err);
+    throw err;
+  }
 };
