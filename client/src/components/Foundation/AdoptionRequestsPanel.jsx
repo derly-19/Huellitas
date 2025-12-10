@@ -321,7 +321,7 @@ const RequestCard = ({ request, onViewDetail }) => {
 };
 
 // Componente principal del panel de solicitudes
-export default function AdoptionRequestsPanel({ foundationId }) {
+export default function AdoptionRequestsPanel({ foundationId, onRequestUpdated }) {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -406,6 +406,11 @@ export default function AdoptionRequestsPanel({ foundationId }) {
         fetchRequests();
         fetchStats();
         setSelectedRequest(null);
+
+        // Llamar al callback para recargar la lista de mascotas
+        if (onRequestUpdated) {
+          onRequestUpdated();
+        }
       } else {
         setToast({
           isVisible: true,

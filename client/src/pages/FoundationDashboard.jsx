@@ -418,7 +418,7 @@ export default function FoundationDashboard() {
 
         {/* Contenido según el tab activo */}
         {activeTab === "requests" ? (
-          <AdoptionRequestsPanel foundationId={user?.id} />
+          <AdoptionRequestsPanel foundationId={user?.id} onRequestUpdated={fetchPets} />
         ) : (
         /* Sección de Mascotas en Adopción */
         <div className="bg-white rounded-xl shadow-md p-6">
