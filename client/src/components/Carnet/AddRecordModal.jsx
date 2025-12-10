@@ -19,7 +19,7 @@ export default function AddRecordModal({ isOpen, onClose, sectionType, onSubmit 
           { name: 'observaciones', label: 'Observaciones', type: 'textarea' },
           { name: 'evidencia', label: 'Adjunte evidencia', type: 'file' }
         ];
-      case 'desparasitacion':
+      case 'desparasitaciones':
         return [
           { name: 'medicamento', label: 'Medicamento', type: 'text' },
           { name: 'fecha', label: 'Fecha de aplicación', type: 'date' },
@@ -35,6 +35,16 @@ export default function AddRecordModal({ isOpen, onClose, sectionType, onSubmit 
           { name: 'fechaInicio', label: 'Fecha de inicio', type: 'date' },
           { name: 'fechaFin', label: 'Fecha de fin', type: 'date' },
           { name: 'observaciones', label: 'Observaciones', type: 'textarea' }
+        ];
+      case 'procedimientos':
+        return [
+          { name: 'tipo', label: 'Tipo de procedimiento', type: 'select', options: ['Cirugía', 'Esterilización', 'Castración', 'Extracción dental', 'Otro'] },
+          { name: 'fecha', label: 'Fecha del procedimiento', type: 'date' },
+          { name: 'veterinario', label: 'Veterinario', type: 'text' },
+          { name: 'duracion', label: 'Duración (minutos)', type: 'text' },
+          { name: 'complicaciones', label: 'Complicaciones', type: 'textarea' },
+          { name: 'observaciones', label: 'Observaciones', type: 'textarea' },
+          { name: 'evidencia', label: 'Adjunte evidencia', type: 'file' }
         ];
       case 'historialMedico':
         return [
@@ -74,6 +84,7 @@ export default function AddRecordModal({ isOpen, onClose, sectionType, onSubmit 
       baños: 'Agregar baño',
       desparasitacion: 'Agregar desparasitación',
       medicamentos: 'Agregar medicamento',
+      procedimientos: 'Agregar procedimiento',
       historialMedico: 'Agregar registro médico'
     };
     return titles[sectionType] || 'Agregar registro';
@@ -81,24 +92,24 @@ export default function AddRecordModal({ isOpen, onClose, sectionType, onSubmit 
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-        <div className="p-6">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-xl font-semibold">{getSectionTitle()}</h3>
+      <div className="bg-white rounded-lg w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+        <div className="p-8">
+          <div className="flex justify-between items-center mb-8">
+            <h3 className="text-2xl font-bold text-gray-800">{getSectionTitle()}</h3>
             <button
               onClick={onClose}
-              className="text-gray-500 hover:text-gray-700 text-2xl"
+              className="text-gray-400 hover:text-gray-600 text-3xl transition-colors"
             >
               ×
             </button>
           </div>
 
-          <form onSubmit={handleSubmit}>
-            {/* Grid 2x2 para los primeros 4 campos */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-              {fields.slice(0, 4).map((field) => (
-                <div key={field.name}>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Grid responsivo para todos los campos */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {fields.map((field) => (
+                <div key={field.name} className="flex flex-col">
+                  <label className="block text-sm font-semibold text-gray-700 mb-3">
                     {field.label}
                   </label>
                   
@@ -107,7 +118,7 @@ export default function AddRecordModal({ isOpen, onClose, sectionType, onSubmit 
                       name={field.name}
                       value={formData[field.name] || ''}
                       onChange={handleChange}
-                      className="w-full p-3 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-green-500 focus:border-transparent focus:bg-white"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-green-500 focus:border-transparent focus:bg-white text-gray-700"
                       required
                     >
                       <option value="">Seleccionar...</option>
@@ -122,11 +133,11 @@ export default function AddRecordModal({ isOpen, onClose, sectionType, onSubmit 
                         name={field.name}
                         onChange={handleChange}
                         accept="image/*"
-                        className="w-full p-3 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-green-500 focus:border-transparent focus:bg-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-green-500 focus:border-transparent focus:bg-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100 cursor-pointer"
                       />
                       {!formData[field.name] && (
-                        <span className="absolute left-3 top-3 text-gray-500 pointer-events-none">
-                          Imagen
+                        <span className="absolute left-4 top-3 text-gray-500 pointer-events-none">
+                          Seleccionar archivo
                         </span>
                       )}
                     </div>
@@ -136,9 +147,18 @@ export default function AddRecordModal({ isOpen, onClose, sectionType, onSubmit 
                       name={field.name}
                       value={formData[field.name] || ''}
                       onChange={handleChange}
-                      className="w-full p-3 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-green-500 focus:border-transparent focus:bg-white"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-green-500 focus:border-transparent focus:bg-white text-gray-700"
                       placeholder="DD/MM/AAAA"
                       required
+                    />
+                  ) : field.type === 'textarea' ? (
+                    <textarea
+                      name={field.name}
+                      value={formData[field.name] || ''}
+                      onChange={handleChange}
+                      rows={4}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-green-500 focus:border-transparent focus:bg-white resize-none text-gray-700"
+                      placeholder={`Ingrese ${field.label.toLowerCase()}`}
                     />
                   ) : (
                     <input
@@ -146,7 +166,7 @@ export default function AddRecordModal({ isOpen, onClose, sectionType, onSubmit 
                       name={field.name}
                       value={formData[field.name] || ''}
                       onChange={handleChange}
-                      className="w-full p-3 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-green-500 focus:border-transparent focus:bg-white"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-green-500 focus:border-transparent focus:bg-white text-gray-700"
                       placeholder={`Ingrese ${field.label.toLowerCase()}`}
                       required
                     />
@@ -155,66 +175,19 @@ export default function AddRecordModal({ isOpen, onClose, sectionType, onSubmit 
               ))}
             </div>
 
-            {/* Campos adicionales si los hay (textarea, etc.) */}
-            {fields.length > 4 && (
-              <div className="space-y-4 mb-6">
-                {fields.slice(4).map((field) => (
-                  <div key={field.name}>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      {field.label}
-                    </label>
-                    
-                    {field.type === 'textarea' ? (
-                      <textarea
-                        name={field.name}
-                        value={formData[field.name] || ''}
-                        onChange={handleChange}
-                        rows={3}
-                        className="w-full p-3 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-green-500 focus:border-transparent focus:bg-white resize-none"
-                        placeholder={`Ingrese ${field.label.toLowerCase()}`}
-                      />
-                    ) : field.type === 'file' ? (
-                      <div className="relative">
-                        <input
-                          type="file"
-                          name={field.name}
-                          onChange={handleChange}
-                          accept="image/*"
-                          className="w-full p-3 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-green-500 focus:border-transparent focus:bg-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100"
-                        />
-                        {!formData[field.name] && (
-                          <span className="absolute left-3 top-3 text-gray-500 pointer-events-none">
-                            Imagen
-                          </span>
-                        )}
-                      </div>
-                    ) : (
-                      <input
-                        type={field.type}
-                        name={field.name}
-                        value={formData[field.name] || ''}
-                        onChange={handleChange}
-                        className="w-full p-3 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-green-500 focus:border-transparent focus:bg-white"
-                        placeholder={field.type === 'date' ? 'DD/MM/AAAA' : `Ingrese ${field.label.toLowerCase()}`}
-                        required={field.type !== 'file'}
-                      />
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
+            {/* Sección de botones */}
 
-            <div className="flex gap-3 pt-4">
+            <div className="flex gap-4 pt-8 border-t border-gray-200">
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors"
               >
                 Cancelar
               </button>
               <button
                 type="submit"
-                className="flex-1 px-4 py-2 bg-[#BCC990] text-white rounded-lg hover:bg-[#A5B67F] transition-colors"
+                className="flex-1 px-6 py-3 bg-[#BCC990] text-white font-semibold rounded-lg hover:bg-[#A5B67F] transition-colors"
               >
                 Agregar
               </button>

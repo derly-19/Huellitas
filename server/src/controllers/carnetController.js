@@ -209,8 +209,8 @@ export async function addBano(req, res) {
 export async function addProcedimiento(req, res) {
   try {
     const { petId } = req.params;
-    const { tipo, descripcion, fecha, veterinario, observaciones } = req.body;
-    const tipo_procedimiento = tipo || req.body.tipo_procedimiento;
+    const { tipo_procedimiento, descripcion, fecha, veterinario, observaciones, duracion, complicaciones } = req.body;
+    const tipo = tipo_procedimiento || req.body.tipo;
 
     // Obtener carnet
     const carnet = await db.get("SELECT id FROM carnet WHERE pet_id = ?", [petId]);
@@ -224,9 +224,9 @@ export async function addProcedimiento(req, res) {
     // Insertar procedimiento
     const result = await db.run(`
       INSERT INTO carnet_procedimientos
-      (carnet_id, tipo_procedimiento, descripcion, fecha, veterinario, observaciones)
-      VALUES (?, ?, ?, ?, ?, ?)
-    `, [carnet.id, tipo_procedimiento, descripcion, fecha, veterinario, observaciones]);
+      (carnet_id, tipo_procedimiento, descripcion, fecha, veterinario, observaciones, duracion, complicaciones)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `, [carnet.id, tipo, descripcion, fecha, veterinario, observaciones, duracion, complicaciones]);
 
     res.status(201).json({
       success: true,
@@ -234,11 +234,13 @@ export async function addProcedimiento(req, res) {
       data: {
         id: result.lastID,
         carnet_id: carnet.id,
-        tipo: tipo_procedimiento,
+        tipo_procedimiento: tipo,
         descripcion,
         fecha,
         veterinario,
-        observaciones
+        observaciones,
+        duracion,
+        complicaciones
       }
     });
 
@@ -255,8 +257,7 @@ export async function addProcedimiento(req, res) {
 export async function addMedicamento(req, res) {
   try {
     const { petId } = req.params;
-    const { medicamento, dosis, duracion, fecha, fecha_fin, observaciones } = req.body;
-    const fecha_inicio = fecha || req.body.fecha_inicio;
+    const { medicamento, dosis, frecuencia, fecha_inicio, fecha_fin, observaciones, veterinario } = req.body;
 
     // Obtener carnet
     const carnet = await db.get("SELECT id FROM carnet WHERE pet_id = ?", [petId]);
@@ -270,9 +271,9 @@ export async function addMedicamento(req, res) {
     // Insertar medicamento
     const result = await db.run(`
       INSERT INTO carnet_medicamentos
-      (carnet_id, medicamento, dosis, fecha_inicio, fecha_fin, observaciones)
-      VALUES (?, ?, ?, ?, ?, ?)
-    `, [carnet.id, medicamento, dosis, fecha_inicio, fecha_fin, observaciones]);
+      (carnet_id, medicamento, dosis, frecuencia, fecha_inicio, fecha_fin, observaciones, veterinario)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `, [carnet.id, medicamento, dosis, frecuencia, fecha_inicio, fecha_fin, observaciones, veterinario]);
 
     res.status(201).json({
       success: true,
@@ -282,10 +283,11 @@ export async function addMedicamento(req, res) {
         carnet_id: carnet.id,
         medicamento,
         dosis,
-        duracion,
+        frecuencia,
         fecha_inicio,
         fecha_fin,
-        observaciones
+        observaciones,
+        veterinario
       }
     });
 

@@ -1,49 +1,49 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaBell, FaTimes, FaCheckCircle, FaTimesCircle, FaInfoCircle } from "react-icons/fa";
 import { useAuth } from "../contexts/AuthContext";
 
 export default function NotificationBell() {
-  const { user } = useAuth();
+  const { user, isFoundation } = useAuth();
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [showPanel, setShowPanel] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // Cargar notificaciones
-  const fetchNotifications = async () => {
-    if (!user?.id) {
-      console.log('⚠️ No hay usuario autenticado');
-      return;
-    }
-    
-    console.log(`🔔 Cargando notificaciones para usuario ${user.id}`);
-    
+  // No renderizar para fundaciones
+  if (isFoundation?.()) {
+    return null;
+  }
+
+  // Función memoizada para cargar notificaciones
+  const reloadNotifications = useCallback(async () => {
+    if (!user?.id) return;
+
     try {
       const response = await fetch(`http://localhost:4000/api/notifications/user/${user.id}`);
       const result = await response.json();
       
-      console.log('📬 Respuesta de notificaciones:', result);
-      
-      if (result.success) {
+      if (result.success && Array.isArray(result.data)) {
         setNotifications(result.data);
         const unread = result.data.filter(n => n.is_read === 0).length;
         setUnreadCount(unread);
-        console.log(`✅ ${result.data.length} notificaciones cargadas, ${unread} sin leer`);
       }
     } catch (error) {
-      console.error('❌ Error cargando notificaciones:', error);
+      console.error('Error recargando notificaciones:', error);
     }
-  };
+  }, [user?.id]);
 
   // Cargar al montar y cada 30 segundos
   useEffect(() => {
-    if (user?.id) {
-      fetchNotifications();
-      const interval = setInterval(fetchNotifications, 30000);
-      return () => clearInterval(interval);
-    }
-  }, [user?.id]);
+    if (!user?.id) return;
+
+    // Cargar inmediatamente
+    reloadNotifications();
+
+    // Luego cada 30 segundos
+    const interval = setInterval(reloadNotifications, 30000);
+    return () => clearInterval(interval);
+  }, [user?.id, reloadNotifications]);
 
   // Marcar como leída
   const markAsRead = async (notificationId) => {
@@ -51,7 +51,7 @@ export default function NotificationBell() {
       await fetch(`http://localhost:4000/api/notifications/${notificationId}/read`, {
         method: 'PATCH'
       });
-      fetchNotifications();
+      await reloadNotifications();
     } catch (error) {
       console.error('Error marcando notificación:', error);
     }
@@ -66,7 +66,7 @@ export default function NotificationBell() {
       await fetch(`http://localhost:4000/api/notifications/user/${user.id}/read-all`, {
         method: 'PATCH'
       });
-      fetchNotifications();
+      await reloadNotifications();
     } catch (error) {
       console.error('Error marcando todas:', error);
     } finally {
@@ -80,7 +80,7 @@ export default function NotificationBell() {
       await fetch(`http://localhost:4000/api/notifications/${notificationId}`, {
         method: 'DELETE'
       });
-      fetchNotifications();
+      await reloadNotifications();
     } catch (error) {
       console.error('Error eliminando notificación:', error);
     }
@@ -114,6 +114,7 @@ export default function NotificationBell() {
     return date.toLocaleDateString();
   };
 
+  // No mostrar nada si no hay usuario
   if (!user) return null;
 
   return (

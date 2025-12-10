@@ -48,18 +48,18 @@ export const AuthProvider = ({ children }) => {
 
       const data = await response.json();
 
-      if (data.success) {
+      if (data.success && data.user) {
         // Guardar token y datos del usuario
         localStorage.setItem('authToken', data.token || 'dummy-token');
         localStorage.setItem('userData', JSON.stringify(data.user));
         setUser(data.user);
-        return { success: true, message: 'Login exitoso' };
+        return { success: true, message: 'Login exitoso', user: data.user };
       } else {
-        return { success: false, message: data.message || 'Error en el login' };
+        return { success: false, message: data.message || 'Error en el login', user: null };
       }
     } catch (error) {
       console.error('Error en login:', error);
-      return { success: false, message: 'Error de conexión' };
+      return { success: false, message: 'Error de conexión', user: null };
     }
   };
 

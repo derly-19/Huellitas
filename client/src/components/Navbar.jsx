@@ -14,12 +14,30 @@ export default function Navbar() {
 
   // Verificar si el usuario ha adoptado una mascota
   useEffect(() => {
-    if (isAuthenticated() && !isFoundation()) {
-      const hasAdopted = localStorage.getItem('hasAdoptedPet') === 'true';
-      setHasAdoptedPet(hasAdopted);
-    } else {
-      setHasAdoptedPet(false);
-    }
+    const checkAdoptedPets = async () => {
+      if (isAuthenticated() && !isFoundation() && user?.id) {
+        try {
+          const response = await fetch(
+            `http://localhost:4000/api/adoption-requests/user/${user.id}`
+          );
+          const data = await response.json();
+          
+          if (data.success && Array.isArray(data.data)) {
+            const hasApproved = data.data.some(req => req.status === 'approved');
+            setHasAdoptedPet(hasApproved);
+            if (hasApproved) {
+              localStorage.setItem('hasAdoptedPet', 'true');
+            }
+          }
+        } catch (error) {
+          console.error('Error checking adopted pets:', error);
+        }
+      } else {
+        setHasAdoptedPet(false);
+      }
+    };
+
+    checkAdoptedPets();
   }, [isAuthenticated, isFoundation, user]);
 
   // ✅ Links para usuarios no autenticados (público)
@@ -30,22 +48,13 @@ export default function Navbar() {
     { name: "Fundaciones", path: "/fundaciones", icon: <HeartHandshake size={18} /> },
   ];
 
-  // ✅ Links para usuarios autenticados normales (sin carnet por defecto)
-  const baseAuthenticatedLinks = [
+  // ✅ Links para usuarios autenticados normales
+  const authenticatedLinks = [
     { name: "Inicio", path: "/", icon: <Home size={18} /> },
     { name: "Adopción", path: "/Dogs", icon: <HeartHandshake size={18} /> },
+    { name: "Mis Solicitudes", path: "/mis-solicitudes", icon: <FileText size={18} /> },
     { name: "Perfil", path: "/perfil", icon: <User size={18} /> },
   ];
-
-  // Si el usuario ha adoptado una mascota, agregar el link de Carnet
-  const authenticatedLinks = hasAdoptedPet
-    ? [
-        { name: "Inicio", path: "/", icon: <Home size={18} /> },
-        { name: "Carnet", path: "/carnet", icon: <FileText size={18} /> },
-        { name: "Adopción", path: "/Dogs", icon: <HeartHandshake size={18} /> },
-        { name: "Perfil", path: "/perfil", icon: <User size={18} /> },
-      ]
-    : baseAuthenticatedLinks;
 
   // ✅ Links para fundaciones
   const foundationLinks = [

@@ -31,7 +31,7 @@ export default function CarnetSection({
           { key: 'tipoShampoo', label: 'Tipo de shampoo' },
           { key: 'observaciones', label: 'Observaciones' }
         ];
-      case 'desparasitacion':
+      case 'desparasitaciones':
         return [
           { key: 'medicamento', label: 'Medicamento' },
           { key: 'fecha', label: 'Fecha aplicación' },
@@ -62,8 +62,9 @@ export default function CarnetSection({
     const labels = {
       vacunas: 'Agregar vacuna',
       baños: 'Agregar baño',
-      desparasitacion: 'Agregar desparasitación',
+      desparasitaciones: 'Agregar desparasitación',
       medicamentos: 'Agregar medicamento',
+      procedimientos: 'Agregar procedimiento',
       historialMedico: 'Agregar registro médico'
     };
     return labels[sectionType] || 'Agregar registro';

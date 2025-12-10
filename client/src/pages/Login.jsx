@@ -27,22 +27,29 @@ export default function Login() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
+        setMessage("");
 
         try {
+            if (!email || !password) {
+                setMessage("❌ Por favor completa todos los campos");
+                setLoading(false);
+                return;
+            }
+
             const result = await login(email, password);
 
-            if (result.success) {
+            if (result?.success) {
                 // Guardar el email para recordarlo en futuros logins
                 localStorage.setItem('lastLoginEmail', email);
                 
                 setMessage("✅ Login exitoso, bienvenido!");
                 
                 // Obtener datos del usuario del localStorage para verificar el tipo
-                const userData = JSON.parse(localStorage.getItem('userData'));
+                const userData = JSON.parse(localStorage.getItem('userData') || '{}');
                 
                 // Si es una fundación, redirigir al dashboard
                 if (userData?.user_type === 'foundation') {
-                    navigate('/foundation/dashboard');
+                    setTimeout(() => navigate('/foundation/dashboard'), 500);
                     return;
                 }
                 
@@ -54,18 +61,18 @@ export default function Login() {
                     clearAdoptionIntent();
                     
                     // Redirigir al formulario con la mascota seleccionada
-                    navigate(`/formulario/${adoptionIntent.petId}`);
+                    setTimeout(() => navigate(`/formulario/${adoptionIntent.petId}`), 500);
                 } else {
                     // Redirigir al inicio si no hay intención de adopción
-                    navigate("/");
+                    setTimeout(() => navigate("/"), 500);
                 }
             } else {
-                setMessage("❌ " + result.message);
+                setMessage("❌ " + (result?.message || "Error desconocido en el login"));
+                setLoading(false);
             }
         } catch (error) {
-            console.error(error);
+            console.error("Error en login:", error);
             setMessage("❌ Error de conexión con el servidor");
-        } finally {
             setLoading(false);
         }
     };

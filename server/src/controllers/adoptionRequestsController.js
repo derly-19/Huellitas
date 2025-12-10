@@ -359,18 +359,31 @@ export const getPetRequests = async (req, res) => {
 export const getUserRequests = async (req, res) => {
   try {
     const { userId } = req.params;
+    
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: "ID de usuario requerido"
+      });
+    }
+
+    console.log(`📋 Obteniendo solicitudes para usuario ${userId}`);
+    
     const requests = await AdoptionRequestsModel.getRequestsByUser(userId);
+
+    console.log(`✅ Se encontraron ${requests?.length || 0} solicitudes`);
 
     res.json({
       success: true,
-      data: requests
+      data: requests || []
     });
 
   } catch (error) {
     console.error("Error fetching user requests:", error);
     res.status(500).json({
       success: false,
-      message: "Error al obtener tus solicitudes"
+      message: "Error al obtener tus solicitudes",
+      error: error.message
     });
   }
 };

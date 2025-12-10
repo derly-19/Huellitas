@@ -195,13 +195,18 @@ export const countRequestsByFoundation = async (foundationId) => {
 
 // Obtener solicitudes de un usuario
 export const getRequestsByUser = async (userId) => {
-  const requests = await db.all(
-    `SELECT ar.*, p.img as pet_img
-     FROM adoption_requests ar
-     LEFT JOIN pets p ON ar.pet_id = p.id
-     WHERE ar.user_id = ?
-     ORDER BY ar.created_at DESC`,
-    [userId]
-  );
-  return requests;
+  try {
+    const requests = await db.all(
+      `SELECT ar.*, p.img as pet_img, p.type as pet_type, p.name as pet_name
+       FROM adoption_requests ar
+       LEFT JOIN pets p ON ar.pet_id = p.id
+       WHERE ar.user_id = ?
+       ORDER BY ar.created_at DESC`,
+      [userId]
+    );
+    return requests || [];
+  } catch (error) {
+    console.error("Error getting requests by user:", error);
+    return [];
+  }
 };

@@ -12,6 +12,7 @@ import RegisterFoundation from "./pages/RegisterFoundation";
 import Fundaciones from "./pages/Fundaciones";
 import Formulario from "./pages/Formulario";
 import Carnet from "./pages/Carnet";
+import MisSolicitudes from "./pages/MisSolicitudes";
 import FoundationDashboard from "./pages/FoundationDashboard";
 import Perfil from "./pages/Perfil";
 
@@ -40,6 +41,7 @@ function AppContent() {
           <Route path="/formulario/:petId" element={<Formulario />} />
           <Route path="/carnet" element={<Carnet />} />
           <Route path="/carnet/:petId" element={<Carnet />} />
+          <Route path="/mis-solicitudes" element={<MisSolicitudes />} />
           <Route path="/perfil" element={<Perfil />} />
           <Route path="/foundation/dashboard" element={<FoundationDashboard />} />
         </Routes>
