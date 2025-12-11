@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom"; // ✅ Para Vite/React
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Home, HeartHandshake, Dog, Cat, FileText, User, Building2, LayoutDashboard } from "lucide-react";
+import { Menu, X, Home, HeartHandshake, Dog, Cat, FileText, User, Building2, LayoutDashboard, ClipboardList } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import NotificationBell from "./NotificationBell";
 
@@ -53,12 +53,14 @@ export default function Navbar() {
     { name: "Inicio", path: "/", icon: <Home size={18} /> },
     { name: "Adopción", path: "/Dogs", icon: <HeartHandshake size={18} /> },
     { name: "Mis Solicitudes", path: "/mis-solicitudes", icon: <FileText size={18} /> },
+    { name: "Seguimiento", path: "/seguimiento", icon: <ClipboardList size={18} /> },
     { name: "Perfil", path: "/perfil", icon: <User size={18} /> },
   ];
 
   // ✅ Links para fundaciones
   const foundationLinks = [
     { name: "Dashboard", path: "/foundation/dashboard", icon: <LayoutDashboard size={18} /> },
+    { name: "Seguimiento", path: "/seguimiento", icon: <ClipboardList size={18} /> },
   ];
 
   // Usar los links apropiados según el estado de autenticación

@@ -8,11 +8,13 @@ import { createPetsTable, insertInitialPets } from "./models/petsModel.js";
 import { createCarnetTables, createCarnetsForAllPets, insertSampleCarnetData } from "./models/carnetModel.js";
 import { createAdoptionRequestsTable } from "./models/adoptionRequestsModel.js";
 import { createNotificationsTable } from "./models/notificationsModel.js";
+import { createFollowUpTable } from "./models/followUpModel.js";
 import usersRoutes from "./routes/users.js";
 import petsRoutes from "./routes/pets.js";
 import carnetRoutes from "./routes/carnet.js";
 import adoptionRequestsRoutes from "./routes/adoptionRequests.js";
 import notificationsRoutes from "./routes/notifications.js";
+import followUpRoutes from "./routes/followUp.js";
 
 // Obtener __dirname en ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -44,6 +46,7 @@ app.use((req, res, next) => {
   createCarnetTables();
   createAdoptionRequestsTable();
   await createNotificationsTable();
+  await createFollowUpTable();
   console.log("📋 Todas las tablas inicializadas");
 })();
 
@@ -62,6 +65,7 @@ app.use("/api/pets", petsRoutes);
 app.use("/api/carnet", carnetRoutes);
 app.use("/api/adoption-requests", adoptionRequestsRoutes);
 app.use("/api/notifications", notificationsRoutes);
+app.use("/api/follow-ups", followUpRoutes);
 
 app.get("/", (req, res) => {
   res.send("API funcionando 🚀");
