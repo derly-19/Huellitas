@@ -9,12 +9,18 @@ import {
   FaSmile,
   FaHeartbeat,
   FaUserCheck,
-  FaExclamationTriangle
+  FaExclamationTriangle,
+  FaCalendarAlt,
+  FaPaw
 } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import FollowUpForm from '../components/FollowUp/FollowUpForm';
 import FollowUpCard from '../components/FollowUp/FollowUpCard';
 import FollowUpModal from '../components/FollowUp/FollowUpModal';
+import AdoptedPetCard from '../components/FollowUp/AdoptedPetCard';
+import ScheduleVisitModal from '../components/FollowUp/ScheduleVisitModal';
+import VisitCard from '../components/FollowUp/VisitCard';
+import FoundationAdoptionsTab from '../components/FollowUp/FoundationAdoptionsTab';
 import Toast from '../components/Toast';
 
 export default function FollowUp() {
@@ -30,11 +36,16 @@ export default function FollowUp() {
   };
 
   const [followUps, setFollowUps] = useState([]);
+  const [adoptedPets, setAdoptedPets] = useState([]);
+  const [visits, setVisits] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedFollowUp, setSelectedFollowUp] = useState(null);
   const [showForm, setShowForm] = useState(false);
-  const [editingFollowUp, setEditingFollowUp] = useState(null);
+  const [selectedPetForFollowUp, setSelectedPetForFollowUp] = useState(null);
+  const [showVisitModal, setShowVisitModal] = useState(false);
+  const [selectedPetForVisit, setSelectedPetForVisit] = useState(null);
+  const [activeTab, setActiveTab] = useState('pets'); // 'pets', 'followups', 'visits'
   const [toast, setToast] = useState({ isVisible: false, message: '', type: 'success' });
   const [stats, setStats] = useState(null);
 
@@ -45,12 +56,29 @@ export default function FollowUp() {
     }
   }, [isAuthenticated, navigate]);
 
+  // Obtener mascotas adoptadas del usuario
+  const fetchAdoptedPets = async () => {
+    if (!user?.id || isFoundation?.()) return;
+
+    try {
+      const response = await fetch(`http://localhost:4000/api/adoption-requests/user/${user.id}`);
+      const result = await response.json();
+
+      if (result.success) {
+        // Filtrar solo las aprobadas
+        const approved = result.data.filter(a => a.status === 'approved');
+        setAdoptedPets(approved);
+      }
+    } catch (err) {
+      console.error('Error fetching adopted pets:', err);
+    }
+  };
+
   // Obtener seguimientos
   const fetchFollowUps = async () => {
     if (!user?.id) return;
 
     try {
-      setLoading(true);
       setError(null);
 
       const endpoint = isFoundation?.()
@@ -63,7 +91,6 @@ export default function FollowUp() {
       if (result.success) {
         setFollowUps(result.data);
         
-        // Si es fundación, obtener estadísticas
         if (isFoundation?.()) {
           fetchStats();
         }
@@ -73,8 +100,26 @@ export default function FollowUp() {
     } catch (err) {
       console.error('Error fetching follow-ups:', err);
       setError('Error de conexión con el servidor');
-    } finally {
-      setLoading(false);
+    }
+  };
+
+  // Obtener visitas
+  const fetchVisits = async () => {
+    if (!user?.id) return;
+
+    try {
+      const endpoint = isFoundation?.()
+        ? `http://localhost:4000/api/visits/foundation/${user.id}`
+        : `http://localhost:4000/api/visits/user/${user.id}`;
+
+      const response = await fetch(endpoint);
+      const result = await response.json();
+
+      if (result.success) {
+        setVisits(result.data);
+      }
+    } catch (err) {
+      console.error('Error fetching visits:', err);
     }
   };
 
@@ -94,45 +139,42 @@ export default function FollowUp() {
     }
   };
 
-  // Cargar seguimientos al montar
+  // Cargar datos al montar
   useEffect(() => {
-    if (user?.id) {
-      fetchFollowUps();
-    }
+    const loadData = async () => {
+      if (!user?.id) return;
+      
+      setLoading(true);
+      await Promise.all([
+        fetchAdoptedPets(),
+        fetchFollowUps(),
+        fetchVisits()
+      ]);
+      setLoading(false);
+    };
+
+    loadData();
   }, [user?.id]);
 
   // Crear seguimiento
   const handleCreateFollowUp = async (formData) => {
+    if (!selectedPetForFollowUp) {
+      setToast({
+        isVisible: true,
+        message: '❌ Error: Selecciona una mascota',
+        type: 'error'
+      });
+      return;
+    }
+
     try {
-      // Obtener el primer seguimiento del usuario para obtener los datos necesarios
-      const adoptionResponse = await fetch(`http://localhost:4000/api/adoption-requests/user/${user.id}`);
-      const adoptionResult = await adoptionResponse.json();
-
-      if (!adoptionResult.success || !adoptionResult.data || adoptionResult.data.length === 0) {
-        setToast({
-          isVisible: true,
-          message: '❌ Error: No tienes adopciones registradas',
-          type: 'error'
-        });
-        return;
-      }
-
-      const adoption = adoptionResult.data.find(a => a.status === 'approved');
-      if (!adoption) {
-        setToast({
-          isVisible: true,
-          message: '❌ Error: Debes tener una adopción aprobada',
-          type: 'error'
-        });
-        return;
-      }
-
       const followUpData = {
         ...formData,
-        adoption_request_id: adoption.id,
-        pet_id: adoption.pet_id,
-        foundation_id: adoption.foundation_id,
-        pet_name: adoption.pet_name,
+        user_id: user.id,
+        adoption_request_id: selectedPetForFollowUp.id,
+        pet_id: selectedPetForFollowUp.pet_id,
+        foundation_id: selectedPetForFollowUp.foundation_id,
+        pet_name: selectedPetForFollowUp.pet_name,
         follow_up_date: new Date().toISOString().split('T')[0]
       };
 
@@ -153,6 +195,7 @@ export default function FollowUp() {
         setTimeout(() => setToast({ ...toast, isVisible: false }), 3000);
 
         setShowForm(false);
+        setSelectedPetForFollowUp(null);
         fetchFollowUps();
       } else {
         setToast({
@@ -168,6 +211,101 @@ export default function FollowUp() {
         message: '❌ Error al crear el seguimiento',
         type: 'error'
       });
+    }
+  };
+
+  // Agendar visita
+  const handleScheduleVisit = async (visitData) => {
+    try {
+      // Cuando una fundación programa la visita, no sobrescribimos el user_id
+      // porque ya viene con el ID del adoptante desde ScheduleVisitModal
+      const dataToSend = isFoundation 
+        ? { ...visitData, foundation_id: user.id }  // Fundación programa: usar user_id del adoptante
+        : { ...visitData, user_id: user.id };        // Adoptante sugiere: usar su propio ID
+
+      const response = await fetch('http://localhost:4000/api/visits', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(dataToSend)
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setToast({
+          isVisible: true,
+          message: '✅ Visita programada exitosamente',
+          type: 'success'
+        });
+        setTimeout(() => setToast({ ...toast, isVisible: false }), 3000);
+
+        setShowVisitModal(false);
+        setSelectedPetForVisit(null);
+        fetchVisits();
+      } else {
+        setToast({
+          isVisible: true,
+          message: `❌ Error: ${result.message}`,
+          type: 'error'
+        });
+      }
+    } catch (err) {
+      console.error('Error scheduling visit:', err);
+      setToast({
+        isVisible: true,
+        message: '❌ Error al programar la visita',
+        type: 'error'
+      });
+    }
+  };
+
+  // Cancelar visita
+  const handleCancelVisit = async (visitId) => {
+    if (!confirm('¿Estás seguro de que deseas cancelar esta visita?')) return;
+
+    try {
+      const response = await fetch(`http://localhost:4000/api/visits/${visitId}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'cancelled' })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setToast({
+          isVisible: true,
+          message: '✅ Visita cancelada',
+          type: 'success'
+        });
+        fetchVisits();
+      }
+    } catch (err) {
+      console.error('Error cancelling visit:', err);
+    }
+  };
+
+  // Completar visita (fundación)
+  const handleCompleteVisit = async (visitId) => {
+    try {
+      const response = await fetch(`http://localhost:4000/api/visits/${visitId}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'completed' })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setToast({
+          isVisible: true,
+          message: '✅ Visita marcada como completada',
+          type: 'success'
+        });
+        fetchVisits();
+      }
+    } catch (err) {
+      console.error('Error completing visit:', err);
     }
   };
 
@@ -227,9 +365,113 @@ export default function FollowUp() {
     }
   };
 
+  // Contar seguimientos por mascota
+  const getFollowUpsCountForPet = (petId) => {
+    return followUps.filter(f => f.pet_id === petId).length;
+  };
+
+  // Contar visitas por mascota
+  const getVisitsCountForPet = (petId) => {
+    return visits.filter(v => v.pet_id === petId).length;
+  };
+
+  // Contar visitas pendientes por mascota (adoptante)
+  const getPendingVisitsCountForPet = (petId) => {
+    return visits.filter(v => v.pet_id === petId && v.status === 'scheduled').length;
+  };
+
+  // Manejar selección para nuevo seguimiento
+  const handleNewFollowUp = (adoption) => {
+    setSelectedPetForFollowUp(adoption);
+    setShowForm(true);
+    setActiveTab('followups');
+  };
+
+  // Ver visitas de una mascota (adoptante)
+  const handleViewVisits = (adoption) => {
+    setActiveTab('visits');
+  };
+
+  // Abrir modal para programar visita (fundación)
+  const handleOpenVisitModal = (adoption) => {
+    setSelectedPetForVisit(adoption);
+    setShowVisitModal(true);
+  };
+
+  // Aceptar visita (adoptante)
+  const handleAcceptVisit = async (visitId) => {
+    try {
+      const response = await fetch(`http://localhost:4000/api/visits/${visitId}/accept`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setToast({
+          isVisible: true,
+          message: '✅ Visita aceptada',
+          type: 'success'
+        });
+        fetchVisits();
+      }
+    } catch (err) {
+      console.error('Error accepting visit:', err);
+    }
+  };
+
+  // Sugerir cambio de fecha (adoptante)
+  const handleSuggestReschedule = async (visitId, suggestedDate, suggestedTime, reason) => {
+    try {
+      const response = await fetch(`http://localhost:4000/api/visits/${visitId}/suggest-reschedule`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ suggested_date: suggestedDate, suggested_time: suggestedTime, reason })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setToast({
+          isVisible: true,
+          message: '✅ Sugerencia de cambio enviada',
+          type: 'success'
+        });
+        fetchVisits();
+      }
+    } catch (err) {
+      console.error('Error suggesting reschedule:', err);
+    }
+  };
+
+  // Aprobar cambio de fecha sugerido (fundación)
+  const handleApproveReschedule = async (visitId, newDate, newTime) => {
+    try {
+      const response = await fetch(`http://localhost:4000/api/visits/${visitId}/reschedule`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ scheduled_date: newDate, scheduled_time: newTime })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setToast({
+          isVisible: true,
+          message: '✅ Visita reprogramada',
+          type: 'success'
+        });
+        fetchVisits();
+      }
+    } catch (err) {
+      console.error('Error approving reschedule:', err);
+    }
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#FFFCF4] flex items-center justify-center mt-20">
+      <div className="min-h-screen bg-[#FFFCF4] flex items-center justify-center pt-24">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#005017] mx-auto mb-4"></div>
           <p className="text-gray-600">Cargando seguimientos...</p>
@@ -239,13 +481,13 @@ export default function FollowUp() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FFFCF4] py-8">
+    <div className="min-h-screen bg-[#FFFCF4] py-8 pt-24">
       <div className="max-w-6xl mx-auto px-4">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-12"
+          className="text-center mb-8"
         >
           <div className="flex items-center justify-center gap-3 mb-4">
             <FaClipboardList className="text-3xl text-[#BCC990]" />
@@ -257,12 +499,12 @@ export default function FollowUp() {
           <p className="text-gray-600 text-lg">
             {isFoundation?.()
               ? 'Revisa el progreso de tus mascotas adoptadas'
-              : 'Comparte cómo va tu mascota adoptada'}
+              : 'Gestiona el seguimiento de tus mascotas adoptadas'}
           </p>
         </motion.div>
 
         {/* Estadísticas (solo para fundación) */}
-        {isFoundation?.() && (
+        {isFoundation?.() && stats && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -316,30 +558,42 @@ export default function FollowUp() {
           </motion.div>
         )}
 
-        {/* Botón crear (solo para usuarios) */}
+        {/* Tabs para usuario */}
         {!isFoundation?.() && (
           <div className="flex justify-center mb-8">
-            <button
-              onClick={() => setShowForm(!showForm)}
-              className="bg-[#BCC990] text-white px-6 py-3 rounded-lg font-bold hover:bg-[#9FB36F] flex items-center gap-2 transition"
-            >
-              <FaPlus /> Nuevo Seguimiento
-            </button>
+            <div className="bg-white rounded-xl shadow-sm p-1 inline-flex gap-1">
+              <button
+                onClick={() => setActiveTab('pets')}
+                className={`px-6 py-3 rounded-lg font-medium transition-all flex items-center gap-2 ${
+                  activeTab === 'pets'
+                    ? 'bg-[#BCC990] text-white'
+                    : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                <FaPaw /> Mis Mascotas ({adoptedPets.length})
+              </button>
+              <button
+                onClick={() => setActiveTab('followups')}
+                className={`px-6 py-3 rounded-lg font-medium transition-all flex items-center gap-2 ${
+                  activeTab === 'followups'
+                    ? 'bg-[#BCC990] text-white'
+                    : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                <FaClipboardList /> Seguimientos ({followUps.length})
+              </button>
+              <button
+                onClick={() => setActiveTab('visits')}
+                className={`px-6 py-3 rounded-lg font-medium transition-all flex items-center gap-2 ${
+                  activeTab === 'visits'
+                    ? 'bg-[#BCC990] text-white'
+                    : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                <FaCalendarAlt /> Visitas ({visits.length})
+              </button>
+            </div>
           </div>
-        )}
-
-        {/* Formulario */}
-        {showForm && !isFoundation?.() && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-8"
-          >
-            <FollowUpForm
-              petName="Mi mascota"
-              onSubmit={handleCreateFollowUp}
-            />
-          </motion.div>
         )}
 
         {/* Error */}
@@ -349,52 +603,318 @@ export default function FollowUp() {
           </div>
         )}
 
-        {/* Lista de seguimientos */}
-        {followUps.length === 0 ? (
-          <div className="text-center py-16 px-6 bg-gradient-to-br from-white via-white to-[#f5f1e4] rounded-2xl border border-[#e9e3d2] shadow-sm">
-            <div className="mx-auto mb-6 h-16 w-16 flex items-center justify-center rounded-full bg-[#BCC990]/15">
-              <FaClipboardList className="text-4xl text-[#BCC990]" />
-            </div>
-            <p className="text-gray-600 text-xl font-semibold mb-2">
-              {isFoundation?.()
-                ? 'Aún no hay seguimientos de adopciones'
-                : 'Aún no has completado ningún seguimiento'}
-            </p>
-            <p className="text-gray-400 max-w-sm mx-auto">
-              {isFoundation?.()
-                ? 'Cuando las familias compartan avances, los verás aquí con sus métricas principales.'
-                : 'Cuéntanos cómo va la adaptación de tu mascota para mantener informada a la fundación.'}
-            </p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {followUps.map((followUp, index) => (
+        {/* Contenido para usuarios */}
+        {!isFoundation?.() && (
+          <>
+            {/* Tab: Mis Mascotas */}
+            {activeTab === 'pets' && (
               <motion.div
-                key={followUp.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
               >
-                <FollowUpCard
-                  followUp={followUp}
-                  onViewDetail={setSelectedFollowUp}
-                  onEdit={setEditingFollowUp}
-                  onDelete={handleDeleteFollowUp}
-                  isFoundation={isFoundation?.()}
-                />
+                {adoptedPets.length === 0 ? (
+                  <div className="text-center py-16 px-6 bg-gradient-to-br from-white via-white to-[#f5f1e4] rounded-2xl border border-[#e9e3d2] shadow-sm">
+                    <div className="mx-auto mb-6 h-16 w-16 flex items-center justify-center rounded-full bg-[#BCC990]/15">
+                      <FaPaw className="text-4xl text-[#BCC990]" />
+                    </div>
+                    <p className="text-gray-600 text-xl font-semibold mb-2">
+                      Aún no tienes mascotas adoptadas
+                    </p>
+                    <p className="text-gray-400 max-w-sm mx-auto">
+                      Cuando adoptes una mascota y sea aprobada, aparecerá aquí para hacer seguimiento.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {adoptedPets.map((adoption, index) => (
+                      <motion.div
+                        key={adoption.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                      >
+                        <AdoptedPetCard
+                          adoption={adoption}
+                          followUpsCount={getFollowUpsCountForPet(adoption.pet_id)}
+                          visitsCount={getVisitsCountForPet(adoption.pet_id)}
+                          pendingVisitsCount={getPendingVisitsCountForPet(adoption.pet_id)}
+                          onNewFollowUp={handleNewFollowUp}
+                          onViewVisits={handleViewVisits}
+                        />
+                      </motion.div>
+                    ))}
+                  </div>
+                )}
               </motion.div>
-            ))}
-          </div>
+            )}
+
+            {/* Tab: Seguimientos */}
+            {activeTab === 'followups' && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+              >
+                {/* Formulario de seguimiento */}
+                {showForm && selectedPetForFollowUp && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mb-8"
+                  >
+                    <div className="flex justify-between items-center mb-4">
+                      <h3 className="text-lg font-bold text-gray-800">
+                        Nuevo seguimiento para {selectedPetForFollowUp.pet_name}
+                      </h3>
+                      <button
+                        onClick={() => {
+                          setShowForm(false);
+                          setSelectedPetForFollowUp(null);
+                        }}
+                        className="text-gray-500 hover:text-gray-700"
+                      >
+                        ✕ Cancelar
+                      </button>
+                    </div>
+                    <FollowUpForm
+                      petName={selectedPetForFollowUp.pet_name}
+                      onSubmit={handleCreateFollowUp}
+                    />
+                  </motion.div>
+                )}
+
+                {/* Lista de seguimientos */}
+                {!showForm && (
+                  <>
+                    {followUps.length === 0 ? (
+                      <div className="text-center py-16 px-6 bg-gradient-to-br from-white via-white to-[#f5f1e4] rounded-2xl border border-[#e9e3d2] shadow-sm">
+                        <div className="mx-auto mb-6 h-16 w-16 flex items-center justify-center rounded-full bg-[#BCC990]/15">
+                          <FaClipboardList className="text-4xl text-[#BCC990]" />
+                        </div>
+                        <p className="text-gray-600 text-xl font-semibold mb-2">
+                          Aún no has completado ningún seguimiento
+                        </p>
+                        <p className="text-gray-400 max-w-sm mx-auto mb-4">
+                          Cuéntanos cómo va la adaptación de tu mascota para mantener informada a la fundación.
+                        </p>
+                        {adoptedPets.length > 0 && (
+                          <button
+                            onClick={() => setActiveTab('pets')}
+                            className="bg-[#BCC990] text-white px-6 py-3 rounded-lg font-bold hover:bg-[#9FB36F] transition"
+                          >
+                            Ver mis mascotas
+                          </button>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {followUps.map((followUp, index) => (
+                          <motion.div
+                            key={followUp.id}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: index * 0.1 }}
+                          >
+                            <FollowUpCard
+                              followUp={followUp}
+                              onViewDetail={setSelectedFollowUp}
+                              onDelete={handleDeleteFollowUp}
+                              isFoundation={false}
+                            />
+                          </motion.div>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                )}
+              </motion.div>
+            )}
+
+            {/* Tab: Visitas */}
+            {activeTab === 'visits' && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+              >
+                {visits.length === 0 ? (
+                  <div className="text-center py-16 px-6 bg-gradient-to-br from-white via-white to-[#f5f1e4] rounded-2xl border border-[#e9e3d2] shadow-sm">
+                    <div className="mx-auto mb-6 h-16 w-16 flex items-center justify-center rounded-full bg-purple-100">
+                      <FaCalendarAlt className="text-4xl text-purple-500" />
+                    </div>
+                    <p className="text-gray-600 text-xl font-semibold mb-2">
+                      No tienes visitas programadas
+                    </p>
+                    <p className="text-gray-400 max-w-sm mx-auto mb-4">
+                      Las fundaciones programarán visitas para verificar el bienestar de tu mascota.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {visits.map((visit, index) => (
+                      <motion.div
+                        key={visit.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                      >
+                        <VisitCard
+                          visit={visit}
+                          isFoundation={false}
+                          onAccept={handleAcceptVisit}
+                          onSuggestReschedule={handleSuggestReschedule}
+                        />
+                      </motion.div>
+                    ))}
+                  </div>
+                )}
+              </motion.div>
+            )}
+          </>
+        )}
+
+        {/* Contenido para fundaciones */}
+        {isFoundation?.() && (
+          <>
+            {/* Tabs para fundación */}
+            <div className="flex justify-center mb-8">
+              <div className="bg-white rounded-xl shadow-sm p-1 inline-flex gap-1">
+                <button
+                  onClick={() => setActiveTab('adoptions')}
+                  className={`px-6 py-3 rounded-lg font-medium transition-all flex items-center gap-2 ${
+                    activeTab === 'adoptions'
+                      ? 'bg-[#BCC990] text-white'
+                      : 'text-gray-600 hover:bg-gray-100'
+                  }`}
+                >
+                  <FaPaw /> Adopciones
+                </button>
+                <button
+                  onClick={() => setActiveTab('followups')}
+                  className={`px-6 py-3 rounded-lg font-medium transition-all flex items-center gap-2 ${
+                    activeTab === 'followups'
+                      ? 'bg-[#BCC990] text-white'
+                      : 'text-gray-600 hover:bg-gray-100'
+                  }`}
+                >
+                  <FaClipboardList /> Seguimientos ({followUps.length})
+                </button>
+                <button
+                  onClick={() => setActiveTab('visits')}
+                  className={`px-6 py-3 rounded-lg font-medium transition-all flex items-center gap-2 ${
+                    activeTab === 'visits'
+                      ? 'bg-[#BCC990] text-white'
+                      : 'text-gray-600 hover:bg-gray-100'
+                  }`}
+                >
+                  <FaCalendarAlt /> Visitas ({visits.length})
+                </button>
+              </div>
+            </div>
+
+            {/* Tab: Adopciones aprobadas (para programar visitas) */}
+            {activeTab === 'adoptions' && (
+              <FoundationAdoptionsTab 
+                onScheduleVisit={handleOpenVisitModal}
+                foundationId={user?.id}
+              />
+            )}
+
+            {/* Seguimientos de fundación */}
+            {activeTab === 'followups' && (
+              <>
+                {followUps.length === 0 ? (
+                  <div className="text-center py-16 px-6 bg-gradient-to-br from-white via-white to-[#f5f1e4] rounded-2xl border border-[#e9e3d2] shadow-sm">
+                    <div className="mx-auto mb-6 h-16 w-16 flex items-center justify-center rounded-full bg-[#BCC990]/15">
+                      <FaClipboardList className="text-4xl text-[#BCC990]" />
+                    </div>
+                    <p className="text-gray-600 text-xl font-semibold mb-2">
+                      Aún no hay seguimientos de adopciones
+                    </p>
+                    <p className="text-gray-400 max-w-sm mx-auto">
+                      Cuando las familias compartan avances, los verás aquí con sus métricas principales.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {followUps.map((followUp, index) => (
+                      <motion.div
+                        key={followUp.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                      >
+                        <FollowUpCard
+                          followUp={followUp}
+                          onViewDetail={setSelectedFollowUp}
+                          onDelete={handleDeleteFollowUp}
+                          isFoundation={true}
+                        />
+                      </motion.div>
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
+
+            {/* Visitas de fundación */}
+            {activeTab === 'visits' && (
+              <>
+                {visits.length === 0 ? (
+                  <div className="text-center py-16 px-6 bg-gradient-to-br from-white via-white to-[#f5f1e4] rounded-2xl border border-[#e9e3d2] shadow-sm">
+                    <div className="mx-auto mb-6 h-16 w-16 flex items-center justify-center rounded-full bg-purple-100">
+                      <FaCalendarAlt className="text-4xl text-purple-500" />
+                    </div>
+                    <p className="text-gray-600 text-xl font-semibold mb-2">
+                      No hay visitas programadas
+                    </p>
+                    <p className="text-gray-400 max-w-sm mx-auto">
+                      Programa visitas desde el tab "Adopciones" para verificar el bienestar de las mascotas.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {visits.map((visit, index) => (
+                      <motion.div
+                        key={visit.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                      >
+                        <VisitCard
+                          visit={visit}
+                          isFoundation={true}
+                          onComplete={handleCompleteVisit}
+                          onCancel={handleCancelVisit}
+                          onApproveReschedule={handleApproveReschedule}
+                        />
+                      </motion.div>
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
+          </>
         )}
       </div>
 
-      {/* Modal */}
+      {/* Modal de seguimiento */}
       {selectedFollowUp && (
         <FollowUpModal
           followUp={selectedFollowUp}
           onClose={() => setSelectedFollowUp(null)}
           isFoundation={isFoundation?.()}
           onAddFeedback={isFoundation?.() ? handleAddFeedback : null}
+        />
+      )}
+
+      {/* Modal de programar visita (fundación) */}
+      {showVisitModal && selectedPetForVisit && (
+        <ScheduleVisitModal
+          adoption={selectedPetForVisit}
+          onClose={() => {
+            setShowVisitModal(false);
+            setSelectedPetForVisit(null);
+          }}
+          onSchedule={handleScheduleVisit}
         />
       )}
 

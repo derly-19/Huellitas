@@ -2,9 +2,27 @@ import { useState } from 'react';
 import { FaTimes, FaStar } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 
+// Helper para parsear fotos que pueden venir como string JSON o array
+const parsePhotos = (photos) => {
+  if (!photos) return [];
+  if (Array.isArray(photos)) return photos;
+  if (typeof photos === 'string') {
+    try {
+      const parsed = JSON.parse(photos);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  }
+  return [];
+};
+
 export default function FollowUpModal({ followUp, onClose, isFoundation = false, onAddFeedback = null }) {
   const [feedback, setFeedback] = useState('');
   const [loadingFeedback, setLoadingFeedback] = useState(false);
+
+  // Parsear fotos de forma segura
+  const photos = parsePhotos(followUp?.photos);
 
   const handleAddFeedback = async () => {
     if (!feedback.trim() || !onAddFeedback) return;
@@ -170,11 +188,11 @@ export default function FollowUpModal({ followUp, onClose, isFoundation = false,
               )}
 
               {/* Fotos */}
-              {followUp.photos && Array.isArray(followUp.photos) && followUp.photos.length > 0 && (
+              {photos.length > 0 && (
                 <div className="bg-purple-50 rounded-lg p-4">
                   <h3 className="font-bold text-gray-800 mb-3">📸 Fotos</h3>
                   <div className="grid grid-cols-2 gap-3">
-                    {followUp.photos.map((photo, index) => (
+                    {photos.map((photo, index) => (
                       <img
                         key={index}
                         src={photo}

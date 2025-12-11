@@ -1,6 +1,24 @@
 import { FaStar, FaEdit, FaTrash, FaEye } from 'react-icons/fa';
 
+// Helper para parsear fotos que pueden venir como string JSON o array
+const parsePhotos = (photos) => {
+  if (!photos) return [];
+  if (Array.isArray(photos)) return photos;
+  if (typeof photos === 'string') {
+    try {
+      const parsed = JSON.parse(photos);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  }
+  return [];
+};
+
 export default function FollowUpCard({ followUp, onViewDetail, onEdit, onDelete, isFoundation = false }) {
+  // Parsear fotos de forma segura
+  const photos = parsePhotos(followUp.photos);
+
   const getHealthColor = (status) => {
     switch(status) {
       case 'excelente': return 'bg-green-100 text-green-800';
@@ -82,11 +100,11 @@ export default function FollowUpCard({ followUp, onViewDetail, onEdit, onDelete,
         )}
 
         {/* Fotos */}
-        {followUp.photos && followUp.photos.length > 0 && (
+        {photos.length > 0 && (
           <div className="mb-3">
-            <p className="text-xs font-semibold text-gray-600 mb-2">📸 Fotos ({followUp.photos.length})</p>
+            <p className="text-xs font-semibold text-gray-600 mb-2">📸 Fotos ({photos.length})</p>
             <div className="flex gap-2">
-              {followUp.photos.slice(0, 3).map((photo, index) => (
+              {photos.slice(0, 3).map((photo, index) => (
                 <img
                   key={index}
                   src={photo}
@@ -94,9 +112,9 @@ export default function FollowUpCard({ followUp, onViewDetail, onEdit, onDelete,
                   className="w-12 h-12 object-cover rounded"
                 />
               ))}
-              {followUp.photos.length > 3 && (
+              {photos.length > 3 && (
                 <div className="w-12 h-12 bg-gray-200 rounded flex items-center justify-center text-xs text-gray-600">
-                  +{followUp.photos.length - 3}
+                  +{photos.length - 3}
                 </div>
               )}
             </div>

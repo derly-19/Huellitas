@@ -170,15 +170,17 @@ const RequestDetailModal = ({ request, onClose, onUpdateStatus }) => {
           </div>
 
           {/* Acciones */}
-          {request.status === 'pending' && (
+          {['pending', 'contacted'].includes(request.status) && (
             <div className="flex flex-wrap gap-3 justify-end border-t pt-4">
-              <button
-                onClick={() => handleStatusChange('contacted')}
-                disabled={updating}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors disabled:opacity-50"
-              >
-                <FaPhone /> Marcar como Contactado
-              </button>
+              {request.status === 'pending' && (
+                <button
+                  onClick={() => handleStatusChange('contacted')}
+                  disabled={updating}
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors disabled:opacity-50"
+                >
+                  <FaPhone /> Marcar como Contactado
+                </button>
+              )}
               <button
                 onClick={() => handleStatusChange('rejected')}
                 disabled={updating}
@@ -196,7 +198,7 @@ const RequestDetailModal = ({ request, onClose, onUpdateStatus }) => {
             </div>
           )}
 
-          {request.status !== 'pending' && (
+          {!['pending', 'contacted'].includes(request.status) && (
             <div className="text-center text-gray-500 border-t pt-4">
               Esta solicitud ya fue {request.status === 'approved' ? 'aprobada' : request.status === 'rejected' ? 'rechazada' : 'procesada'}
               {request.notes && (
