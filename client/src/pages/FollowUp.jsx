@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -11,11 +11,15 @@ import {
   FaUserCheck,
   FaExclamationTriangle,
   FaCalendarAlt,
-  FaPaw
+  FaPaw,
+  FaThLarge,
+  FaList
 } from 'react-icons/fa';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import FollowUpForm from '../components/FollowUp/FollowUpForm';
 import FollowUpCard from '../components/FollowUp/FollowUpCard';
+import FollowUpCardFoundation from '../components/FollowUp/FollowUpCardFoundation';
+import FollowUpFilters from '../components/FollowUp/FollowUpFilters';
 import FollowUpModal from '../components/FollowUp/FollowUpModal';
 import AdoptedPetCard from '../components/FollowUp/AdoptedPetCard';
 import ScheduleVisitModal from '../components/FollowUp/ScheduleVisitModal';
@@ -48,6 +52,63 @@ export default function FollowUp() {
   const [activeTab, setActiveTab] = useState('pets'); // 'pets', 'followups', 'visits'
   const [toast, setToast] = useState({ isVisible: false, message: '', type: 'success' });
   const [stats, setStats] = useState(null);
+  
+  // Estado para filtros de fundación
+  const [foundationFilters, setFoundationFilters] = useState({ type: 'all', search: '', sort: 'newest' });
+  const [viewMode, setViewMode] = useState('grid'); // 'grid' o 'list'
+
+  // Filtrar y ordenar seguimientos para fundación
+  const filteredFollowUps = useMemo(() => {
+    if (!isFoundation?.()) return followUps;
+    
+    let filtered = [...followUps];
+    
+    // Aplicar filtro de búsqueda
+    if (foundationFilters.search) {
+      const searchLower = foundationFilters.search.toLowerCase();
+      filtered = filtered.filter(f => 
+        f.pet_name?.toLowerCase().includes(searchLower) ||
+        f.user_name?.toLowerCase().includes(searchLower) ||
+        f.user_email?.toLowerCase().includes(searchLower)
+      );
+    }
+    
+    // Aplicar filtro por tipo
+    switch (foundationFilters.type) {
+      case 'pending':
+        filtered = filtered.filter(f => !f.reviewed);
+        break;
+      case 'reviewed':
+        filtered = filtered.filter(f => f.reviewed);
+        break;
+      case 'withProblems':
+        filtered = filtered.filter(f => f.problems_encountered && f.problems_encountered.trim());
+        break;
+      case 'excellentHealth':
+        filtered = filtered.filter(f => f.health_status === 'excelente');
+        break;
+      case 'adapted':
+        filtered = filtered.filter(f => f.behavior_status === 'adaptado');
+        break;
+    }
+    
+    // Aplicar ordenamiento
+    filtered.sort((a, b) => {
+      const dateA = new Date(a.follow_up_date);
+      const dateB = new Date(b.follow_up_date);
+      
+      if (foundationFilters.sort === 'newest') {
+        return dateB - dateA;
+      } else if (foundationFilters.sort === 'oldest') {
+        return dateA - dateB;
+      } else if (foundationFilters.sort === 'rating') {
+        return (b.overall_satisfaction || 0) - (a.overall_satisfaction || 0);
+      }
+      return 0;
+    });
+    
+    return filtered;
+  }, [followUps, foundationFilters, isFoundation]);
 
   // Verificar autenticación
   useEffect(() => {
@@ -340,6 +401,36 @@ export default function FollowUp() {
     }
   };
 
+  // Marcar seguimiento como revisado (solo fundación)
+  const handleMarkReviewed = async (followUpId) => {
+    try {
+      const response = await fetch(`http://localhost:4000/api/follow-ups/${followUpId}/review`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setToast({
+          isVisible: true,
+          message: '✅ Seguimiento marcado como revisado',
+          type: 'success'
+        });
+        setTimeout(() => setToast({ ...toast, isVisible: false }), 3000);
+        fetchFollowUps();
+        fetchStats();
+      }
+    } catch (err) {
+      console.error('Error marking as reviewed:', err);
+      setToast({
+        isVisible: true,
+        message: '❌ Error al marcar como revisado',
+        type: 'error'
+      });
+    }
+  };
+
   // Eliminar seguimiento
   const handleDeleteFollowUp = async (followUpId) => {
     if (!confirm('¿Estás seguro de que deseas eliminar este seguimiento?')) return;
@@ -466,6 +557,46 @@ export default function FollowUp() {
       }
     } catch (err) {
       console.error('Error approving reschedule:', err);
+    }
+  };
+
+  // Reprogramar visita directamente (fundación)
+  const handleRescheduleVisit = async (visitId, newDate, newTime, meetingLink) => {
+    try {
+      const response = await fetch(`http://localhost:4000/api/visits/${visitId}/reschedule`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          scheduled_date: newDate, 
+          scheduled_time: newTime,
+          meeting_link: meetingLink 
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setToast({
+          isVisible: true,
+          message: '✅ Visita reprogramada exitosamente',
+          type: 'success'
+        });
+        setTimeout(() => setToast({ ...toast, isVisible: false }), 3000);
+        fetchVisits();
+      } else {
+        setToast({
+          isVisible: true,
+          message: `❌ Error: ${result.message}`,
+          type: 'error'
+        });
+      }
+    } catch (err) {
+      console.error('Error rescheduling visit:', err);
+      setToast({
+        isVisible: true,
+        message: '❌ Error al reprogramar la visita',
+        type: 'error'
+      });
     }
   };
 
@@ -834,23 +965,81 @@ export default function FollowUp() {
                     </p>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {followUps.map((followUp, index) => (
+                  <>
+                    {/* Filtros y búsqueda */}
+                    <FollowUpFilters
+                      followUps={followUps}
+                      activeFilters={foundationFilters}
+                      onFilterChange={setFoundationFilters}
+                      stats={stats}
+                    />
+
+                    {/* Barra de herramientas con selector de vista */}
+                    <div className="flex items-center justify-between mb-4">
+                      <p className="text-sm text-gray-600">
+                        Mostrando <span className="font-semibold text-gray-800">{filteredFollowUps.length}</span> de {followUps.length} seguimientos
+                      </p>
+                      <div className="flex items-center gap-2 bg-white rounded-lg border border-gray-200 p-1">
+                        <button
+                          onClick={() => setViewMode('grid')}
+                          className={`p-2 rounded transition-all ${viewMode === 'grid' ? 'bg-[#BCC990] text-white' : 'text-gray-500 hover:bg-gray-100'}`}
+                          title="Vista de cuadrícula"
+                        >
+                          <FaThLarge size={14} />
+                        </button>
+                        <button
+                          onClick={() => setViewMode('list')}
+                          className={`p-2 rounded transition-all ${viewMode === 'list' ? 'bg-[#BCC990] text-white' : 'text-gray-500 hover:bg-gray-100'}`}
+                          title="Vista de lista"
+                        >
+                          <FaList size={14} />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Lista vacía después de filtrar */}
+                    {filteredFollowUps.length === 0 && (
+                      <div className="text-center py-12 px-6 bg-white rounded-2xl border border-gray-100 shadow-sm">
+                        <div className="mx-auto mb-4 h-14 w-14 flex items-center justify-center rounded-full bg-gray-100">
+                          <FaClipboardList className="text-2xl text-gray-400" />
+                        </div>
+                        <p className="text-gray-600 font-semibold mb-2">
+                          No se encontraron seguimientos
+                        </p>
+                        <p className="text-gray-400 text-sm max-w-xs mx-auto">
+                          Intenta ajustar los filtros o buscar con otros términos.
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Grid de seguimientos */}
+                    <AnimatePresence mode="popLayout">
                       <motion.div
-                        key={followUp.id}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.1 }}
+                        layout
+                        className={viewMode === 'grid' 
+                          ? 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5'
+                          : 'flex flex-col gap-4'
+                        }
                       >
-                        <FollowUpCard
-                          followUp={followUp}
-                          onViewDetail={setSelectedFollowUp}
-                          onDelete={handleDeleteFollowUp}
-                          isFoundation={true}
-                        />
+                        {filteredFollowUps.map((followUp, index) => (
+                          <motion.div
+                            key={followUp.id}
+                            layout
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            transition={{ delay: Math.min(index * 0.05, 0.3) }}
+                          >
+                            <FollowUpCardFoundation
+                              followUp={followUp}
+                              onViewDetail={setSelectedFollowUp}
+                              onMarkReviewed={handleMarkReviewed}
+                            />
+                          </motion.div>
+                        ))}
                       </motion.div>
-                    ))}
-                  </div>
+                    </AnimatePresence>
+                  </>
                 )}
               </>
             )}
@@ -885,6 +1074,7 @@ export default function FollowUp() {
                           onComplete={handleCompleteVisit}
                           onCancel={handleCancelVisit}
                           onApproveReschedule={handleApproveReschedule}
+                          onReschedule={handleRescheduleVisit}
                         />
                       </motion.div>
                     ))}

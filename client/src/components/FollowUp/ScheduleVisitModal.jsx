@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { FaCalendarAlt, FaClock, FaMapMarkerAlt, FaVideo, FaTimes, FaUser } from 'react-icons/fa';
+import { FaCalendarAlt, FaClock, FaMapMarkerAlt, FaVideo, FaTimes, FaUser, FaLink } from 'react-icons/fa';
 
 export default function ScheduleVisitModal({ adoption, onClose, onSchedule, isFoundation = true }) {
   const [formData, setFormData] = useState({
     scheduled_date: '',
     scheduled_time: '',
     visit_type: 'presencial',
+    meeting_link: '',
     notes: ''
   });
   const [loading, setLoading] = useState(false);
@@ -147,6 +148,26 @@ export default function ScheduleVisitModal({ adoption, onClose, onSchedule, isFo
               </button>
             </div>
           </div>
+
+          {/* Enlace de reunión (solo para virtual) */}
+          {formData.visit_type === 'virtual' && (
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
+                <FaLink className="text-[#BCC990]" /> Enlace de la reunión
+              </label>
+              <input
+                type="url"
+                name="meeting_link"
+                value={formData.meeting_link}
+                onChange={handleChange}
+                placeholder="https://meet.google.com/xxx-xxxx-xxx"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#BCC990] focus:outline-none"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Pega el enlace de Google Meet, Zoom, Teams, etc.
+              </p>
+            </div>
+          )}
 
           {/* Notas */}
           <div>

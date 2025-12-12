@@ -12,6 +12,7 @@ export async function createVisitsTable() {
       scheduled_date TEXT NOT NULL,
       scheduled_time TEXT,
       visit_type TEXT NOT NULL DEFAULT 'presencial', -- presencial, virtual
+      meeting_link TEXT, -- enlace de reunión para visitas virtuales
       status TEXT NOT NULL DEFAULT 'scheduled', -- scheduled, accepted, completed, cancelled, pending_reschedule
       notes TEXT,
       foundation_notes TEXT,
@@ -30,6 +31,15 @@ export async function createVisitsTable() {
   
   try {
     await db.run(sql);
+    
+    // Agregar columna meeting_link si no existe
+    try {
+      await db.run(`ALTER TABLE visits ADD COLUMN meeting_link TEXT`);
+      console.log("✅ Columna meeting_link agregada a visits");
+    } catch (e) {
+      // La columna ya existe, ignorar
+    }
+    
     console.log("✅ Visits table ready");
   } catch (err) {
     console.error("❌ Error creating visits table:", err);
@@ -46,15 +56,16 @@ export async function createVisit(visitData) {
     scheduled_date,
     scheduled_time,
     visit_type,
+    meeting_link,
     notes
   } = visitData;
 
   try {
     const result = await db.run(
       `INSERT INTO visits 
-       (adoption_request_id, pet_id, user_id, foundation_id, scheduled_date, scheduled_time, visit_type, notes)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [adoption_request_id, pet_id, user_id, foundation_id, scheduled_date, scheduled_time, visit_type || 'presencial', notes]
+       (adoption_request_id, pet_id, user_id, foundation_id, scheduled_date, scheduled_time, visit_type, meeting_link, notes)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [adoption_request_id, pet_id, user_id, foundation_id, scheduled_date, scheduled_time, visit_type || 'presencial', meeting_link || null, notes]
     );
     
     console.log(`✅ Visita programada para ${scheduled_date}`);
@@ -145,16 +156,27 @@ export async function updateVisitStatus(id, status, notes = null) {
 }
 
 // Reprogramar visita
-export async function rescheduleVisit(id, newDate, newTime) {
+export async function rescheduleVisit(id, newDate, newTime, meetingLink = null) {
   try {
-    await db.run(
-      `UPDATE visits 
-       SET scheduled_date = ?, scheduled_time = ?, status = 'scheduled', 
-           suggested_date = NULL, suggested_time = NULL, reschedule_reason = NULL,
-           updated_at = CURRENT_TIMESTAMP
-       WHERE id = ?`,
-      [newDate, newTime, id]
-    );
+    if (meetingLink) {
+      await db.run(
+        `UPDATE visits 
+         SET scheduled_date = ?, scheduled_time = ?, meeting_link = ?, status = 'scheduled', 
+             suggested_date = NULL, suggested_time = NULL, reschedule_reason = NULL,
+             updated_at = CURRENT_TIMESTAMP
+         WHERE id = ?`,
+        [newDate, newTime, meetingLink, id]
+      );
+    } else {
+      await db.run(
+        `UPDATE visits 
+         SET scheduled_date = ?, scheduled_time = ?, status = 'scheduled', 
+             suggested_date = NULL, suggested_time = NULL, reschedule_reason = NULL,
+             updated_at = CURRENT_TIMESTAMP
+         WHERE id = ?`,
+        [newDate, newTime, id]
+      );
+    }
     
     console.log(`✅ Visita ${id} reprogramada para ${newDate}`);
     return { id, scheduled_date: newDate, scheduled_time: newTime };

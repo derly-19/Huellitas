@@ -112,7 +112,7 @@ export async function getFoundationFollowUps(foundationId) {
     const rows = await db.all(
       `SELECT fu.*, 
               u.username as user_name, u.email as user_email,
-              p.name as pet_name, p.type as pet_type
+              p.name as pet_name, p.type as pet_type, p.img as pet_img
        FROM follow_ups fu
        JOIN users u ON fu.user_id = u.id
        JOIN pets p ON fu.pet_id = p.id
@@ -208,6 +208,23 @@ export async function addFoundationFeedback(id, feedback) {
   }
 }
 
+// Marcar seguimiento como revisado
+export async function markAsReviewed(id) {
+  try {
+    await db.run(
+      `UPDATE follow_ups 
+       SET reviewed = 1, updated_at = CURRENT_TIMESTAMP
+       WHERE id = ?`,
+      [id]
+    );
+    
+    console.log(`✅ Follow-up ${id} marcado como revisado`);
+  } catch (err) {
+    console.error("Error marking follow-up as reviewed:", err);
+    throw err;
+  }
+}
+
 // Obtener seguimientos pendientes (no revisados)
 export async function getPendingFollowUps(foundationId) {
   try {
@@ -238,7 +255,7 @@ export async function getFoundationFollowUpStats(foundationId) {
         AVG(overall_satisfaction) as avg_satisfaction,
         SUM(CASE WHEN health_status = 'excelente' THEN 1 ELSE 0 END) as excellent_health,
         SUM(CASE WHEN behavior_status = 'adaptado' THEN 1 ELSE 0 END) as well_adapted,
-        SUM(CASE WHEN problems_encountered IS NOT NULL THEN 1 ELSE 0 END) as with_problems
+        SUM(CASE WHEN problems_encountered IS NOT NULL AND TRIM(problems_encountered) != '' THEN 1 ELSE 0 END) as with_problems
        FROM follow_ups
        WHERE foundation_id = ?`,
       [foundationId]

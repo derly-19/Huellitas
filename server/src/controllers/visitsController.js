@@ -146,7 +146,7 @@ export async function updateVisitStatus(req, res) {
 export async function rescheduleVisit(req, res) {
   try {
     const { id } = req.params;
-    const { scheduled_date, scheduled_time } = req.body;
+    const { scheduled_date, scheduled_time, meeting_link } = req.body;
 
     if (!scheduled_date) {
       return res.status(400).json({
@@ -155,7 +155,7 @@ export async function rescheduleVisit(req, res) {
       });
     }
 
-    const result = await VisitsModel.rescheduleVisit(id, scheduled_date, scheduled_time);
+    const result = await VisitsModel.rescheduleVisit(id, scheduled_date, scheduled_time, meeting_link);
 
     res.json({
       success: true,

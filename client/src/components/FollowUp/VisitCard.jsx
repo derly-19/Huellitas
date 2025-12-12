@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FaCalendarAlt, FaClock, FaMapMarkerAlt, FaVideo, FaTrash, FaCheck, FaTimes, FaExchangeAlt } from 'react-icons/fa';
+import { FaCalendarAlt, FaClock, FaMapMarkerAlt, FaVideo, FaCheck, FaTimes, FaExchangeAlt, FaExternalLinkAlt, FaRedo } from 'react-icons/fa';
 
 const getImageUrl = (imgPath) => {
   if (!imgPath) return '/public/icon.png';
@@ -21,18 +21,33 @@ const statusConfig = {
   pending_reschedule: { label: 'Cambio solicitado', color: 'bg-orange-100 text-orange-700', icon: FaExchangeAlt }
 };
 
-export default function VisitCard({ visit, isFoundation = false, onAccept, onCancel, onComplete, onSuggestReschedule, onApproveReschedule }) {
+export default function VisitCard({ visit, isFoundation = false, onAccept, onCancel, onComplete, onSuggestReschedule, onApproveReschedule, onReschedule }) {
   const [showRescheduleForm, setShowRescheduleForm] = useState(false);
+  const [showFoundationRescheduleForm, setShowFoundationRescheduleForm] = useState(false);
   const [suggestedDate, setSuggestedDate] = useState('');
   const [suggestedTime, setSuggestedTime] = useState('');
   const [suggestReason, setSuggestReason] = useState('');
+  const [newMeetingLink, setNewMeetingLink] = useState(visit.meeting_link || '');
 
   const config = statusConfig[visit.status] || statusConfig.scheduled;
   const StatusIcon = config.icon;
 
   const formatDate = (dateString) => {
-    if (!dateString) return '';
-    const date = new Date(dateString + 'T00:00:00');
+    if (!dateString) return 'Fecha por definir';
+    
+    // Arreglar fechas con año mal formateado (ej: 22025 -> 2025)
+    let cleanDate = dateString;
+    if (dateString.startsWith('2202')) {
+      cleanDate = dateString.substring(1); // Quitar el primer dígito extra
+    }
+    
+    const date = new Date(cleanDate + 'T00:00:00');
+    
+    // Verificar si la fecha es válida
+    if (isNaN(date.getTime())) {
+      return 'Fecha inválida';
+    }
+    
     return date.toLocaleDateString('es-ES', {
       weekday: 'long',
       day: '2-digit',
@@ -65,6 +80,18 @@ export default function VisitCard({ visit, isFoundation = false, onAccept, onCan
     }
     onSuggestReschedule?.(visit.id, suggestedDate, suggestedTime, suggestReason);
     setShowRescheduleForm(false);
+  };
+
+  const handleFoundationReschedule = () => {
+    if (!suggestedDate) {
+      alert('Por favor selecciona una fecha');
+      return;
+    }
+    onReschedule?.(visit.id, suggestedDate, suggestedTime, visit.visit_type === 'virtual' ? newMeetingLink : null);
+    setShowFoundationRescheduleForm(false);
+    setSuggestedDate('');
+    setSuggestedTime('');
+    setNewMeetingLink('');
   };
 
   const getMinDate = () => {
@@ -137,6 +164,19 @@ export default function VisitCard({ visit, isFoundation = false, onAccept, onCan
                   </>
                 )}
               </div>
+
+              {/* Enlace de reunión virtual */}
+              {visit.visit_type === 'virtual' && visit.meeting_link && (
+                <a
+                  href={visit.meeting_link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 mt-2 px-3 py-1.5 bg-purple-100 text-purple-700 rounded-lg text-sm font-medium hover:bg-purple-200 transition"
+                >
+                  <FaExternalLinkAlt size={12} />
+                  Unirse a la reunión
+                </a>
+              )}
             </div>
 
             {/* Notas de la fundación */}
@@ -248,14 +288,80 @@ export default function VisitCard({ visit, isFoundation = false, onAccept, onCan
                   </button>
                 )}
 
-                {isFoundation && visit.status === 'scheduled' && (
-                  <button
-                    onClick={() => onCancel?.(visit.id)}
-                    className="text-xs px-3 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition flex items-center gap-1"
-                  >
-                    <FaTrash /> Cancelar
-                  </button>
+                {isFoundation && visit.status === 'scheduled' && !showFoundationRescheduleForm && (
+                  <>
+                    <button
+                      onClick={() => onComplete?.(visit.id)}
+                      className="flex-1 text-xs px-3 py-2 bg-emerald-100 text-emerald-700 rounded-lg hover:bg-emerald-200 transition flex items-center justify-center gap-1"
+                    >
+                      <FaCheck /> Marcar completada
+                    </button>
+                    <button
+                      onClick={() => setShowFoundationRescheduleForm(true)}
+                      className="flex-1 text-xs px-3 py-2 bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200 transition flex items-center justify-center gap-1"
+                    >
+                      <FaRedo /> Reprogramar
+                    </button>
+                  </>
                 )}
+              </div>
+            )}
+
+            {/* Formulario de reprogramar (para fundación) */}
+            {isFoundation && showFoundationRescheduleForm && (
+              <div className="mt-3 p-4 bg-orange-50 rounded-xl space-y-3 border border-orange-200">
+                <p className="text-sm font-bold text-orange-800 flex items-center gap-2">
+                  <FaRedo /> Reprogramar visita
+                </p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-xs text-gray-600 mb-1 block">Nueva fecha</label>
+                    <input
+                      type="date"
+                      value={suggestedDate}
+                      onChange={(e) => setSuggestedDate(e.target.value)}
+                      min={getMinDate()}
+                      className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-orange-300 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-600 mb-1 block">Nueva hora</label>
+                    <input
+                      type="time"
+                      value={suggestedTime}
+                      onChange={(e) => setSuggestedTime(e.target.value)}
+                      className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-orange-300 focus:outline-none"
+                    />
+                  </div>
+                </div>
+                
+                {visit.visit_type === 'virtual' && (
+                  <div>
+                    <label className="text-xs text-gray-600 mb-1 block">Enlace de reunión</label>
+                    <input
+                      type="url"
+                      value={newMeetingLink}
+                      onChange={(e) => setNewMeetingLink(e.target.value)}
+                      placeholder="https://meet.google.com/xxx"
+                      className="w-full px-3 py-2 border rounded-lg text-sm focus:ring-2 focus:ring-orange-300 focus:outline-none"
+                    />
+                  </div>
+                )}
+
+                <div className="flex gap-2 pt-2">
+                  <button
+                    onClick={() => setShowFoundationRescheduleForm(false)}
+                    className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-100 transition"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    onClick={handleFoundationReschedule}
+                    className="flex-1 px-3 py-2 text-sm bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition font-medium"
+                  >
+                    Confirmar reprogramación
+                  </button>
+                </div>
               </div>
             )}
           </div>

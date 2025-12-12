@@ -245,6 +245,26 @@ export async function addFoundationFeedback(req, res) {
   }
 }
 
+// Marcar seguimiento como revisado (sin feedback)
+export async function markAsReviewed(req, res) {
+  try {
+    const { id } = req.params;
+
+    await FollowUpModel.markAsReviewed(id);
+
+    res.json({
+      success: true,
+      message: "Seguimiento marcado como revisado"
+    });
+  } catch (error) {
+    console.error("Error marking as reviewed:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error interno del servidor"
+    });
+  }
+}
+
 // Obtener seguimientos pendientes
 export async function getPendingFollowUps(req, res) {
   try {

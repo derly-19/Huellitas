@@ -27,6 +27,9 @@ router.patch("/:id", FollowUpController.updateFollowUp);
 // Agregar feedback de fundación
 router.patch("/:id/feedback", FollowUpController.addFoundationFeedback);
 
+// Marcar como revisado (sin feedback)
+router.patch("/:id/review", FollowUpController.markAsReviewed);
+
 // Eliminar seguimiento
 router.delete("/:id", FollowUpController.deleteFollowUp);
 
