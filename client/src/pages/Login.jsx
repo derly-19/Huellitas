@@ -131,10 +131,20 @@ export default function Login() {
                         name="password"
                     />
 
+                    {/* Link para olvidó contraseña - DEBAJO DEL PASSWORD */}
+                    <div className="text-right mb-2">
+                        <Link
+                            to="/forgot-password"
+                            className="text-xs sm:text-sm text-gray-500 hover:text-[#005017] hover:underline"
+                        >
+                            ¿Olvidaste tu contraseña?
+                        </Link>
+                    </div>
+
                     <motion.button
                         type="submit"
                         disabled={loading}
-                        className={`mt-2 w-full font-semibold py-2 rounded-lg shadow ${
+                        className={`w-full font-semibold py-2 rounded-lg shadow ${
                             loading 
                                 ? 'bg-gray-400 cursor-not-allowed' 
                                 : 'bg-[#BCC990] hover:bg-[#9FB36F] text-white'

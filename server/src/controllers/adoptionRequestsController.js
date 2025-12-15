@@ -1,6 +1,12 @@
 import * as AdoptionRequestsModel from "../models/adoptionRequestsModel.js";
 import { getPetById, updatePetAvailability } from "../models/petsModel.js";
 import { createNotification } from "../models/notificationsModel.js";
+import { 
+  sendAdoptionRequestEmail, 
+  sendAdoptionApprovedEmail, 
+  sendAdoptionRejectedEmail,
+  sendContactedNotificationEmail
+} from "../services/emailService.js";
 
 // Crear una nueva solicitud de adopción
 export const createRequest = async (req, res) => {
@@ -96,6 +102,20 @@ export const createRequest = async (req, res) => {
     };
 
     const result = await AdoptionRequestsModel.createAdoptionRequest(requestData);
+
+    // Enviar email de confirmación
+    try {
+      await sendAdoptionRequestEmail({
+        adoptedByEmail: correo,
+        adoptedByName: nombre,
+        petName: pet.name,
+        foundationName: pet.foundation
+      });
+      console.log(`📧 Email de solicitud enviado a ${correo}`);
+    } catch (emailError) {
+      console.error('Error enviando email de solicitud:', emailError);
+      // No fallar la operación si falla el email
+    }
 
     res.status(201).json({
       success: true,
@@ -249,11 +269,40 @@ export const updateRequestStatus = async (req, res) => {
             title: notificationTitle,
             message: notificationMessage,
             request_id: id,
-            pet_name: request.pet_name
+            pet_name: request.pet_name,
+            email_address: request.correo
           });
           console.log(`📧 Notificación enviada a usuario ${request.user_id}`);
+          
+          // Enviar email también
+          if (status === 'approved') {
+            await sendAdoptionApprovedEmail({
+              adoptedByEmail: request.correo,
+              adoptedByName: request.nombre,
+              petName: request.pet_name,
+              foundationName: request.foundation_name,
+              appUrl: process.env.APP_URL || 'http://localhost:3000'
+            });
+          } else if (status === 'rejected') {
+            await sendAdoptionRejectedEmail({
+              adoptedByEmail: request.correo,
+              adoptedByName: request.nombre,
+              petName: request.pet_name,
+              foundationName: request.foundation_name,
+              reason: notes || null
+            });
+          } else if (status === 'contacted') {
+            await sendContactedNotificationEmail({
+              adoptedByEmail: request.correo,
+              adoptedByName: request.nombre,
+              petName: request.pet_name,
+              foundationName: request.foundation_name,
+              message: notes || null
+            });
+          }
+          
         } catch (notifError) {
-          console.error('Error creando notificación:', notifError);
+          console.error('Error creando notificación o enviando email:', notifError);
           // No fallar la operación si falla la notificación
         }
       }

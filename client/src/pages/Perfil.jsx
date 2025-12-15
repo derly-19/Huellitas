@@ -1,13 +1,15 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import { FaUser, FaEnvelope, FaPhone, FaHome, FaMapMarkerAlt, FaEdit, FaSave, FaTimes, FaPaw, FaCalendar } from "react-icons/fa";
+import { FaUser, FaEnvelope, FaPhone, FaHome, FaMapMarkerAlt, FaEdit, FaSave, FaTimes, FaPaw, FaCalendar, FaLock } from "react-icons/fa";
+import ChangePasswordModal from "../components/ChangePasswordModal";
 
 export default function Perfil() {
   const { user, logout, updateUser } = useAuth();
   const navigate = useNavigate();
   
   const [isEditing, setIsEditing] = useState(false);
+  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [formData, setFormData] = useState({
@@ -144,12 +146,20 @@ export default function Perfil() {
                 </div>
               </div>
               {!isEditing && (
-                <button
-                  onClick={() => setIsEditing(true)}
-                  className="flex items-center gap-2 bg-white text-green-600 px-4 py-2 rounded-lg hover:bg-green-50 transition-colors"
-                >
-                  <FaEdit /> Editar Perfil
-                </button>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setIsEditing(true)}
+                    className="flex items-center gap-2 bg-white text-green-600 px-4 py-2 rounded-lg hover:bg-green-50 transition-colors"
+                  >
+                    <FaEdit /> Editar Perfil
+                  </button>
+                  <button
+                    onClick={() => setIsChangePasswordOpen(true)}
+                    className="flex items-center gap-2 bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition-colors"
+                  >
+                    <FaLock /> Cambiar Contraseña
+                  </button>
+                </div>
               )}
             </div>
           </div>
@@ -351,6 +361,13 @@ export default function Perfil() {
           </div>
         </div>
       </div>
+
+      {/* Modal de cambio de contraseña */}
+      <ChangePasswordModal 
+        isOpen={isChangePasswordOpen}
+        onClose={() => setIsChangePasswordOpen(false)}
+        user={user}
+      />
     </div>
   );
 }

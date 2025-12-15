@@ -12,6 +12,8 @@ export const createNotificationsTable = async () => {
       request_id INTEGER,
       pet_name TEXT,
       is_read INTEGER DEFAULT 0,
+      email_sent INTEGER DEFAULT 0,
+      email_address TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (user_id) REFERENCES users(id)
     )
@@ -27,13 +29,13 @@ export const createNotificationsTable = async () => {
 
 // Crear una notificación
 export const createNotification = async (notificationData) => {
-  const { user_id, type, title, message, request_id, pet_name } = notificationData;
+  const { user_id, type, title, message, request_id, pet_name, email_address, email_sent } = notificationData;
   
   try {
     const result = await db.run(
-      `INSERT INTO notifications (user_id, type, title, message, request_id, pet_name)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      [user_id, type, title, message, request_id, pet_name]
+      `INSERT INTO notifications (user_id, type, title, message, request_id, pet_name, email_address, email_sent)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [user_id, type, title, message, request_id, pet_name, email_address || null, email_sent ? 1 : 0]
     );
     console.log(`✅ Notificación creada para usuario ${user_id}`);
     return { id: result.lastID };

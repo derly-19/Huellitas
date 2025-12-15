@@ -1,5 +1,6 @@
 import * as FollowUpModel from "../models/followUpModel.js";
 import { createNotification } from "../models/notificationsModel.js";
+import { sendEmail } from "../services/emailService.js";
 
 // Crear seguimiento
 export async function createFollowUp(req, res) {
@@ -43,8 +44,43 @@ export async function createFollowUp(req, res) {
         request_id: adoption_request_id,
         pet_name: req.body.pet_name
       });
+      
+      // Enviar email a la fundación notificando del seguimiento
+      const htmlContent = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <div style="background-color: #f0f0f0; padding: 20px; text-align: center;">
+            <h1 style="color: #2c3e50; margin: 0;">🐾 Huellitas</h1>
+            <p style="color: #7f8c8d; margin: 5px 0;">Plataforma de Adopción de Mascotas</p>
+          </div>
+          
+          <div style="padding: 30px; background-color: #ffffff;">
+            <h2 style="color: #2c3e50;">📋 Nuevo Seguimiento Post-Adopción</h2>
+            
+            <p>La familia que adoptó a <strong>${req.body.pet_name || 'la mascota'}</strong> ha enviado un nuevo seguimiento.</p>
+            
+            <div style="background-color: #e8f5e9; padding: 15px; border-left: 4px solid #4caf50; margin: 20px 0;">
+              <p style="margin: 5px 0;"><strong>📅 Fecha:</strong> ${followUpData.follow_up_date}</p>
+              <p style="margin: 5px 0;"><strong>🐾 Mascota:</strong> ${req.body.pet_name || 'N/A'}</p>
+              <p style="margin: 5px 0;"><strong>😊 Satisfacción General:</strong> ${followUpData.overall_satisfaction}/5</p>
+            </div>
+            
+            <p>Entra a la plataforma para ver los detalles completos del seguimiento.</p>
+            
+            <p style="color: #7f8c8d; font-size: 12px; margin-top: 30px; border-top: 1px solid #ecf0f1; padding-top: 20px;">
+              Este es un email automático, por favor no responder.
+            </p>
+          </div>
+        </div>
+      `;
+      
+      await sendEmail(
+        process.env.EMAIL_USER,
+        `Nuevo Seguimiento Post-Adopción - ${req.body.pet_name || 'Mascota'}`,
+        htmlContent
+      );
+      
     } catch (notifError) {
-      console.error('Error creando notificación:', notifError);
+      console.error('Error creando notificación o enviando email:', notifError);
     }
 
     res.status(201).json({
