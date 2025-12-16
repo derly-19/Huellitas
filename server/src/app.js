@@ -17,6 +17,7 @@ import adoptionRequestsRoutes from "./routes/adoptionRequests.js";
 import notificationsRoutes from "./routes/notifications.js";
 import followUpRoutes from "./routes/followUp.js";
 import visitsRoutes from "./routes/visits.js";
+import remindersRoutes from "./routes/reminders.js";
 
 // Obtener __dirname en ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -70,6 +71,7 @@ app.use("/api/adoption-requests", adoptionRequestsRoutes);
 app.use("/api/notifications", notificationsRoutes);
 app.use("/api/follow-ups", followUpRoutes);
 app.use("/api/visits", visitsRoutes);
+app.use("/api/reminders", remindersRoutes);
 
 app.get("/", (req, res) => {
   res.send("API funcionando 🚀");

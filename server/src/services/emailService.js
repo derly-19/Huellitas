@@ -324,4 +324,84 @@ export const sendPasswordResetEmail = async (userData) => {
   return sendEmail(email, `Código de Verificación: ${resetCode} - Huellitas`, htmlContent);
 };
 
+// Plantilla: Recordatorios del carnet de mascota
+export const sendReminderEmail = async (reminderData) => {
+  const { email, username, reminders } = reminderData;
+  
+  // Generar HTML para cada recordatorio
+  const reminderItems = reminders.map(reminder => {
+    let icon = '📌';
+    let color = '#3498db';
+    
+    switch(reminder.type) {
+      case 'vaccine':
+        icon = '💉';
+        color = '#e74c3c';
+        break;
+      case 'deworming':
+        icon = '💊';
+        color = '#9b59b6';
+        break;
+      case 'bath':
+        icon = '🛁';
+        color = '#3498db';
+        break;
+      case 'medication':
+        icon = '💊';
+        color = '#f39c12';
+        break;
+    }
+
+    return `
+      <div style="background-color: #f8f9fa; padding: 15px; border-left: 4px solid ${color}; margin: 10px 0; border-radius: 5px;">
+        <p style="margin: 0; font-size: 18px;">${icon} <strong>${reminder.title}</strong></p>
+        <p style="margin: 5px 0 0 0; color: #555;">${reminder.message}</p>
+        ${reminder.days_before <= 1 ? '<p style="margin: 5px 0 0 0; color: #e74c3c; font-weight: bold;">⚠️ ¡Urgente!</p>' : ''}
+      </div>
+    `;
+  }).join('');
+
+  const htmlContent = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <div style="background-color: #f0f0f0; padding: 20px; text-align: center;">
+        <h1 style="color: #2c3e50; margin: 0;">🐾 Huellitas</h1>
+        <p style="color: #7f8c8d; margin: 5px 0;">Plataforma de Adopción de Mascotas</p>
+      </div>
+      
+      <div style="padding: 30px; background-color: #ffffff;">
+        <h2 style="color: #2c3e50;">🔔 Recordatorios para tus mascotas</h2>
+        
+        <p>Hola <strong>${username}</strong>,</p>
+        
+        <p>Te enviamos los siguientes recordatorios importantes sobre el cuidado de tus mascotas:</p>
+        
+        ${reminderItems}
+        
+        <div style="background-color: #d4edda; padding: 15px; border-radius: 5px; margin: 20px 0;">
+          <p style="margin: 0; color: #155724;">
+            <strong>💡 Consejo:</strong> Mantener al día las vacunas y desparasitaciones de tu mascota 
+            es fundamental para su salud y bienestar. ¡Tu peludo te lo agradecerá!
+          </p>
+        </div>
+        
+        <p style="text-align: center; margin: 25px 0;">
+          <a href="${process.env.APP_URL || 'http://localhost:3000'}/carnet" style="display: inline-block; background-color: #BCC990; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+            Ver Carnet Digital
+          </a>
+        </p>
+        
+        <p style="color: #7f8c8d; font-size: 12px; margin-top: 30px; border-top: 1px solid #ecf0f1; padding-top: 20px;">
+          Este es un email automático de recordatorio. Si no deseas recibir estos recordatorios, 
+          puedes desactivarlos desde la configuración de tu perfil.
+        </p>
+      </div>
+    </div>
+  `;
+
+  const reminderCount = reminders.length;
+  const subject = `🔔 ${reminderCount} recordatorio${reminderCount > 1 ? 's' : ''} para tus mascotas - Huellitas`;
+
+  return sendEmail(email, subject, htmlContent);
+};
+
 export default sendEmail;

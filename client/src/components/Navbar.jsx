@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Home, HeartHandshake, Dog, Cat, FileText, User, Building2, LayoutDashboard, ClipboardList } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import NotificationBell from "./NotificationBell";
+import ReminderBell from "./ReminderBell";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
@@ -108,8 +109,13 @@ export default function Navbar() {
         {isAuthenticated() ? (
           // Usuario autenticado - mostrar saludo y logout
           <>
-            {/* Campana de notificaciones (solo para usuarios normales) */}
-            {!isFoundation() && <NotificationBell />}
+            {/* Campanas de notificaciones y recordatorios (solo para usuarios normales) */}
+            {!isFoundation() && (
+              <div className="flex items-center gap-2">
+                <ReminderBell />
+                <NotificationBell />
+              </div>
+            )}
             
             <div className="flex items-center gap-3">
               <span className="text-[var(--secondary)]">
