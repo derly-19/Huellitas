@@ -127,22 +127,6 @@ export default function FollowUpModal({ followUp, onClose, isFoundation = false,
                   </p>
                 </div>
 
-                {/* Satisfacción */}
-                <div className="bg-yellow-50 rounded-lg p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-2xl">⭐</span>
-                    <h3 className="font-bold text-gray-800">Satisfacción</h3>
-                  </div>
-                  <div className="flex gap-1">
-                    {[...Array(5)].map((_, i) => (
-                      <FaStar
-                        key={i}
-                        className={i < followUp.overall_satisfaction ? 'text-yellow-400' : 'text-gray-300'}
-                      />
-                    ))}
-                  </div>
-                </div>
-
                 {/* Visitas Vet */}
                 <div className="bg-purple-50 rounded-lg p-4">
                   <div className="flex items-center gap-2 mb-2">

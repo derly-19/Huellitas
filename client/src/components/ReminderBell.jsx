@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaBell, FaTimes, FaSyringe, FaPills, FaShower, FaCapsules, FaCheck } from "react-icons/fa";
+import { FaBell, FaTimes, FaSyringe, FaPills, FaShower, FaCapsules, FaCheck, FaClock } from "react-icons/fa";
 import { useAuth } from "../contexts/AuthContext";
 import { Link } from "react-router-dom";
 
@@ -89,7 +89,7 @@ export default function ReminderBell() {
       case "medication":
         return <FaCapsules className="text-yellow-500" />;
       default:
-        return <FaBell className="text-gray-500" />;
+        return <FaClock className="text-gray-500" />;
     }
   };
 
@@ -114,15 +114,15 @@ export default function ReminderBell() {
       {/* Botón campana */}
       <button
         onClick={() => setShowPanel(!showPanel)}
-        className="relative p-2 text-gray-600 hover:text-[#BCC990] transition-colors"
+        className="relative p-2 text-gray-600 hover:text-orange-500 transition-colors"
         title="Recordatorios del carnet"
       >
-        <FaBell className="text-xl" />
+        <FaClock className="text-xl" />
         {unreadCount > 0 && (
           <motion.span
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold"
+            className="absolute -top-1 -right-1 bg-gradient-to-br from-orange-500 to-yellow-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold shadow-lg"
           >
             {unreadCount > 9 ? "9+" : unreadCount}
           </motion.span>
@@ -147,9 +147,9 @@ export default function ReminderBell() {
               className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl z-50 overflow-hidden border border-gray-200"
             >
               {/* Header */}
-              <div className="bg-gradient-to-r from-[#BCC990] to-[#9ab06a] px-4 py-3 flex items-center justify-between">
+              <div className="bg-gradient-to-r from-orange-500 to-yellow-500 px-4 py-3 flex items-center justify-between">
                 <h3 className="font-semibold text-white flex items-center gap-2">
-                  <FaBell />
+                  <FaClock className="animate-pulse" />
                   Recordatorios
                 </h3>
                 <div className="flex items-center gap-2">
@@ -175,9 +175,11 @@ export default function ReminderBell() {
               <div className="max-h-96 overflow-y-auto">
                 {reminders.length === 0 ? (
                   <div className="p-6 text-center text-gray-500">
-                    <FaBell className="text-4xl mx-auto mb-2 text-gray-300" />
-                    <p>No tienes recordatorios pendientes</p>
-                    <p className="text-sm mt-1">
+                    <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                      <FaClock className="text-3xl text-orange-400" />
+                    </div>
+                    <p className="font-semibold text-gray-700">No tienes recordatorios pendientes</p>
+                    <p className="text-sm mt-1 text-gray-500">
                       ¡Tu mascota está al día! 🐾
                     </p>
                   </div>

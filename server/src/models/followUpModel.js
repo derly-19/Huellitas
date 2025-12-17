@@ -16,7 +16,6 @@ export async function createFollowUpTable() {
       feeding_notes TEXT,
       medical_visits INTEGER DEFAULT 0,
       problems_encountered TEXT,
-      overall_satisfaction INTEGER DEFAULT 5, -- 1-5 estrellas
       additional_notes TEXT,
       photos TEXT, -- JSON array de URLs
       reviewed INTEGER DEFAULT 0, -- 0 = no revisado, 1 = revisado
@@ -52,7 +51,6 @@ export async function createFollowUp(followUpData) {
     feeding_notes,
     medical_visits,
     problems_encountered,
-    overall_satisfaction,
     additional_notes,
     photos
   } = followUpData;
@@ -62,8 +60,8 @@ export async function createFollowUp(followUpData) {
       `INSERT INTO follow_ups 
        (adoption_request_id, user_id, pet_id, foundation_id, follow_up_date, 
         health_status, behavior_status, environment_description, feeding_notes, 
-        medical_visits, problems_encountered, overall_satisfaction, additional_notes, photos)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        medical_visits, problems_encountered, additional_notes, photos)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         adoption_request_id,
         user_id,
@@ -76,7 +74,6 @@ export async function createFollowUp(followUpData) {
         feeding_notes,
         medical_visits,
         problems_encountered,
-        overall_satisfaction,
         additional_notes,
         photos ? JSON.stringify(photos) : null
       ]
@@ -156,7 +153,6 @@ export async function updateFollowUp(id, followUpData) {
     feeding_notes,
     medical_visits,
     problems_encountered,
-    overall_satisfaction,
     additional_notes,
     photos
   } = followUpData;
@@ -166,7 +162,7 @@ export async function updateFollowUp(id, followUpData) {
       `UPDATE follow_ups 
        SET health_status = ?, behavior_status = ?, environment_description = ?,
            feeding_notes = ?, medical_visits = ?, problems_encountered = ?,
-           overall_satisfaction = ?, additional_notes = ?, photos = ?,
+           additional_notes = ?, photos = ?,
            updated_at = CURRENT_TIMESTAMP
        WHERE id = ?`,
       [
@@ -176,7 +172,6 @@ export async function updateFollowUp(id, followUpData) {
         feeding_notes,
         medical_visits,
         problems_encountered,
-        overall_satisfaction,
         additional_notes,
         photos ? JSON.stringify(photos) : null,
         id
@@ -252,7 +247,6 @@ export async function getFoundationFollowUpStats(foundationId) {
     const stats = await db.get(
       `SELECT 
         COUNT(*) as total_follow_ups,
-        AVG(overall_satisfaction) as avg_satisfaction,
         SUM(CASE WHEN health_status = 'excelente' THEN 1 ELSE 0 END) as excellent_health,
         SUM(CASE WHEN behavior_status = 'adaptado' THEN 1 ELSE 0 END) as well_adapted,
         SUM(CASE WHEN problems_encountered IS NOT NULL AND TRIM(problems_encountered) != '' THEN 1 ELSE 0 END) as with_problems

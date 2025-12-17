@@ -151,21 +151,9 @@ export default function FollowUpCardFoundation({ followUp, onViewDetail, onMarkR
 
       {/* Contenido expandible */}
       <div className="px-4 pb-3">
-        {/* Satisfacción y fotos en línea */}
+        {/* Fotos */}
         <div className="flex items-center justify-between py-2 border-t border-gray-100">
           <div className="flex items-center gap-3">
-            {/* Estrellas */}
-            <div className="flex items-center gap-1">
-              {[...Array(5)].map((_, i) => (
-                <FaStar
-                  key={i}
-                  size={14}
-                  className={i < followUp.overall_satisfaction ? 'text-yellow-400' : 'text-gray-200'}
-                />
-              ))}
-              <span className="text-xs text-gray-500 ml-1">({followUp.overall_satisfaction}/5)</span>
-            </div>
-            
             {/* Indicador de fotos */}
             {photos.length > 0 && (
               <span className="text-xs text-gray-500 flex items-center gap-1 bg-gray-100 px-2 py-0.5 rounded-full">

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { FaCalendarAlt, FaClock, FaMapMarkerAlt, FaVideo, FaTimes, FaUser, FaLink } from 'react-icons/fa';
+import AlertModal from '../AlertModal';
 
 export default function ScheduleVisitModal({ adoption, onClose, onSchedule, isFoundation = true }) {
   const [formData, setFormData] = useState({
@@ -10,6 +11,7 @@ export default function ScheduleVisitModal({ adoption, onClose, onSchedule, isFo
     notes: ''
   });
   const [loading, setLoading] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
 
   // Obtener fecha mínima (mañana)
   const getMinDate = () => {
@@ -27,7 +29,7 @@ export default function ScheduleVisitModal({ adoption, onClose, onSchedule, isFo
     e.preventDefault();
     
     if (!formData.scheduled_date) {
-      alert('Por favor selecciona una fecha');
+      setShowAlert(true);
       return;
     }
 
@@ -209,6 +211,14 @@ export default function ScheduleVisitModal({ adoption, onClose, onSchedule, isFo
           </div>
         </form>
       </div>
+      
+      <AlertModal
+        isOpen={showAlert}
+        onClose={() => setShowAlert(false)}
+        title="Fecha requerida"
+        message="Por favor selecciona una fecha para la visita"
+        type="warning"
+      />
     </div>
   );
 }

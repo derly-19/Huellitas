@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 import SuccessNotification from "./SuccessNotification";
+import AlertModal from "./AlertModal";
 
 export default function AdoptionFormModal({ isOpen, onClose, pet, user }) {
   const [formData, setFormData] = useState({
@@ -17,6 +18,7 @@ export default function AdoptionFormModal({ isOpen, onClose, pet, user }) {
 
   const [submitting, setSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -64,7 +66,7 @@ export default function AdoptionFormModal({ isOpen, onClose, pet, user }) {
       }, 3000);
     } catch (error) {
       console.error("Error:", error);
-      alert("Hubo un error al enviar la solicitud");
+      setShowAlert(true);
     } finally {
       setSubmitting(false);
     }
@@ -283,6 +285,15 @@ export default function AdoptionFormModal({ isOpen, onClose, pet, user }) {
             isOpen={showSuccess}
             onClose={() => setShowSuccess(false)}
             petName={pet.name}
+          />
+
+          {/* Modal de alerta */}
+          <AlertModal
+            isOpen={showAlert}
+            onClose={() => setShowAlert(false)}
+            title="Error al enviar"
+            message="Hubo un error al enviar la solicitud. Por favor, inténtalo de nuevo."
+            type="error"
           />
         </>
       )}

@@ -15,6 +15,14 @@ export async function createFollowUp(req, res) {
       });
     }
 
+    // Validar que se incluyan fotos
+    if (!req.body.photos || req.body.photos.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Debe incluir al menos una foto de la mascota"
+      });
+    }
+
     const followUpData = {
       adoption_request_id,
       user_id,
@@ -27,7 +35,6 @@ export async function createFollowUp(req, res) {
       feeding_notes: req.body.feeding_notes,
       medical_visits: req.body.medical_visits || 0,
       problems_encountered: req.body.problems_encountered,
-      overall_satisfaction: req.body.overall_satisfaction || 5,
       additional_notes: req.body.additional_notes,
       photos: req.body.photos
     };
@@ -61,7 +68,6 @@ export async function createFollowUp(req, res) {
             <div style="background-color: #e8f5e9; padding: 15px; border-left: 4px solid #4caf50; margin: 20px 0;">
               <p style="margin: 5px 0;"><strong>📅 Fecha:</strong> ${followUpData.follow_up_date}</p>
               <p style="margin: 5px 0;"><strong>🐾 Mascota:</strong> ${req.body.pet_name || 'N/A'}</p>
-              <p style="margin: 5px 0;"><strong>😊 Satisfacción General:</strong> ${followUpData.overall_satisfaction}/5</p>
             </div>
             
             <p>Entra a la plataforma para ver los detalles completos del seguimiento.</p>
@@ -210,6 +216,14 @@ export async function updateFollowUp(req, res) {
       });
     }
 
+    // Validar que se incluyan fotos
+    if (!req.body.photos || req.body.photos.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Debe incluir al menos una foto de la mascota"
+      });
+    }
+
     const followUpData = {
       health_status: req.body.health_status || followUp.health_status,
       behavior_status: req.body.behavior_status || followUp.behavior_status,
@@ -217,7 +231,6 @@ export async function updateFollowUp(req, res) {
       feeding_notes: req.body.feeding_notes,
       medical_visits: req.body.medical_visits,
       problems_encountered: req.body.problems_encountered,
-      overall_satisfaction: req.body.overall_satisfaction,
       additional_notes: req.body.additional_notes,
       photos: req.body.photos
     };
@@ -333,7 +346,6 @@ export async function getFollowUpStats(req, res) {
       success: true,
       data: {
         total_follow_ups: stats.total_follow_ups || 0,
-        avg_satisfaction: (stats.avg_satisfaction || 0).toFixed(1),
         excellent_health: stats.excellent_health || 0,
         well_adapted: stats.well_adapted || 0,
         with_problems: stats.with_problems || 0

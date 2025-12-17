@@ -26,6 +26,7 @@ import ScheduleVisitModal from '../components/FollowUp/ScheduleVisitModal';
 import VisitCard from '../components/FollowUp/VisitCard';
 import FoundationAdoptionsTab from '../components/FollowUp/FoundationAdoptionsTab';
 import Toast from '../components/Toast';
+import ConfirmModal from '../components/ConfirmModal';
 
 export default function FollowUp() {
   const { user, isAuthenticated, isFoundation } = useAuth();
@@ -48,6 +49,7 @@ export default function FollowUp() {
   const [showForm, setShowForm] = useState(false);
   const [selectedPetForFollowUp, setSelectedPetForFollowUp] = useState(null);
   const [showVisitModal, setShowVisitModal] = useState(false);
+  const [confirmConfig, setConfirmConfig] = useState({ isOpen: false, title: '', message: '', onConfirm: null });
   const [selectedPetForVisit, setSelectedPetForVisit] = useState(null);
   const [activeTab, setActiveTab] = useState('pets'); // 'pets', 'followups', 'visits'
   const [toast, setToast] = useState({ isVisible: false, message: '', type: 'success' });
@@ -101,8 +103,6 @@ export default function FollowUp() {
         return dateB - dateA;
       } else if (foundationFilters.sort === 'oldest') {
         return dateA - dateB;
-      } else if (foundationFilters.sort === 'rating') {
-        return (b.overall_satisfaction || 0) - (a.overall_satisfaction || 0);
       }
       return 0;
     });
@@ -322,28 +322,44 @@ export default function FollowUp() {
 
   // Cancelar visita
   const handleCancelVisit = async (visitId) => {
-    if (!confirm('¿Estás seguro de que deseas cancelar esta visita?')) return;
+    setConfirmConfig({
+      isOpen: true,
+      title: 'Cancelar visita',
+      message: '¿Estás seguro de que deseas cancelar esta visita?',
+      onConfirm: async () => {
+        try {
+          const response = await fetch(`http://localhost:4000/api/visits/${visitId}/status`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: 'cancelled' })
+          });
 
-    try {
-      const response = await fetch(`http://localhost:4000/api/visits/${visitId}/status`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'cancelled' })
-      });
+          const result = await response.json();
 
-      const result = await response.json();
-
-      if (result.success) {
-        setToast({
-          isVisible: true,
-          message: '✅ Visita cancelada',
-          type: 'success'
-        });
-        fetchVisits();
+          if (result.success) {
+            setToast({
+              isVisible: true,
+              message: '✅ Visita cancelada',
+              type: 'success'
+            });
+            fetchVisits();
+          } else {
+            setToast({
+              isVisible: true,
+              message: '❌ Error al cancelar visita',
+              type: 'error'
+            });
+          }
+        } catch (err) {
+          console.error('Error cancelling visit:', err);
+          setToast({
+            isVisible: true,
+            message: '❌ Error al cancelar visita',
+            type: 'error'
+          });
+        }
       }
-    } catch (err) {
-      console.error('Error cancelling visit:', err);
-    }
+    });
   };
 
   // Completar visita (fundación)
@@ -433,27 +449,43 @@ export default function FollowUp() {
 
   // Eliminar seguimiento
   const handleDeleteFollowUp = async (followUpId) => {
-    if (!confirm('¿Estás seguro de que deseas eliminar este seguimiento?')) return;
+    setConfirmConfig({
+      isOpen: true,
+      title: 'Eliminar seguimiento',
+      message: '¿Estás seguro de que deseas eliminar este seguimiento? Esta acción no se puede deshacer.',
+      onConfirm: async () => {
+        try {
+          const response = await fetch(`http://localhost:4000/api/follow-ups/${followUpId}`, {
+            method: 'DELETE'
+          });
 
-    try {
-      const response = await fetch(`http://localhost:4000/api/follow-ups/${followUpId}`, {
-        method: 'DELETE'
-      });
+          const result = await response.json();
 
-      const result = await response.json();
-
-      if (result.success) {
-        setToast({
-          isVisible: true,
-          message: '✅ Seguimiento eliminado',
-          type: 'success'
-        });
-        setTimeout(() => setToast({ ...toast, isVisible: false }), 3000);
-        fetchFollowUps();
+          if (result.success) {
+            setToast({
+              isVisible: true,
+              message: '✅ Seguimiento eliminado',
+              type: 'success'
+            });
+            setTimeout(() => setToast({ ...toast, isVisible: false }), 3000);
+            fetchFollowUps();
+          } else {
+            setToast({
+              isVisible: true,
+              message: '❌ Error al eliminar seguimiento',
+              type: 'error'
+            });
+          }
+        } catch (err) {
+          console.error('Error deleting follow-up:', err);
+          setToast({
+            isVisible: true,
+            message: '❌ Error al eliminar seguimiento',
+            type: 'error'
+          });
+        }
       }
-    } catch (err) {
-      console.error('Error deleting follow-up:', err);
-    }
+    });
   };
 
   // Contar seguimientos por mascota
@@ -1114,6 +1146,15 @@ export default function FollowUp() {
         onClose={() => setToast({ ...toast, isVisible: false })}
         message={toast.message}
         type={toast.type}
+      />
+
+      {/* Modal de confirmación */}
+      <ConfirmModal
+        isOpen={confirmConfig.isOpen}
+        onClose={() => setConfirmConfig({ ...confirmConfig, isOpen: false })}
+        onConfirm={confirmConfig.onConfirm}
+        title={confirmConfig.title}
+        message={confirmConfig.message}
       />
     </div>
   );

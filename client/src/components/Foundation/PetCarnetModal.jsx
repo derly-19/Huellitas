@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import AlertModal from '../AlertModal';
+import ConfirmModal from '../ConfirmModal';
 
 const PetCarnetModal = ({ pet, onClose }) => {
   const [carnetData, setCarnetData] = useState({
@@ -13,6 +15,8 @@ const PetCarnetModal = ({ pet, onClose }) => {
   const [activeTab, setActiveTab] = useState('solicitudes');
   const [showAddModal, setShowAddModal] = useState(false);
   const [updatingStatus, setUpdatingStatus] = useState(false);
+  const [alertConfig, setAlertConfig] = useState({ isOpen: false, title: '', message: '', type: 'info' });
+  const [confirmConfig, setConfirmConfig] = useState({ isOpen: false, title: '', message: '', onConfirm: null });
 
   useEffect(() => {
     fetchCarnetData();
@@ -55,49 +59,79 @@ const PetCarnetModal = ({ pet, onClose }) => {
   };
 
   const handleDelete = async (recordId, tipo) => {
-    if (!confirm('¿Estás seguro de eliminar este registro?')) return;
+    setConfirmConfig({
+      isOpen: true,
+      title: 'Confirmar eliminación',
+      message: '¿Estás seguro de eliminar este registro? Esta acción no se puede deshacer.',
+      onConfirm: async () => {
+        try {
+          const response = await fetch(`http://localhost:4000/api/carnet/${pet.id}/${tipo}/${recordId}`, {
+            method: 'DELETE'
+          });
+          const result = await response.json();
 
-    try {
-      const response = await fetch(`http://localhost:4000/api/carnet/${pet.id}/${tipo}/${recordId}`, {
-        method: 'DELETE'
-      });
-      const result = await response.json();
-
-      if (result.success) {
-        fetchCarnetData();
-      } else {
-        alert('Error al eliminar el registro');
+          if (result.success) {
+            fetchCarnetData();
+          } else {
+            setAlertConfig({
+              isOpen: true,
+              title: 'Error',
+              message: 'Error al eliminar el registro',
+              type: 'error'
+            });
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          setAlertConfig({
+            isOpen: true,
+            title: 'Error',
+            message: 'Error al eliminar el registro',
+            type: 'error'
+          });
+        }
       }
-    } catch (error) {
-      console.error('Error:', error);
-      alert('Error al eliminar el registro');
-    }
+    });
   };
 
   const handleUpdateRequestStatus = async (requestId, newStatus) => {
-    if (!confirm(`¿Cambiar estado a "${newStatus}"?`)) return;
+    setConfirmConfig({
+      isOpen: true,
+      title: 'Confirmar cambio de estado',
+      message: `¿Cambiar estado a "${newStatus}"?`,
+      onConfirm: async () => {
+        setUpdatingStatus(true);
+        try {
+          const response = await fetch(`http://localhost:4000/api/adoption-requests/${requestId}/status`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: newStatus })
+          });
 
-    setUpdatingStatus(true);
-    try {
-      const response = await fetch(`http://localhost:4000/api/adoption-requests/${requestId}/status`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: newStatus })
-      });
+          const result = await response.json();
 
-      const result = await response.json();
-
-      if (result.success) {
-        await fetchAdoptionRequests();
-      } else {
-        alert('Error al actualizar el estado');
+          if (result.success) {
+            await fetchAdoptionRequests();
+          } else {
+            setAlertConfig({
+              isOpen: true,
+              title: 'Error',
+              message: 'Error al actualizar el estado',
+              type: 'error'
+            });
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          setAlertConfig({
+            isOpen: true,
+            title: 'Error',
+            message: 'Error al actualizar el estado',
+            type: 'error'
+          });
+        } finally {
+          setUpdatingStatus(false);
+        }
       }
-    } catch (error) {
-      console.error('Error:', error);
-      alert('Error al actualizar el estado');
-    } finally {
-      setUpdatingStatus(false);
-    }
+    });
   };
 
   const tabs = [
@@ -436,6 +470,24 @@ const PetCarnetModal = ({ pet, onClose }) => {
           }}
         />
       )}
+
+      {/* Modal de alerta */}
+      <AlertModal
+        isOpen={alertConfig.isOpen}
+        onClose={() => setAlertConfig({ ...alertConfig, isOpen: false })}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        type={alertConfig.type}
+      />
+
+      {/* Modal de confirmación */}
+      <ConfirmModal
+        isOpen={confirmConfig.isOpen}
+        onClose={() => setConfirmConfig({ ...confirmConfig, isOpen: false })}
+        onConfirm={confirmConfig.onConfirm}
+        title={confirmConfig.title}
+        message={confirmConfig.message}
+      />
     </div>
   );
 };
@@ -446,6 +498,8 @@ const AddRecordModal = ({ petId, tipo, onClose, onSuccess }) => {
     fecha: new Date().toISOString().split('T')[0]
   });
   const [saving, setSaving] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -463,11 +517,13 @@ const AddRecordModal = ({ petId, tipo, onClose, onSuccess }) => {
       if (result.success) {
         onSuccess();
       } else {
-        alert(result.message || 'Error al guardar el registro');
+        setAlertMessage(result.message || 'Error al guardar el registro');
+        setShowAlert(true);
       }
     } catch (error) {
       console.error('Error:', error);
-      alert('Error al guardar el registro');
+      setAlertMessage('Error al guardar el registro');
+      setShowAlert(true);
     } finally {
       setSaving(false);
     }
@@ -680,6 +736,14 @@ const AddRecordModal = ({ petId, tipo, onClose, onSuccess }) => {
           </div>
         </form>
       </div>
+      
+      <AlertModal
+        isOpen={showAlert}
+        onClose={() => setShowAlert(false)}
+        title="Error al guardar"
+        message={alertMessage}
+        type="error"
+      />
     </div>
   );
 };

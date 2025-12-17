@@ -122,11 +122,11 @@ export default function NotificationBell() {
       {/* Botón de campana */}
       <button
         onClick={() => setShowPanel(!showPanel)}
-        className="relative p-2 text-gray-700 hover:text-[#BCC990] transition-colors"
+        className="relative p-2 text-gray-700 hover:text-blue-600 transition-colors"
       >
         <FaBell className="text-2xl" />
         {unreadCount > 0 && (
-          <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
+          <span className="absolute top-0 right-0 bg-gradient-to-br from-blue-500 to-blue-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold shadow-lg">
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}
@@ -150,12 +150,15 @@ export default function NotificationBell() {
               className="absolute right-0 mt-2 w-96 bg-white rounded-lg shadow-xl border border-gray-200 z-50 max-h-[600px] flex flex-col"
             >
               {/* Header */}
-              <div className="p-4 border-b border-gray-200">
+              <div className="bg-gradient-to-r from-blue-600 to-[#BCC990] px-4 py-3 border-b border-blue-200">
                 <div className="flex items-center justify-between mb-2">
-                  <h3 className="font-bold text-lg text-gray-800">Notificaciones</h3>
+                  <h3 className="font-bold text-lg text-white flex items-center gap-2">
+                    <FaBell />
+                    Notificaciones
+                  </h3>
                   <button
                     onClick={() => setShowPanel(false)}
-                    className="text-gray-400 hover:text-gray-600"
+                    className="text-white/80 hover:text-white transition"
                   >
                     <FaTimes />
                   </button>
@@ -164,7 +167,7 @@ export default function NotificationBell() {
                   <button
                     onClick={markAllAsRead}
                     disabled={loading}
-                    className="text-sm text-[#BCC990] hover:underline disabled:opacity-50"
+                    className="text-sm text-white/90 hover:text-white hover:underline disabled:opacity-50 transition"
                   >
                     Marcar todas como leídas
                   </button>
@@ -175,8 +178,11 @@ export default function NotificationBell() {
               <div className="overflow-y-auto flex-1">
                 {notifications.length === 0 ? (
                   <div className="p-8 text-center text-gray-500">
-                    <FaBell className="text-4xl mx-auto mb-2 opacity-30" />
-                    <p>No tienes notificaciones</p>
+                    <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                      <FaBell className="text-3xl text-blue-400" />
+                    </div>
+                    <p className="font-semibold text-gray-700">No tienes notificaciones</p>
+                    <p className="text-sm mt-1 text-gray-500">¡Todo listo! 🎉</p>
                   </div>
                 ) : (
                   <div className="divide-y divide-gray-100">

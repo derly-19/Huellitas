@@ -6,6 +6,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { FileText, Heart } from "lucide-react";
 import SuccessNotification from "../components/SuccessNotification";
 import CarnetCard from "../components/Carnet/CarnetCard";
+import AlertModal from "../components/AlertModal";
 
 export default function Formulario() {
   const { petId } = useParams();
@@ -18,6 +19,9 @@ export default function Formulario() {
   // Estados para el carnet
   const [carnetData, setCarnetData] = useState(null);
   const [loadingCarnet, setLoadingCarnet] = useState(false);
+  
+  // Estados para alertas
+  const [alertConfig, setAlertConfig] = useState({ isOpen: false, title: '', message: '', type: 'info' });
   
   // Estados para el formulario
   const [formData, setFormData] = useState({
@@ -191,7 +195,12 @@ export default function Formulario() {
       if (!formData.nombre || !formData.apellido || !formData.correo || 
           !formData.telefono || !formData.direccion || !formData.tipoVivienda || 
           !formData.motivacion) {
-        alert('Por favor completa todos los campos requeridos');
+        setAlertConfig({
+          isOpen: true,
+          title: 'Campos incompletos',
+          message: 'Por favor completa todos los campos requeridos',
+          type: 'warning'
+        });
         setSubmitting(false);
         return;
       }
@@ -238,12 +247,22 @@ export default function Formulario() {
         setShowSuccessNotification(true);
       } else {
         console.error('Error del servidor:', result);
-        alert(result.message || 'Error al enviar la solicitud');
+        setAlertConfig({
+          isOpen: true,
+          title: 'Error al enviar',
+          message: result.message || 'Error al enviar la solicitud',
+          type: 'error'
+        });
       }
       
     } catch (error) {
       console.error('Error enviando formulario:', error);
-      alert('Error de conexión. Verifica que el servidor esté funcionando.');
+      setAlertConfig({
+        isOpen: true,
+        title: 'Error de conexión',
+        message: 'Error de conexión. Verifica que el servidor esté funcionando.',
+        type: 'error'
+      });
     } finally {
       setSubmitting(false);
     }
@@ -557,6 +576,15 @@ export default function Formulario() {
         isVisible={showSuccessNotification}
         onClose={handleSuccessClose}
         petName={mascota?.name || 'la mascota'}
+      />
+
+      {/* Modal de alerta */}
+      <AlertModal
+        isOpen={alertConfig.isOpen}
+        onClose={() => setAlertConfig({ ...alertConfig, isOpen: false })}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        type={alertConfig.type}
       />
     </div>
   );

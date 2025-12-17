@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 export default function FollowUpFilters({ followUps, onFilterChange, activeFilters, stats }) {
   const [showFilters, setShowFilters] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortOrder, setSortOrder] = useState('newest'); // 'newest', 'oldest', 'rating'
+  const [sortOrder, setSortOrder] = useState('newest'); // 'newest', 'oldest'
 
   // Calcular conteos para los filtros
   const filterCounts = useMemo(() => {

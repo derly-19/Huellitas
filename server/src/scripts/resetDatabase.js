@@ -38,7 +38,6 @@ const createTableSQL = `
     feeding_notes TEXT,
     medical_visits INTEGER DEFAULT 0,
     problems_encountered TEXT,
-    overall_satisfaction INTEGER DEFAULT 5,
     additional_notes TEXT,
     photos TEXT,
     reviewed INTEGER DEFAULT 0,

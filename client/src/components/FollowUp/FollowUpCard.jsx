@@ -78,20 +78,6 @@ export default function FollowUpCard({ followUp, onViewDetail, onEdit, onDelete,
           </span>
         </div>
 
-        {/* Satisfacción */}
-        <div className="flex items-center gap-1 mb-3">
-          {[...Array(5)].map((_, i) => (
-            <FaStar
-              key={i}
-              size={14}
-              className={i < followUp.overall_satisfaction ? 'text-yellow-400' : 'text-gray-300'}
-            />
-          ))}
-          <span className="text-sm text-gray-600 ml-2">
-            ({followUp.overall_satisfaction}/5)
-          </span>
-        </div>
-
         {/* Información */}
         {followUp.problems_encountered && (
           <div className="bg-red-50 border-l-2 border-red-300 p-2 mb-3 rounded text-xs text-red-700">

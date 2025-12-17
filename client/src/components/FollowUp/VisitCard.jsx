@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { FaCalendarAlt, FaClock, FaMapMarkerAlt, FaVideo, FaCheck, FaTimes, FaExchangeAlt, FaExternalLinkAlt, FaRedo } from 'react-icons/fa';
+import AlertModal from '../AlertModal';
 
 const getImageUrl = (imgPath) => {
   if (!imgPath) return '/public/icon.png';
@@ -28,6 +29,7 @@ export default function VisitCard({ visit, isFoundation = false, onAccept, onCan
   const [suggestedTime, setSuggestedTime] = useState('');
   const [suggestReason, setSuggestReason] = useState('');
   const [newMeetingLink, setNewMeetingLink] = useState(visit.meeting_link || '');
+  const [showAlert, setShowAlert] = useState(false);
 
   const config = statusConfig[visit.status] || statusConfig.scheduled;
   const StatusIcon = config.icon;
@@ -75,7 +77,7 @@ export default function VisitCard({ visit, isFoundation = false, onAccept, onCan
 
   const handleSuggestSubmit = () => {
     if (!suggestedDate) {
-      alert('Por favor selecciona una fecha');
+      setShowAlert(true);
       return;
     }
     onSuggestReschedule?.(visit.id, suggestedDate, suggestedTime, suggestReason);
@@ -84,7 +86,7 @@ export default function VisitCard({ visit, isFoundation = false, onAccept, onCan
 
   const handleFoundationReschedule = () => {
     if (!suggestedDate) {
-      alert('Por favor selecciona una fecha');
+      setShowAlert(true);
       return;
     }
     onReschedule?.(visit.id, suggestedDate, suggestedTime, visit.visit_type === 'virtual' ? newMeetingLink : null);
@@ -367,6 +369,14 @@ export default function VisitCard({ visit, isFoundation = false, onAccept, onCan
           </div>
         </div>
       </div>
+      
+      <AlertModal
+        isOpen={showAlert}
+        onClose={() => setShowAlert(false)}
+        title="Fecha requerida"
+        message="Por favor selecciona una fecha para reprogramar la visita"
+        type="warning"
+      />
     </div>
   );
 }

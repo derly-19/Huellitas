@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { FaStar, FaCamera } from 'react-icons/fa';
+import AlertModal from '../AlertModal';
 
 export default function FollowUpForm({ petName, onSubmit, initialData = null, isLoading = false }) {
   const [formData, setFormData] = useState(initialData || {
@@ -9,12 +10,12 @@ export default function FollowUpForm({ petName, onSubmit, initialData = null, is
     feeding_notes: '',
     medical_visits: 0,
     problems_encountered: '',
-    overall_satisfaction: 5,
     additional_notes: '',
     photos: []
   });
 
   const [photoPreview, setPhotoPreview] = useState(initialData?.photos || []);
+  const [showAlert, setShowAlert] = useState(false);
 
   const handleChange = (e) => {
     const { name, value, type } = e.target;
@@ -49,11 +50,27 @@ export default function FollowUpForm({ petName, onSubmit, initialData = null, is
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    
+    // Validar que haya al menos una foto
+    if (!formData.photos || formData.photos.length === 0) {
+      setShowAlert(true);
+      return;
+    }
+    
     onSubmit(formData);
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-lg p-6 space-y-6">
+    <>
+      <AlertModal
+        isOpen={showAlert}
+        onClose={() => setShowAlert(false)}
+        title="Foto requerida"
+        message="Por favor, agrega al menos una foto de tu mascota antes de guardar el seguimiento."
+        type="warning"
+      />
+      
+      <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-lg p-6 space-y-6">
       <h2 className="text-2xl font-bold text-gray-800 mb-6">
         Seguimiento de {petName}
       </h2>
@@ -154,32 +171,6 @@ export default function FollowUpForm({ petName, onSubmit, initialData = null, is
         />
       </div>
 
-      {/* Satisfacción */}
-      <div className="bg-yellow-50 rounded-lg p-4">
-        <label className="block text-sm font-bold text-gray-700 mb-3">
-          ⭐ Satisfacción General
-        </label>
-        <div className="flex gap-2">
-          {[1, 2, 3, 4, 5].map((star) => (
-            <button
-              key={star}
-              type="button"
-              onClick={() => setFormData(prev => ({ ...prev, overall_satisfaction: star }))}
-              className={`p-2 rounded-lg transition ${
-                formData.overall_satisfaction >= star
-                  ? 'bg-yellow-400 text-white'
-                  : 'bg-gray-200 text-gray-500'
-              }`}
-            >
-              <FaStar size={24} />
-            </button>
-          ))}
-        </div>
-        <p className="text-sm text-gray-600 mt-2">
-          {formData.overall_satisfaction} de 5 estrellas
-        </p>
-      </div>
-
       {/* Notas Adicionales */}
       <div>
         <label className="block text-sm font-bold text-gray-700 mb-2">
@@ -198,9 +189,10 @@ export default function FollowUpForm({ petName, onSubmit, initialData = null, is
       {/* Fotos */}
       <div className="bg-purple-50 rounded-lg p-4">
         <label className="block text-sm font-bold text-gray-700 mb-3">
-          📸 Fotos de tu Mascota
+          📸 Fotos de tu Mascota <span className="text-red-500">*</span>
+          <span className="text-xs font-normal text-gray-600 ml-2">(Al menos una foto es requerida)</span>
         </label>
-        <div className="flex items-center justify-center border-2 border-dashed border-purple-300 rounded-lg p-6">
+        <div className={`flex items-center justify-center border-2 border-dashed rounded-lg p-6 ${photoPreview.length === 0 ? 'border-red-300 bg-red-50' : 'border-purple-300'}`}>
           <input
             type="file"
             multiple
@@ -252,5 +244,6 @@ export default function FollowUpForm({ petName, onSubmit, initialData = null, is
         </button>
       </div>
     </form>
+    </>
   );
 }
