@@ -242,33 +242,74 @@ export const sendPasswordChangeEmail = async (userData) => {
   const { email, username, changeDate } = userData;
   
   const htmlContent = `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-      <div style="background-color: #f0f0f0; padding: 20px; text-align: center;">
-        <h1 style="color: #2c3e50; margin: 0;">🐾 Huellitas</h1>
-        <p style="color: #7f8c8d; margin: 5px 0;">Plataforma de Adopción de Mascotas</p>
+    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f5f5f5;">
+      <!-- Header con gradiente -->
+      <div style="background: linear-gradient(135deg, #BCC990 0%, #8FA875 100%); padding: 40px 20px; text-align: center; border-radius: 10px 10px 0 0;">
+        <div style="background-color: white; width: 80px; height: 80px; margin: 0 auto 15px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+          <span style="font-size: 40px;">🔒</span>
+        </div>
+        <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 600;">🐾 Huellitas</h1>
+        <p style="color: rgba(255,255,255,0.95); margin: 8px 0 0 0; font-size: 14px; font-weight: 300;">Plataforma de Adopción de Mascotas</p>
       </div>
       
-      <div style="padding: 30px; background-color: #ffffff;">
-        <h2 style="color: #2c3e50;">🔒 Tu contraseña ha sido cambiada</h2>
-        
-        <p>Hola <strong>${username}</strong>,</p>
-        
-        <p>Confirmamos que tu contraseña ha sido cambiada exitosamente.</p>
-        
-        <div style="background-color: #fff3cd; padding: 15px; border-left: 4px solid #ffc107; margin: 20px 0;">
-          <p style="margin: 5px 0;"><strong>⏰ Fecha y hora:</strong> ${changeDate}</p>
-          <p style="margin: 5px 0;"><strong>📧 Cuenta:</strong> ${email}</p>
+      <!-- Contenido principal -->
+      <div style="padding: 40px 30px; background-color: #ffffff; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+        <div style="text-align: center; margin-bottom: 30px;">
+          <h2 style="color: #2c3e50; margin: 0 0 10px 0; font-size: 24px; font-weight: 600;">Tu contraseña ha sido cambiada</h2>
+          <p style="color: #7f8c8d; margin: 0; font-size: 16px;">Confirmación de seguridad</p>
         </div>
         
-        <p style="color: #e74c3c; font-weight: bold;">⚠️ Si no realizaste este cambio, contacta con nosotros inmediatamente.</p>
+        <p style="color: #555; line-height: 1.6; font-size: 15px;">Hola <strong style="color: #2c3e50;">${username}</strong>,</p>
         
-        <p>Tu cuenta está protegida y solo tú tienes acceso a tu contraseña. 
-        Por tu seguridad, no compartas tu contraseña con nadie.</p>
+        <p style="color: #555; line-height: 1.6; font-size: 15px;">Confirmamos que tu contraseña ha sido cambiada exitosamente.</p>
         
-        <p style="color: #7f8c8d; font-size: 12px; margin-top: 30px; border-top: 1px solid #ecf0f1; padding-top: 20px;">
-          Este es un email de seguridad automático, por favor no responder. 
+        <!-- Información de la cuenta con diseño mejorado -->
+        <div style="background: linear-gradient(135deg, #fff9e6 0%, #fff3d4 100%); padding: 20px; border-radius: 10px; margin: 25px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+          <div style="display: flex; align-items: center; margin-bottom: 12px;">
+            <span style="font-size: 24px; margin-right: 12px;">⏰</span>
+            <div>
+              <p style="margin: 0; color: #856404; font-size: 13px; font-weight: 600;">Fecha y hora:</p>
+              <p style="margin: 3px 0 0 0; color: #2c3e50; font-size: 15px; font-weight: 500;">${changeDate}</p>
+            </div>
+          </div>
+          <div style="display: flex; align-items: center;">
+            <span style="font-size: 24px; margin-right: 12px;">📧</span>
+            <div>
+              <p style="margin: 0; color: #856404; font-size: 13px; font-weight: 600;">Cuenta:</p>
+              <p style="margin: 3px 0 0 0; color: #2c3e50; font-size: 15px; font-weight: 500;">${email}</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Alerta de seguridad -->
+        <div style="background-color: #ffe6e6; border-left: 4px solid #e74c3c; padding: 18px; border-radius: 5px; margin: 25px 0;">
+          <p style="margin: 0; color: #c0392b; font-weight: 600; font-size: 15px;">
+            <span style="font-size: 20px; margin-right: 8px;">⚠️</span>
+            Si no realizaste este cambio, contacta con nosotros inmediatamente.
+          </p>
+        </div>
+        
+        <div style="background-color: #f8f9fa; padding: 18px; border-radius: 8px; margin: 25px 0; border: 1px solid #e9ecef;">
+          <p style="margin: 0; color: #555; line-height: 1.7; font-size: 14px;">
+            <strong style="color: #2c3e50;">🛡️ Tu cuenta está protegida:</strong><br>
+            Solo tú tienes acceso a tu contraseña. Por tu seguridad, no compartas tu contraseña con nadie.
+          </p>
+        </div>
+      </div>
+      
+      <!-- Footer -->
+      <div style="background-color: #2c3e50; padding: 25px 30px; border-radius: 0 0 10px 10px; text-align: center;">
+        <p style="color: #ecf0f1; font-size: 13px; margin: 0 0 8px 0; line-height: 1.6;">
+          Este es un email de seguridad automático, por favor no responder.
+        </p>
+        <p style="color: #95a5a6; font-size: 12px; margin: 0; line-height: 1.5;">
           Si tienes preguntas, contacta directamente a través de la plataforma.
         </p>
+        <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #34495e;">
+          <p style="color: #95a5a6; font-size: 12px; margin: 0;">
+            © 2025 Huellitas - Plataforma de Adopción de Mascotas
+          </p>
+        </div>
       </div>
     </div>
   `;

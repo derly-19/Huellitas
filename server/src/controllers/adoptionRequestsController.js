@@ -272,37 +272,46 @@ export const updateRequestStatus = async (req, res) => {
             pet_name: request.pet_name,
             email_address: request.correo
           });
-          console.log(`📧 Notificación enviada a usuario ${request.user_id}`);
+          console.log(`📧 Notificación creada para usuario ${request.user_id}`);
           
           // Enviar email también
+          console.log(`📬 Preparando envío de email para status: ${status} a ${request.correo}`);
+          
           if (status === 'approved') {
-            await sendAdoptionApprovedEmail({
+            console.log('✉️ Enviando email de aprobación...');
+            const emailResult = await sendAdoptionApprovedEmail({
               adoptedByEmail: request.correo,
               adoptedByName: request.nombre,
               petName: request.pet_name,
               foundationName: request.foundation_name,
               appUrl: process.env.APP_URL || 'http://localhost:3000'
             });
+            console.log('✅ Email de aprobación enviado:', emailResult);
           } else if (status === 'rejected') {
-            await sendAdoptionRejectedEmail({
+            console.log('✉️ Enviando email de rechazo...');
+            const emailResult = await sendAdoptionRejectedEmail({
               adoptedByEmail: request.correo,
               adoptedByName: request.nombre,
               petName: request.pet_name,
               foundationName: request.foundation_name,
               reason: notes || null
             });
+            console.log('✅ Email de rechazo enviado:', emailResult);
           } else if (status === 'contacted') {
-            await sendContactedNotificationEmail({
+            console.log('✉️ Enviando email de contacto...');
+            const emailResult = await sendContactedNotificationEmail({
               adoptedByEmail: request.correo,
               adoptedByName: request.nombre,
               petName: request.pet_name,
               foundationName: request.foundation_name,
               message: notes || null
             });
+            console.log('✅ Email de contacto enviado:', emailResult);
           }
           
         } catch (notifError) {
-          console.error('Error creando notificación o enviando email:', notifError);
+          console.error('❌ Error creando notificación o enviando email:', notifError);
+          console.error('❌ Stack trace completo:', notifError.stack);
           // No fallar la operación si falla la notificación
         }
       }

@@ -148,7 +148,7 @@ const PetCarnetModal = ({ pet, onClose }) => {
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
-                      <h4 className="font-bold text-gray-800">{request.user_name}</h4>
+                      <h4 className="font-bold text-gray-800">{request.nombre && request.apellido ? `${request.nombre} ${request.apellido}` : request.user_name}</h4>
                       <span className={`px-3 py-1 rounded-full text-xs font-semibold bg-${config.color}-100 text-${config.color}-800`}>
                         {config.emoji} {config.label}
                       </span>
@@ -156,11 +156,11 @@ const PetCarnetModal = ({ pet, onClose }) => {
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div>
                         <span className="text-gray-500">Email:</span>
-                        <p className="font-medium">{request.user_email}</p>
+                        <p className="font-medium">{request.correo || request.user_email || 'No proporcionado'}</p>
                       </div>
                       <div>
                         <span className="text-gray-500">Teléfono:</span>
-                        <p className="font-medium">{request.phone || 'No proporcionado'}</p>
+                        <p className="font-medium">{request.telefono || request.phone || 'No proporcionado'}</p>
                       </div>
                       <div>
                         <span className="text-gray-500">Fecha de solicitud:</span>
