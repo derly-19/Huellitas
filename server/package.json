@@ -5,7 +5,10 @@
   "type": "module",
   "scripts": {
     "start": "node src/server.js",
-    "dev": "nodemon src/server.js"
+    "dev": "nodemon src/server.js",
+    "test:reminders:create": "node src/scripts/createTestReminders.js",
+    "test:reminders:check": "node src/scripts/checkReminders.js",
+    "test:reminders:clean": "node src/scripts/cleanTestData.js"
   },
   "test": {
     "test": "echo \"Error: no test specified\" && exit 1"

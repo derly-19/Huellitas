@@ -86,7 +86,7 @@ export default function Navbar() {
         transition={{ duration: 0.6 }}
       >
         <img src="/logo.png" alt="logo" className="w-10 h-10" />
-        <h1 className="font-bold text-lg">Huellitas</h1>
+        <h1 className="font-bold text-lg">Huellitas con amor</h1>
       </motion.div>
 
       {/* Links en desktop */}

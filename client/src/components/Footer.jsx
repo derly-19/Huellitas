@@ -1,5 +1,5 @@
 import React from "react";
-import { FaFacebook, FaInstagram, FaTwitter } from "react-icons/fa";
+import { FaFacebook, FaInstagram } from "react-icons/fa";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 
@@ -47,7 +47,7 @@ export default function Footer() {
           whileInView={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6 }}
         >
-          Huellitas 🐾
+          Huellitas con amor 🐾
         </motion.p>
 
         {/* Redes sociales */}
@@ -60,7 +60,6 @@ export default function Footer() {
           {[
             { Icon: FaFacebook, label: "Facebook" },
             { Icon: FaInstagram, label: "Instagram" },
-            { Icon: FaTwitter, label: "Twitter" },
           ].map(({ Icon, label }) => (
             <motion.a
               key={label}
@@ -98,7 +97,7 @@ export default function Footer() {
           whileInView={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.5 }}
         >
-          © {new Date().getFullYear()} Huellitas
+          © {new Date().getFullYear()} Huellitas con amor
         </motion.p>
       </div>
     </motion.footer>
