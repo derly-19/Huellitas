@@ -10,6 +10,9 @@ router.post("/", AdoptionRequestsController.createRequest);
 // Obtener estadísticas de solicitudes de una fundación (debe ir antes de /foundation/:foundationId)
 router.get("/foundation/:foundationId/stats", AdoptionRequestsController.getFoundationRequestStats);
 
+// Obtener mascotas adoptadas por un usuario
+router.get("/user/:userId/adopted", AdoptionRequestsController.getUserAdoptedPets);
+
 // Obtener solicitudes de una fundación
 router.get("/foundation/:foundationId", AdoptionRequestsController.getFoundationRequests);
 

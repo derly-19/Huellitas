@@ -12,6 +12,8 @@ export default function Perfil() {
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [adoptedPets, setAdoptedPets] = useState([]);
+  const [loadingPets, setLoadingPets] = useState(true);
   const [formData, setFormData] = useState({
     nombre: "",
     apellido: "",
@@ -30,8 +32,31 @@ export default function Perfil() {
         direccion: user.direccion || "",
         ciudad: user.ciudad || ""
       });
+      if (user.id) {
+        fetchAdoptedPets();
+      }
     }
   }, [user]);
+
+  // Obtener mascotas adoptadas
+  const fetchAdoptedPets = async () => {
+    try {
+      console.log('🔍 Buscando mascotas adoptadas para usuario:', user.id);
+      const response = await fetch(`http://localhost:4000/api/adoption-requests/user/${user.id}/adopted`);
+      const result = await response.json();
+      
+      console.log('📦 Resultado de mascotas adoptadas:', result);
+      
+      if (result.success) {
+        setAdoptedPets(result.data || []);
+        console.log('✅ Mascotas adoptadas cargadas:', result.data.length);
+      }
+    } catch (error) {
+      console.error('Error al cargar mascotas adoptadas:', error);
+    } finally {
+      setLoadingPets(false);
+    }
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -128,7 +153,7 @@ export default function Perfil() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#FFFCF4] to-[#EDE4D6] py-12 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-[#FFFCF4] to-[#EDE4D6] py-12 px-4 pt-32">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="bg-white rounded-2xl shadow-lg overflow-hidden mb-6">
@@ -314,51 +339,61 @@ export default function Perfil() {
           </div>
         </div>
 
-        {/* Información adicional */}
-        <div className="grid md:grid-cols-2 gap-6">
-          {/* Información de cuenta */}
-          <div className="bg-white rounded-xl shadow-md p-6">
-            <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-              <FaCalendar className="text-green-600" /> Información de Cuenta
-            </h2>
-            <div className="space-y-3 text-sm">
-              <div className="flex justify-between">
-                <span className="text-gray-600">Tipo de cuenta:</span>
-                <span className="font-semibold text-gray-800">
-                  {user.user_type === 'foundation' ? 'Fundación' : 'Usuario'}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Fecha de registro:</span>
-                <span className="font-semibold text-gray-800">
-                  {user.created_at ? new Date(user.created_at).toLocaleDateString('es-ES') : 'N/A'}
-                </span>
-              </div>
+        {/* Mis mascotas adoptadas */}
+        <div className="bg-white rounded-xl shadow-md p-6">
+          <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+            <FaPaw className="text-green-600" /> Mis Mascotas
+          </h2>
+          
+          {loadingPets ? (
+            <div className="text-center py-8">
+              <p className="text-gray-500">Cargando mascotas...</p>
             </div>
-          </div>
-
-          {/* Mis mascotas adoptadas */}
-          <div className="bg-white rounded-xl shadow-md p-6">
-            <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-              <FaPaw className="text-green-600" /> Mis Mascotas
-            </h2>
+          ) : adoptedPets.length === 0 ? (
             <div className="text-center py-8">
               <FaPaw className="text-6xl text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-500">
-                {localStorage.getItem('hasAdoptedPet') === 'true' 
-                  ? 'Tienes mascotas adoptadas. Revisa tu carnet.'
-                  : 'Aún no has adoptado ninguna mascota'}
-              </p>
-              {localStorage.getItem('hasAdoptedPet') === 'true' && (
-                <button
-                  onClick={() => navigate('/carnet')}
-                  className="mt-4 bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700"
-                >
-                  Ver Carnet
-                </button>
-              )}
+              <p className="text-gray-500">Aún no has adoptado ninguna mascota</p>
+              <button
+                onClick={() => navigate('/perros')}
+                className="mt-4 bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700"
+              >
+                Ver Mascotas en Adopción
+              </button>
             </div>
-          </div>
+          ) : (
+            <div className="space-y-4">
+              {adoptedPets.map((pet) => (
+                <div 
+                  key={pet.id} 
+                  className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
+                  onClick={() => navigate('/carnet')}
+                >
+                  <img 
+                    src={pet.img?.startsWith('http') ? pet.img : `http://localhost:4000${pet.img}`} 
+                    alt={pet.name}
+                    className="w-16 h-16 object-cover rounded-full"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = '/icon.png';
+                    }}
+                  />
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-gray-800">{pet.name}</h3>
+                    <p className="text-sm text-gray-600">{pet.type === 'dog' ? '🐕 Perro' : '🐱 Gato'}</p>
+                  </div>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate('/carnet');
+                    }}
+                    className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 text-sm"
+                  >
+                    Ver Carnet
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 

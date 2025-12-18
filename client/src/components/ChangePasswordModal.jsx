@@ -99,7 +99,7 @@ export default function ChangePasswordModal({ isOpen, onClose, user }) {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
+        <div className="fixed inset-0 flex items-center justify-center z-50 px-4">
             <motion.div
                 className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 sm:p-8"
                 initial={{ opacity: 0, scale: 0.9 }}

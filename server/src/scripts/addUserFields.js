@@ -8,7 +8,7 @@ const __dirname = path.dirname(__filename);
 
 async function addUserFields() {
   const db = await open({
-    filename: path.join(__dirname, '../../huellitas.db'),
+    filename: path.join(__dirname, '../db/huellitas.db'),
     driver: sqlite3.Database
   });
 

@@ -364,15 +364,31 @@ export async function getFollowUpStats(req, res) {
 export async function deleteFollowUp(req, res) {
   try {
     const { id } = req.params;
-    const userId = req.user?.id || req.body.user_id;
-
-    // Verificar que el seguimiento pertenece al usuario
+    
+    // Verificar que el seguimiento existe
     const followUp = await FollowUpModel.getFollowUpById(id);
-    if (!followUp || followUp.user_id !== parseInt(userId)) {
-      return res.status(403).json({
+    if (!followUp) {
+      return res.status(404).json({
         success: false,
-        message: "No tienes permiso para eliminar este seguimiento"
+        message: "Seguimiento no encontrado"
       });
+    }
+
+    // Si hay usuario autenticado, verificar permisos
+    if (req.user) {
+      const userId = req.user.id;
+      const userType = req.user.user_type;
+      
+      // El usuario puede eliminar si es el adoptante o si es la fundación
+      const canDelete = followUp.user_id === parseInt(userId) || 
+                       (userType === 'fundacion' && followUp.foundation_id === parseInt(userId));
+      
+      if (!canDelete) {
+        return res.status(403).json({
+          success: false,
+          message: "No tienes permiso para eliminar este seguimiento"
+        });
+      }
     }
 
     await FollowUpModel.deleteFollowUp(id);

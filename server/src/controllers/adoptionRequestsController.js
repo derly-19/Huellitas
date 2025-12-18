@@ -445,3 +445,36 @@ export const getUserRequests = async (req, res) => {
     });
   }
 };
+
+// Obtener mascotas adoptadas por un usuario
+export const getUserAdoptedPets = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: "ID de usuario requerido"
+      });
+    }
+
+    console.log(`🐾 Obteniendo mascotas adoptadas para usuario ${userId}`);
+    
+    const adoptedPets = await AdoptionRequestsModel.getUserAdoptedPets(userId);
+
+    console.log(`✅ Se encontraron ${adoptedPets?.length || 0} mascotas adoptadas`);
+
+    res.json({
+      success: true,
+      data: adoptedPets || []
+    });
+
+  } catch (error) {
+    console.error("Error fetching adopted pets:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error al obtener las mascotas adoptadas",
+      error: error.message
+    });
+  }
+};

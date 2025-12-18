@@ -455,8 +455,12 @@ export default function FollowUp() {
       message: '¿Estás seguro de que deseas eliminar este seguimiento? Esta acción no se puede deshacer.',
       onConfirm: async () => {
         try {
+          const token = localStorage.getItem('token');
           const response = await fetch(`http://localhost:4000/api/follow-ups/${followUpId}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
           });
 
           const result = await response.json();

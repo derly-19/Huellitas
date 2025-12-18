@@ -246,9 +246,13 @@ export async function editUser(req, res) {
     const { id } = req.params;
     const { nombre, apellido, telefono, direccion, ciudad } = req.body;
     
-    console.log(`📝 Actualizando usuario ${id}:`, { nombre, apellido, telefono, direccion, ciudad });
+    console.log('=== INICIO ACTUALIZACIÓN DE USUARIO ===');
+    console.log(`📝 ID del usuario: ${id}`);
+    console.log(`📝 Datos recibidos:`, { nombre, apellido, telefono, direccion, ciudad });
     
     const user = await getUserById(id);
+    console.log('👤 Usuario encontrado:', user ? 'Sí' : 'No');
+    
     if (!user) {
       console.log(`❌ Usuario ${id} no encontrado`);
       return res.status(404).json({
@@ -257,6 +261,7 @@ export async function editUser(req, res) {
       });
     }
     
+    console.log('🔄 Intentando actualizar...');
     const result = await updateUser(id, {
       nombre,
       apellido,
@@ -265,14 +270,17 @@ export async function editUser(req, res) {
       ciudad
     });
     
-    console.log(`✅ Usuario ${id} actualizado:`, result);
+    console.log(`✅ Usuario ${id} actualizado exitosamente:`, result);
     
     res.json({
       success: true,
       message: "Información del usuario actualizada"
     });
   } catch (error) {
-    console.error("❌ Error al actualizar usuario:", error);
+    console.error("❌❌❌ ERROR AL ACTUALIZAR USUARIO ❌❌❌");
+    console.error("Tipo de error:", error.constructor.name);
+    console.error("Mensaje:", error.message);
+    console.error("Stack completo:", error.stack);
     res.status(500).json({ 
       success: false, 
       message: "Error al actualizar usuario: " + error.message

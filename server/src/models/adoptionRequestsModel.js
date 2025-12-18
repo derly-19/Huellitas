@@ -210,3 +210,22 @@ export const getRequestsByUser = async (userId) => {
     return [];
   }
 };
+
+// Obtener mascotas adoptadas por un usuario (solicitudes aprobadas)
+export const getUserAdoptedPets = async (userId) => {
+  try {
+    const adoptedPets = await db.all(
+      `SELECT DISTINCT p.id, p.name, p.type, p.img, p.age as edad, p.size as tamaño, p.sex as sexo,
+              ar.created_at as adoption_date
+       FROM adoption_requests ar
+       INNER JOIN pets p ON ar.pet_id = p.id
+       WHERE ar.user_id = ? AND ar.status = 'approved'
+       ORDER BY ar.created_at DESC`,
+      [userId]
+    );
+    return adoptedPets || [];
+  } catch (error) {
+    console.error("Error getting adopted pets:", error);
+    return [];
+  }
+};
